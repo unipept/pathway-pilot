@@ -8,10 +8,15 @@ const useFileStore = defineStore('fileStore', () => {
         uploadedFile.value = file;
     }
 
+    const clear = () => {
+        uploadedFile.value = undefined;
+    }
+
     return {
         uploadedFile,
 
-        upload
+        upload,
+        clear
     };
 });
 

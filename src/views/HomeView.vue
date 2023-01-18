@@ -9,9 +9,16 @@
         <v-btn class="mt-5 float-right" color="primary" to="/selection">
             Continue
         </v-btn>
+
+        <v-btn class="me-5 mt-5 float-right" color="error" @click="() => fileStore.clear()">
+            <v-icon class="me-2">mdi-delete-outline</v-icon> Clear file
+        </v-btn>
     </v-container>
 </template>
 
 <script lang="ts" setup>
 import FileInput from '@/components/inputs/FileInput.vue';
+import useFileStore from '@/stores/FileStore';
+
+const fileStore = useFileStore();
 </script>

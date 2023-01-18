@@ -16,8 +16,8 @@
                 <p>
                     Drop your file here, or click anywhere to select it.
                 </p>
-                <p v-if="fileStore.uploadedFile" class="text-green mt-3">
-                    {{ fileStore.uploadedFile.name }} ({{ fileStore.uploadedFile.size }} bytes)
+                <p v-if="uploadedFile" class="text-green mt-3">
+                    {{ uploadedFile.name }} ({{ uploadedFile.size }} bytes)
                 </p>
             </v-row>
         </v-card-text>
@@ -27,8 +27,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import useFileStore from '@/stores/FileStore';
+import { storeToRefs } from 'pinia';
 
 const fileStore = useFileStore();
+
+const { uploadedFile } = storeToRefs(fileStore);
 
 const dragover = ref<boolean>(false);
 
