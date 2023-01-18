@@ -1,15 +1,32 @@
 <template>
-  <navigation-bar :items="items" />
-  
-  <v-container>
-    <router-view />
-  </v-container>
+    <v-app>
+        <v-toolbar
+            app
+            color="secondary"
+            dark
+            hide-on-scroll
+            class="px-lg-16"
+        >
+            <v-container>
+                <router-link to="/" class="homepage-title">
+                    <h1>Van 't pathje</h1>
+                </router-link>
+
+                <v-spacer />
+            </v-container>
+        </v-toolbar>
+
+        <v-content>
+            <v-container>
+                <router-view></router-view>
+            </v-container>
+        </v-content>
+    </v-app>
 </template>
 
-<script lang="ts" setup>
-import NavigationBar from './components/navigation/NavigationBar.vue';
-
-const items = [
-  { name: 'Home', path: '/' }
-];
-</script>
+<style>
+.homepage-title {
+    color: white !important;
+    text-decoration: none;
+}
+</style>

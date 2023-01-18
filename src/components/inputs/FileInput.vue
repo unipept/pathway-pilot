@@ -16,8 +16,8 @@
                 <p>
                     Drop your file here, or click anywhere to select it.
                 </p>
-                <p v-if="uploadedFile" class="text-green mt-3">
-                    {{ uploadedFile.name }} ({{ uploadedFile.size }} bytes)
+                <p v-if="fileStore.uploadedFile" class="text-green mt-3">
+                    {{ fileStore.uploadedFile.name }} ({{ fileStore.uploadedFile.size }} bytes)
                 </p>
             </v-row>
         </v-card-text>
@@ -26,22 +26,20 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import useFileStore from '@/stores/FileStore';
+
+const fileStore = useFileStore();
 
 const dragover = ref<boolean>(false);
-const uploadedFile = ref<any>(undefined);
 
 const onDrop = (event: any) => {
     dragover.value = false;
 
     if (event.dataTransfer.files.length > 1) {
-    console.log("TODO: error message");
+        console.log("TODO: error message");
     } else {
-    uploadedFile.value = event.dataTransfer.files[0];
+        fileStore.upload(event.dataTransfer.files[0]);
     }
-}
-
-const clearFile = () => {
-    uploadedFile.value = undefined;
 }
 </script>
 
