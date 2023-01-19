@@ -3,6 +3,7 @@ from ete3 import NCBITaxa
 import re
 import pandas as pd
 import requests
+from collections import defaultdict
 
 ncbi = NCBITaxa()
 
@@ -45,7 +46,6 @@ def get_ec(accession_file):
     ec_numbers = []
     ec_dict={}
     urls,frame = make_urls(accession_file, 100)
-    print(urls)
     for url in urls:
         response = requests.post(url)
         if response.ok:
@@ -60,7 +60,7 @@ def get_ec(accession_file):
                 ec_numbers.extend(re.findall(r'\(EC [0-9.-]+\)', entries[3]))
                 if len(ec_numbers)!=0:#checks if accession has no EC
                     for ec in range(len(ec_numbers)):  # refine EC
-                        ec_numbers[ec] = ec_numbers[ec].replace('(', '').replace(')', '')
+                        ec_numbers[ec] = ec_numbers[ec].replace('(EC ', '').replace(')', '')
                     for ec_key in ec_numbers:
                         if ec_key not in ec_dict.keys():
                             ec_dict[ec_key]={"accession": [accession_numbers],"taxon": [entries[5]]}
@@ -94,10 +94,48 @@ def ECTaxonFrame(ECDictionary, ProteinWeightFrame):
 
     return ec_pandas
 
+def FetchKeggECMapping():
+    '''
+    fetches the KEGG ec->pathway mapping and turns it into a dictionary
+    :input : none required
+    :return : {pathway:{ec,..}} dictionary
+    '''
+    #get Kegg info, create first dict
+    response = requests.get("https://rest.kegg.jp/link/path/ec")
+    if (response.status_code == 200):
+        print("The request was a success bitch!")
+        ec2path_mapping = str(response.text).split("\n")
+        ec2path_dict = defaultdict(set)
+        for i in range(len(ec2path_mapping)):
+          line = ec2path_mapping[i]
+          #print(line)
+          if len(line) == 0:
+             continue 
+          pair = line.split("\t")
+          if len(pair) != 2 or pair[1].startswith("path:map"):
+            continue
+          ec2path_dict[pair[0].split(':')[1]].add(pair[1])
+    elif (response.status_code == 404):
+        print("Result not found!")
+    
+    return ec2path_dict
+
+def AddPathwayInfo(ECTaxaFrame, EC2PathDict):
+  '''
+  Maps Pathway information based on EC numbers into ec->tax->weight frame
+  :input ECTaxaFrame: dataframe with ec->taxon_> weight info
+  :input EC2PathDict: Dictionary wth ec 2 pathway map from KEGG
+  :return : dataframe with everything we need 
+  '''
+  ECTaxaFrame['pathways']=ECTaxaFrame['ec'].map(EC2PathDict) 
+  ECTaxaFrame = ECTaxaFrame.explode(['pathways'])
+  ECTaxaFrameWithNA = ECTaxaFrame[ECTaxaFrame.isna().any(axis=1)]
+  ECTaxaFrame = ECTaxaFrame.dropna()
+  
+  return ECTaxaFrame, ECTaxaFrameWithNA
 
 ec_dict, protein_data = get_ec(args.ProteinFile)
-print(ec_dict)
-print(protein_data)
-FullFrame = ECTaxonFrame(ec_dict, protein_data)
-
+InputFrame = ECTaxonFrame(ec_dict, protein_data)
+EC2PathDicty = FetchKeggECMapping()
+FullFrame, AllNAs = AddPathwayInfo(InputFrame,EC2PathDicty)
 FullFrame.to_csv(args.out)
