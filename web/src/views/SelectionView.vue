@@ -1,9 +1,9 @@
 <template>
-    <h1>TEST TITEL</h1>
+    <h1>DETECTED PATHWAYS</h1>
 
     <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-    </p>
+        On the left, the pathways are shown where at least one protein could be matched to. Selecting a pathway will show which species carry this protein on the right. <br>
+        To view the KEGG pathway, select a pathway, the species you want to visualize (up to 4), and click on Continue.    </p>
 
     <v-row class="mt-5">
         <v-col>
