@@ -1,7 +1,10 @@
 <template>
-    <p>Tis hier van t' pathje</p>
-    <div v-if="url">
+    <div v-if="url" class="d-flex justify-center">
         <img :src="url"/>
+    </div>
+    <div v-else class="d-flex flex-column align-center">
+        <img src="@/assets/loading_animation.gif" />
+        <p>Loading...</p>
     </div>
 </template>
 
