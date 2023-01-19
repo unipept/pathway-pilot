@@ -41,12 +41,12 @@ const emits = defineEmits(["update:model-value"]);
 const selected = ref<PathwayEntry | undefined>(undefined);
 
 const onRowClicked = (e: any, i: any) => {
-    selected.value = i.item.raw.id === selected.value?.id ? undefined : i.item.raw.id;
+    selected.value = i.item.raw.id === selected.value?.id ? undefined : i.item.raw;
     emits("update:model-value", selected.value);
 };
 
 const rowActive = (item: any) => {
-    return item.raw.id === selected.value;
+    return item.raw.id === selected.value?.id;
 };
 
 const filterPathways = (value: PathwayEntry, search: string, item: PathwayTableItem) => {
