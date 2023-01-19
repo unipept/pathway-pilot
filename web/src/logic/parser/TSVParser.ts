@@ -23,6 +23,8 @@ export default class TSVParser {
         const pathwaysToEcs: Map<string, Set<ECEntry>> = new Map();
         const pathwaysToTaxa: Map<string, Set<Taxon>> = new Map();
 
+        const pathwaysToPeptideCounts: Map<string, number> = new Map();
+
         const inputLines = fileContents.split("\n");
 
         for (const line of inputLines.slice(1)) {
@@ -82,6 +84,11 @@ export default class TSVParser {
                 pathwaysToTaxa.set(pathwayId, new Set());
             }
             pathwaysToTaxa.get(pathwayId)!.add(taxonObj);
+
+            if (!pathwaysToPeptideCounts.has(pathwayId)) {
+                pathwaysToPeptideCounts.set(pathwayId, 0);
+            }
+            pathwaysToPeptideCounts.set(pathwayId, pathwaysToPeptideCounts.get(pathwayId)! + parseInt(fields[this.PEPT_COUNT_COLUMN_IDX]));
         }
 
         return new ParsedFile(
@@ -92,6 +99,7 @@ export default class TSVParser {
             taxaToEcs,
             pathwaysToEcs,
             pathwaysToTaxa,
+            pathwaysToPeptideCounts
         );
     }
 }

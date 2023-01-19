@@ -15,9 +15,9 @@
             </div>
         </template>
 
-        <template #item.count="{ item }">
+        <template #item.rank="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.props.title.count }}
+                {{ item.value.rank }}
             </div>
         </template>
     </v-data-table-virtual>
@@ -74,9 +74,9 @@ const headers = [
         key: "species"
     },
     {
-        title: "Count",
+        title: "Rank",
         align: "start",
-        key: "count"
+        key: "rank"
     }
 ];
 

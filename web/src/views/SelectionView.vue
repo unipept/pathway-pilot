@@ -88,7 +88,7 @@ const speciesItems = computed(() => {
 const pathwayItems = [...fileStore.parsedFile?.pathways.values()!].map((pathway: PathwayEntry) => {
     return {
         pathway: pathway,
-        count: 0
+        count: fileStore.parsedFile?.pathwaysToPeptideCounts.get(pathway.id)!
     };
 });
 
