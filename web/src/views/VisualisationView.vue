@@ -18,6 +18,10 @@
         <img src="@/assets/loading_animation.gif" />
         <p>Loading...</p>
     </div>
+
+    <v-btn class="mt-5" color="primary" @click="() => onBack($router)">
+        Back
+    </v-btn>
 </template>
 
 <script setup lang="ts">
@@ -26,6 +30,7 @@ import useFileStore from '@/stores/FileStore';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import {onMounted, ref} from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
+import { Router } from 'vue-router';
 
 const fileStore = useFileStore();
 const visualisationStore = useVisualisationStore();
@@ -41,4 +46,8 @@ onMounted(async () => {
 const computeTaxonColor = (taxonId: number) => {
     return ColorConstants.LEGEND[visualisationStore.highlightedTaxa.indexOf(taxonId)];
 }
+
+const onBack = (router: Router) => {
+    router.push("/selection");
+};
 </script>
