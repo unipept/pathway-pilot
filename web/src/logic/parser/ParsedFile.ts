@@ -10,6 +10,7 @@ export default class ParsedFile {
         public readonly taxaToPathways: Map<number, Set<PathwayEntry>>,
         public readonly taxaToEcs: Map<number, Set<ECEntry>>,
         public readonly pathwaysToEcs: Map<string, Set<ECEntry>>,
-        public readonly pathwaysToTaxa: Map<string, Set<Taxon>>
+        public readonly pathwaysToTaxa: Map<string, Set<Taxon>>,
+        public readonly pathwaysToPeptideCounts: Map<string, number>
     ) {}
 }

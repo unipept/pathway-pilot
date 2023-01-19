@@ -3,6 +3,7 @@
         :headers="headers"
         :items="items"
         :search="search"
+        :custom-filter="filterSpecies"
         height="300"
         item-value="species"
         density="compact"
@@ -10,24 +11,25 @@
     >
         <template #item.species="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.value }}
+                {{ item.value.name }}
             </div>
         </template>
 
-        <template #item.count="{ item }">
+        <template #item.rank="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.props.title.count }}
+                {{ item.value.rank }}
             </div>
         </template>
     </v-data-table-virtual>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import Taxon from '@/logic/entities/Taxon';
+import { ref, toRaw, watch } from 'vue';
 import { SpeciesTableItem } from './SpeciesTableItem';
 
 export interface Props {
-    modelValue: any[];
+    modelValue: Taxon[];
     search: string;
     items: SpeciesTableItem[];
     max?: number;
@@ -39,11 +41,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emits = defineEmits(["update:model-value"]);
 
-const selected = ref<any[]>([]);
+const selected = ref<Taxon[]>([]);
 
 const onRowClicked = (e: any, i: any) => {
-    if (selected.value.includes(i.item.value)) {
-        selected.value = selected.value.filter((v) => v !== i.item.value);
+    if (selected.value.map((taxon: Taxon) => taxon.id).includes(i.item.value.id)) {
+        selected.value = selected.value.filter((v) => v.id !== i.item.value.id);
     } else if (selected.value.length < props.max) {
         selected.value.push(i.item.value);
     }
@@ -52,8 +54,18 @@ const onRowClicked = (e: any, i: any) => {
 };
 
 const rowActive = (item: any) => {
-    return selected.value.includes(item.value);
+    return selected.value.map((taxon: Taxon) => taxon.id).includes(item.value.id);
 };
+
+const filterSpecies = (value: Taxon, search: string, item: SpeciesTableItem) => {
+    const speciesName = toRaw(item).species.name
+
+    if (!speciesName) {
+        return false;
+    }
+    
+    return speciesName.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+}
 
 const headers = [
     {
@@ -62,11 +74,15 @@ const headers = [
         key: "species"
     },
     {
-        title: "Count",
+        title: "Rank",
         align: "start",
-        key: "count"
+        key: "rank"
     }
 ];
+
+watch(() => props.modelValue, (value) => {
+    selected.value = value;
+});
 </script>
 
 <style scoped>

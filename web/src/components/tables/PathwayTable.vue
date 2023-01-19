@@ -3,6 +3,7 @@
         :headers="headers"
         :items="items"
         :search="search"
+        :custom-filter="filterPathways"
         height="300"
         item-value="pathway"
         density="compact"
@@ -10,7 +11,7 @@
     >
         <template #item.pathway="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.value }}
+                {{ item.value.id }}
             </div>
         </template>
 
@@ -23,29 +24,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import PathwayEntry from '@/logic/entities/PathwayEntry';
+import { ref, watch, toRaw } from 'vue';
 import { PathwayTableItem } from './PathwayTableItem';
 
 export interface Props {
-    modelValue: any;
+    modelValue: PathwayEntry | undefined;
     search: string;
     items: PathwayTableItem[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const emits = defineEmits(["update:model-value"]);
 
-const selected = ref<any>(undefined);
+const selected = ref<PathwayEntry | undefined>(undefined);
 
 const onRowClicked = (e: any, i: any) => {
-    selected.value = i.item.value === selected.value ? undefined : i.item.value;
+    selected.value = i.item.value.id === selected.value?.id ? undefined : i.item.value;
     emits("update:model-value", selected.value);
 };
 
 const rowActive = (item: any) => {
-    return item.value === selected.value;
+    return item.value.id === selected.value?.id;
 };
+
+const filterPathways = (value: PathwayEntry, search: string, item: PathwayTableItem) => {
+    const pathwayId = toRaw(item).pathway.id
+
+    if (!pathwayId) {
+        return false;
+    }
+
+    return pathwayId.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+}
 
 const headers = [
     {
@@ -59,6 +71,10 @@ const headers = [
         key: "count"
     }
 ];
+
+watch(() => props.modelValue, (value) => {
+    selected.value = value;
+});
 </script>
 
 <style scoped>

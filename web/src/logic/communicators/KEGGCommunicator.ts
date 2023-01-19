@@ -1,4 +1,5 @@
 import ParsedFile from "@/logic/parser/ParsedFile";
+import ColorConstants from "@/logic/constants/ColorConstants";
 
 export default class KEGGCommunicator {
     constructor(
@@ -13,11 +14,37 @@ export default class KEGGCommunicator {
      * @param pathwayId
      * @param highlightedTaxa
      */
-    getKEGGMap(
+    async getKEGGMapUrl(
         pathwayId: string,
         highlightedTaxa?: number[]
-    ) {
+    ): Promise<string> {
+        const highlightedEcs: Map<string, number[]> = new Map();
+        if (highlightedTaxa && highlightedTaxa.length > 0) {
+            for (const taxonId of highlightedTaxa) {
+                const ecSet = this.parsedFile.taxaToEcs.get(taxonId);
+                if (ecSet) {
+                    for (const ec of ecSet) {
+                        if (!highlightedEcs.has(ec.id)) {
+                            highlightedEcs.set(ec.id, []);
+                        }
+                        highlightedEcs.get(ec.id)!.push(taxonId);
+                    }
+                }
+            }
+        }
 
-        const url = `https://www.kegg.jp/kegg-bin/show_pathway?map00400/1.14.16.1%09,blue/1.14.16.1%09,red/multi`
+        const urlParams = [];
+        for (const [ec, taxa] of highlightedEcs.entries()) {
+            for (const taxon of taxa) {
+                urlParams.push(`${ec}%09${ColorConstants.LEGEND[highlightedTaxa?.indexOf(taxon) ?? 0].replace("#", "%23")},black`);
+            }
+        }
+
+        const fullUrl = `https://www.kegg.jp/kegg-bin/show_pathway?${pathwayId.replace("path:", "")}/${urlParams.join("/")}/multi/nocolor`;
+        const response = await fetch(fullUrl);
+
+        const contents = await response.text();
+        const path = contents.match(/(\/tmp\/mark_pathway[^"]*)/)![0]
+        return `https://www.kegg.jp${path}`;
     }
 }

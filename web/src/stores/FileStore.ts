@@ -1,10 +1,11 @@
 import { defineStore } from "pinia";
-import {computed, ref} from "vue";
+import {ref} from "vue";
 import TSVParser from "@/logic/parser/TSVParser";
+import ParsedFile from "@/logic/parser/ParsedFile";
 
 const useFileStore = defineStore('fileStore', () => {
     const uploadedFile = ref<any>(undefined);
-    const parsedFile = ref<any>(undefined);
+    const parsedFile = ref<ParsedFile | undefined>(undefined);
 
     const upload = (file: any) => {
         uploadedFile.value = file;
