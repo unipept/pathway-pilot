@@ -23,16 +23,20 @@
                 v-model="speciesSelected"
                 :items="speciesItems"
                 :search="speciesSearch"
-                max="4"
+                :max=4
             />
         </v-col>
     </v-row>
 
-    <v-btn class="mt-5 float-right" color="primary" @click="() => onContinue($router)" >
+    <v-btn class="mt-5" color="primary" @click="() => onBack($router)">
+        Back
+    </v-btn>
+
+    <v-btn class="mt-5 float-right" color="primary" @click="() => onContinue($router)" :disabled="!canContinue">
         Continue
     </v-btn>
 
-    <v-btn class="me-5 mt-5 float-right" color="error" @click="clearSelection">
+    <v-btn class="me-5 mt-5 float-right" color="error" @click="clearSelection" :disabled="!canClearSelection">
         <v-icon class="me-2">mdi-delete-outline</v-icon> Clear selection
     </v-btn>
 </template>
@@ -76,6 +80,13 @@ const pathwayItems = [...fileStore.parsedFile?.pathways.values()!].map((pathway:
     };
 });
 
+const canClearSelection = computed(() => {
+    return pathwaySelected.value !== undefined 
+        || speciesSelected.value.length > 0 
+        || pathwaySearch.value !== "" 
+        || speciesSearch.value !== "";
+});
+
 const clearSelection = () => {
     pathwaySearch.value = "";
     speciesSearch.value = "";
@@ -84,11 +95,19 @@ const clearSelection = () => {
     speciesSelected.value = [];
 };
 
+const canContinue = computed(() => {
+    return pathwaySelected.value !== undefined;
+});
+
 const onContinue = async (router: Router) => {
     // visualisationStore.setPathwayId("path:ec00592");
     // visualisationStore.setHighlightedTaxa([3398, 3814]);
     visualisationStore.setPathwayId(pathwaySelected.value?.id!);
     visualisationStore.setHighlightedTaxa(speciesSelected.value.map((s: Taxon) => s.id));
     await router.push("/visualisation");
+};
+
+const onBack = (router: Router) => {
+    router.push("/");
 };
 </script>
