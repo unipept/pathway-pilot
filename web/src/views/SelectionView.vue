@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import PathwayTable from '@/components/tables/PathwayTable.vue';
 import SpeciesTable from '@/components/tables/SpeciesTable.vue';
 import useFileStore from '@/stores/FileStore';
@@ -42,29 +42,23 @@ const speciesSearch = ref<string>("");
 const pathwaySelected = ref<any>(undefined);
 const speciesSelected = ref<any[]>([]);
 
+const speciesItems = computed(() => {
+    if (!pathwaySelected.value) {
+        return [];
+    }
+
+    return [...fileStore.parsedFile?.pathwaysToTaxa.get(pathwaySelected.value)!].map((key: any) => {
+        return {
+            species: key.name,
+            count: 0
+        };
+    });
+})
+
 const pathwayItems = [...fileStore.parsedFile?.pathways.keys()!].map((key: any) => {
     return {
         pathway: key,
         count: 0
     };
 });
-
-const speciesItems = [
-{
-        species: "A",
-        count: 1
-    },
-    {
-        species: "B",
-        count: 2
-    },
-    {
-        species: "C",
-        count: 3
-    },
-    {
-        species: "D",
-        count: 1
-    }
-];
 </script>
