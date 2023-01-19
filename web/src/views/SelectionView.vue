@@ -81,7 +81,9 @@ const speciesItems = computed(() => {
         .filter((taxon: Taxon) => taxon.id !== 1)
         .map((taxon: Taxon) => {
             return {
-                species: taxon,
+                id: taxon.id,
+                name: taxon.name,
+                rank: taxon.rank,
                 count: 0
             };
         });
