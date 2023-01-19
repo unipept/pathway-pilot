@@ -1,13 +1,7 @@
 import ParsedFile from "@/logic/parser/ParsedFile";
+import ColorConstants from "@/logic/constants/ColorConstants";
 
 export default class KEGGCommunicator {
-    private static readonly COLORS = [
-        "red",
-        "blue",
-        "green",
-        "yellow"
-    ];
-
     constructor(
         private readonly parsedFile: ParsedFile
     ) {}
@@ -42,7 +36,7 @@ export default class KEGGCommunicator {
         const urlParams = [];
         for (const [ec, taxa] of highlightedEcs.entries()) {
             for (const taxon of taxa) {
-                urlParams.push(`${ec}%09${KEGGCommunicator.COLORS[highlightedTaxa?.indexOf(taxon) ?? 0]},black`);
+                urlParams.push(`${ec}%09${ColorConstants.LEGEND[highlightedTaxa?.indexOf(taxon) ?? 0].replace("#", "%23")},black`);
             }
         }
 

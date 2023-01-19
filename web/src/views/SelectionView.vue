@@ -8,7 +8,13 @@
     <v-row class="mt-5">
         <v-col>
             <h3>Select a pathway</h3>
-            <v-text-field label="Search" v-model="pathwaySearch" />
+            <v-text-field 
+                class="mt-3"
+                v-model="pathwaySearch"
+                label="Search a pathway"
+                prepend-inner-icon="mdi-magnify"
+                variant="solo"
+            />
             <pathway-table
                 v-model="pathwaySelected"
                 :items="pathwayItems"
@@ -17,22 +23,32 @@
         </v-col>
 
         <v-col>
-            <h3>Select species</h3>
-            <v-text-field label="Search" v-model="speciesSearch" />
+            <h3>Select multiple species <span style="font-size: x-small; color: #7a7a7a;">OPTIONAL</span></h3>
+            <v-text-field 
+                class="mt-3"
+                v-model="speciesSearch"
+                label="Search for a species" 
+                prepend-inner-icon="mdi-magnify"
+                variant="solo"
+            />
             <species-table
                 v-model="speciesSelected"
                 :items="speciesItems"
                 :search="speciesSearch"
-                max="4"
+                :max=4
             />
         </v-col>
     </v-row>
 
-    <v-btn class="mt-5 float-right" color="primary" @click="() => onContinue($router)" >
+    <v-btn class="mt-5" color="primary" @click="() => onBack($router)">
+        Back
+    </v-btn>
+
+    <v-btn class="mt-5 float-right" color="primary" @click="() => onContinue($router)" :disabled="!canContinue">
         Continue
     </v-btn>
 
-    <v-btn class="me-5 mt-5 float-right" color="error" @click="clearSelection">
+    <v-btn class="me-5 mt-5 float-right" color="error" @click="clearSelection" :disabled="!canClearSelection">
         <v-icon class="me-2">mdi-delete-outline</v-icon> Clear selection
     </v-btn>
 </template>
@@ -61,19 +77,29 @@ const speciesItems = computed(() => {
         return [];
     }
 
-    return [...fileStore.parsedFile?.pathwaysToTaxa.get(pathwaySelected.value?.id)!].map((taxon: Taxon) => {
-        return {
-            species: taxon,
-            count: 0
-        };
-    });
+    return [...fileStore.parsedFile?.pathwaysToTaxa.get(pathwaySelected.value?.id)!]
+        .map((taxon: Taxon) => {
+            return {
+                species: taxon,
+                count: 0
+            };
+        });
 })
 
-const pathwayItems = [...fileStore.parsedFile?.pathways.values()!].map((pathway: PathwayEntry) => {
-    return {
-        pathway: pathway,
-        count: 0
-    };
+const pathwayItems = [...fileStore.parsedFile?.pathways.values()!]
+    .filter((pathway: PathwayEntry) => pathway.id)
+    .map((pathway: PathwayEntry) => {
+        return {
+            pathway: pathway,
+            count: fileStore.parsedFile?.pathwaysToPeptideCounts.get(pathway.id)!
+        };
+    });
+
+const canClearSelection = computed(() => {
+    return pathwaySelected.value !== undefined 
+        || speciesSelected.value.length > 0 
+        || pathwaySearch.value !== "" 
+        || speciesSearch.value !== "";
 });
 
 const clearSelection = () => {
@@ -84,11 +110,19 @@ const clearSelection = () => {
     speciesSelected.value = [];
 };
 
+const canContinue = computed(() => {
+    return pathwaySelected.value !== undefined;
+});
+
 const onContinue = async (router: Router) => {
     // visualisationStore.setPathwayId("path:ec00592");
     // visualisationStore.setHighlightedTaxa([3398, 3814]);
     visualisationStore.setPathwayId(pathwaySelected.value?.id!);
     visualisationStore.setHighlightedTaxa(speciesSelected.value.map((s: Taxon) => s.id));
     await router.push("/visualisation");
+};
+
+const onBack = (router: Router) => {
+    router.push("/");
 };
 </script>
