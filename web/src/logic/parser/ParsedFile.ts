@@ -8,6 +8,7 @@ export default class ParsedFile {
         public readonly pathways: Map<string, PathwayEntry>,
         public readonly ecs: Map<string, ECEntry>,
         public readonly taxaToPathways: Map<number, PathwayEntry[]>,
-        public readonly taxaToEcs: Map<number, ECEntry[]>
+        public readonly taxaToEcs: Map<number, ECEntry[]>,
+        public readonly pathwaysToEcs: Map<string, ECEntry[]>
     ) {}
 }
