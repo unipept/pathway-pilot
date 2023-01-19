@@ -8,7 +8,13 @@
     <v-row class="mt-5">
         <v-col>
             <h3>Select a pathway</h3>
-            <v-text-field label="Search" v-model="pathwaySearch" />
+            <v-text-field 
+                class="mt-3"
+                v-model="pathwaySearch"
+                label="Search a pathway"
+                prepend-inner-icon="mdi-magnify"
+                variant="solo"
+            />
             <pathway-table
                 v-model="pathwaySelected"
                 :items="pathwayItems"
@@ -18,7 +24,13 @@
 
         <v-col>
             <h3>Select species</h3>
-            <v-text-field label="Search" v-model="speciesSearch" />
+            <v-text-field 
+                class="mt-3"
+                v-model="speciesSearch"
+                label="Search for a species" 
+                prepend-inner-icon="mdi-magnify"
+                variant="solo"
+            />
             <species-table
                 v-model="speciesSelected"
                 :items="speciesItems"
