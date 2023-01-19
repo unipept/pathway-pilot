@@ -4,8 +4,17 @@ import TSVParser from "@/logic/parser/TSVParser";
 
 const useFileStore = defineStore('fileStore', () => {
     const uploadedFile = ref<any>(undefined);
+    const parsedFile = ref<any>(undefined);
 
-    const parsedFile = computed(async () => {
+    const upload = (file: any) => {
+        uploadedFile.value = file;
+    }
+
+    const clear = () => {
+        uploadedFile.value = undefined;
+    }
+
+    const parse = async () => {
         if (!uploadedFile.value) {
             return undefined;
         }
@@ -25,22 +34,15 @@ const useFileStore = defineStore('fileStore', () => {
         });
 
         const tsvParser = new TSVParser();
-        return tsvParser.parse(await readFile);
-    })
-
-    const upload = (file: any) => {
-        uploadedFile.value = file;
-    }
-
-    const clear = () => {
-        uploadedFile.value = undefined;
+        parsedFile.value = tsvParser.parse(await readFile);
     }
 
     return {
         uploadedFile,
         parsedFile,
         upload,
-        clear
+        clear,
+        parse
     };
 });
 

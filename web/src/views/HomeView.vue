@@ -6,7 +6,7 @@
 
         <file-input />
 
-        <v-btn class="mt-5 float-right" color="primary" to="/selection">
+        <v-btn class="mt-5 float-right" color="primary" @click="() => onContinue($router)" >
             Continue
         </v-btn>
 
@@ -19,6 +19,14 @@
 <script lang="ts" setup>
 import FileInput from '@/components/inputs/FileInput.vue';
 import useFileStore from '@/stores/FileStore';
+import {Router} from "vue-router";
 
 const fileStore = useFileStore();
+
+const onContinue = async (router: Router) => {
+    await fileStore.parse();
+    console.log("PUSHING TO ROUTER...");
+    await router.push("/selection");
+};
+
 </script>

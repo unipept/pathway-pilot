@@ -26,7 +26,6 @@
             />
         </v-col>
     </v-row>
->>>>>>> f950a5a6e25d7d4fff1750e0fc3c0ff24df72bc8
 </template>
 
 <script setup lang="ts">
