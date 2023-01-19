@@ -10,7 +10,7 @@
     >
         <template #item.pathway="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.value }}
+                {{ item.value.id }}
             </div>
         </template>
 
@@ -23,11 +23,12 @@
 </template>
 
 <script setup lang="ts">
+import PathwayEntry from '@/logic/entities/PathwayEntry';
 import { ref } from 'vue';
 import { PathwayTableItem } from './PathwayTableItem';
 
 export interface Props {
-    modelValue: any;
+    modelValue: PathwayEntry | undefined;
     search: string;
     items: PathwayTableItem[];
 }
@@ -36,15 +37,15 @@ defineProps<Props>();
 
 const emits = defineEmits(["update:model-value"]);
 
-const selected = ref<any>(undefined);
+const selected = ref<PathwayEntry | undefined>(undefined);
 
 const onRowClicked = (e: any, i: any) => {
-    selected.value = i.item.value === selected.value ? undefined : i.item.value;
+    selected.value = i.item.value.id === selected.value?.id ? undefined : i.item.value;
     emits("update:model-value", selected.value);
 };
 
 const rowActive = (item: any) => {
-    return item.value === selected.value;
+    return item.value.id === selected.value?.id;
 };
 
 const headers = [

@@ -20,10 +20,12 @@ export default class KEGGCommunicator {
      * @param pathwayId
      * @param highlightedTaxa
      */
-    getKEGGMap(
+    async getKEGGMapUrl(
         pathwayId: string,
         highlightedTaxa?: number[]
-    ) {
+    ): Promise<string> {
+        console.log(highlightedTaxa);
+
         const highlightedEcs: Map<string, number> = new Map();
         if (highlightedTaxa && highlightedTaxa.length > 0) {
             for (const taxonId of highlightedTaxa) {
@@ -38,9 +40,14 @@ export default class KEGGCommunicator {
 
         const urlParams = [];
         for (const [ec, taxonId] of highlightedEcs.entries()) {
-            urlParams.push(`${ec}%09,${KEGGCommunicator.COLORS[highlightedTaxa?.indexOf(taxonId) ?? 0]}`);
+            urlParams.push(`${ec}%09white,${KEGGCommunicator.COLORS[highlightedTaxa?.indexOf(taxonId) ?? 0]}`);
         }
 
-        return `https://www.kegg.jp/kegg-bin/show_pathway?${pathwayId}/${urlParams.join("/")}/multi`
+        const fullUrl = `https://www.kegg.jp/kegg-bin/show_pathway?${pathwayId.replace("path:", "")}/${urlParams.join("/")}/default%3dwhite/multi`;
+        const response = await fetch(fullUrl);
+
+        const contents = await response.text();
+        const path = contents.match(/(\/tmp\/mark_pathway[^"]*)/)![0]
+        return `https://www.kegg.jp${path}`;
     }
 }
