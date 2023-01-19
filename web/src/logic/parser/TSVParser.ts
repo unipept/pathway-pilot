@@ -22,6 +22,7 @@ export default class TSVParser {
         const taxaToEcs: Map<number, ECEntry[]> = new Map();
 
         const pathwaysToEcs: Map<string, ECEntry[]> = new Map();
+        const pathwaysToTaxa: Map<string, Taxon[]> = new Map();
 
         const inputLines = fileContents.split("\n");
 
@@ -80,6 +81,12 @@ export default class TSVParser {
             } else {
                 pathwaysToEcs.get(pathwayId)!.push(ecObj);
             }
+
+            if (!pathwaysToTaxa.has(pathwayId)) {
+                pathwaysToTaxa.set(pathwayId, [taxonObj]);
+            } else {
+                pathwaysToTaxa.get(pathwayId)!.push(taxonObj);
+            }
         }
 
         return new ParsedFile(
@@ -88,7 +95,8 @@ export default class TSVParser {
             ecs,
             taxaToPathways,
             taxaToEcs,
-            pathwaysToEcs
+            pathwaysToEcs,
+            pathwaysToTaxa,
         );
     }
 }
