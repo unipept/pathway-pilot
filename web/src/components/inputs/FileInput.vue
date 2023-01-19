@@ -4,6 +4,7 @@
         @dragover.prevent="dragover = true"
         @dragenter.prevent="dragover = true"
         @dragleave.prevent="dragover = false"
+        @click="openFilePicker"
         :class="{ 'grey lighten-2': dragover }"
         class="file-input d-flex align-center"
         flat
@@ -42,7 +43,18 @@ const onDrop = (event: any) => {
         console.log("TODO: error message");
     } else {
         fileStore.upload(event.dataTransfer.files[0]);
+        console.log(event.dataTransfer.files[0]);
     }
+}
+
+const openFilePicker = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = (event: any) => {
+        fileStore.upload(event.target.files[0]);
+    }
+    input.click();
 }
 </script>
 

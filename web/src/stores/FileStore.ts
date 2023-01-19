@@ -1,8 +1,11 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import {ref} from "vue";
+import TSVParser from "@/logic/parser/TSVParser";
+import ParsedFile from "@/logic/parser/ParsedFile";
 
 const useFileStore = defineStore('fileStore', () => {
     const uploadedFile = ref<any>(undefined);
+    const parsedFile = ref<ParsedFile | undefined>(undefined);
 
     const upload = (file: any) => {
         uploadedFile.value = file;
@@ -12,11 +15,35 @@ const useFileStore = defineStore('fileStore', () => {
         uploadedFile.value = undefined;
     }
 
+    const parse = async () => {
+        if (!uploadedFile.value) {
+            return undefined;
+        }
+
+        const reader = new FileReader();
+
+        const readFile = new Promise<string>((resolve, reject) => {
+            reader.onload = () => {
+                resolve(reader.result as string);
+            }
+
+            reader.onerror = () => {
+                reject(reader.error);
+            }
+
+            reader.readAsText(uploadedFile.value, "UTF-8");
+        });
+
+        const tsvParser = new TSVParser();
+        parsedFile.value = tsvParser.parse(await readFile);
+    }
+
     return {
         uploadedFile,
-
+        parsedFile,
         upload,
-        clear
+        clear,
+        parse
     };
 });
 

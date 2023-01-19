@@ -13,8 +13,13 @@ const routes = [
       },
       {
         path: 'selection',
-        name: 'About',
+        name: 'selection',
         component: () => import('@/views/SelectionView.vue'),
+      },
+      {
+        path: 'visualisation',
+        name: 'visualisation',
+        component: () => import('@/views/VisualisationView.vue'),
       }
     ]
   },
