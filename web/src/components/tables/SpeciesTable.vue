@@ -30,9 +30,12 @@ export interface Props {
     modelValue: any[];
     search: string;
     items: SpeciesTableItem[];
+    max?: number;
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    max: 2
+});
 
 const emits = defineEmits(["update:model-value"]);
 
@@ -41,7 +44,7 @@ const selected = ref<any[]>([]);
 const onRowClicked = (e: any, i: any) => {
     if (selected.value.includes(i.item.value)) {
         selected.value = selected.value.filter((v) => v !== i.item.value);
-    } else {
+    } else if (selected.value.length < props.max) {
         selected.value.push(i.item.value);
     }
 
