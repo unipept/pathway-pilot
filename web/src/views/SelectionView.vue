@@ -26,6 +26,10 @@
             />
         </v-col>
     </v-row>
+
+    <v-btn class="mt-5 float-right" color="primary" @click="() => onContinue($router)" >
+        Continue
+    </v-btn>
 </template>
 
 <script setup lang="ts">
@@ -33,8 +37,12 @@ import { computed, ref } from 'vue';
 import PathwayTable from '@/components/tables/PathwayTable.vue';
 import SpeciesTable from '@/components/tables/SpeciesTable.vue';
 import useFileStore from '@/stores/FileStore';
+import { Router } from 'vue-router';
+import useVisualisationStore from '@/stores/VisualisationStore';
+import Taxon from '@/logic/entities/Taxon';
 
 const fileStore = useFileStore();
+const visualisationStore = useVisualisationStore();
 
 const pathwaySearch = ref<string>("");
 const speciesSearch = ref<string>("");
@@ -61,4 +69,10 @@ const pathwayItems = [...fileStore.parsedFile?.pathways.keys()!].map((key: any) 
         count: 0
     };
 });
+
+const onContinue = async (router: Router) => {
+    visualisationStore.setPathwayId(pathwaySelected.value);
+    visualisationStore.setHighlightedTaxa(speciesSelected.value.map((s: Taxon) => s.id));
+    await router.push("/visualisation");
+};
 </script>

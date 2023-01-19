@@ -25,8 +25,6 @@ const fileStore = useFileStore();
 
 const onContinue = async (router: Router) => {
     await fileStore.parse();
-    console.log("PUSHING TO ROUTER...");
     await router.push("/selection");
 };
-
 </script>
