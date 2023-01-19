@@ -55,7 +55,7 @@ const line_size = 20;
 let fillColor = {};
 const noColor = groupArray.length -1 ;
 for (let i = 0 ;i < noColor;i++){
-    fillColor[i] = d3.hsl(11+i*360/noColor, 0.55, 0.51);
+    fillColor[i] = d3.hsl(1.9+i*360/noColor, 0.721, 0.747);
 }
 
 fillColor[noColor] = 'grey'
@@ -75,7 +75,8 @@ legend.append('text')
     .text(groupArray[i])
     .attr('text-anchor', 'left')
     .attr('font-family', 'sans-serif')
-    .attr("font-size", "14px");
+    .attr("font-size", "14px")
+    .attr("fill", "#515151");;
 });
   
   
@@ -141,9 +142,9 @@ function createNodes(rawData) {
           .attr("id", 'selectedBackground')
           .attr("stroke",fillColor[d.group])
           .attr('stroke-width', 1.5)
-          .attr('x', d.x-d.name.length*4.5)
+          .attr('x', d.x-(d.name.length+ 10)*4.1)
           .attr('y', d.y-20)
-          .attr('width',d.name.length*9)
+          .attr('width',(d.name.length+10)*8.2)
           .attr('height',30)
           .attr("fill", "white")
           .attr("anchor", "middle")
@@ -156,7 +157,8 @@ function createNodes(rawData) {
           .attr("font-family", "sans-serif")
           .attr("text-anchor", "middle")
           .attr("style", "pointer-events: none;")
-          .text(d.name)
+          .attr("fill", "#515151")
+          .text(d.name + ' (' + d.value + ' / ' + pathway2count[d.id] + ')')
        d3.select('#legend_'+d.group)
           .attr('r',legend_radius*1.3)
           // .attr('stroke', 'black');
