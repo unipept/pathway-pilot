@@ -3,9 +3,14 @@
         <v-img :src="url"/>
         <div class="legend ml-2">
             <span class="text-h6">Legend</span>
-            <div v-for="taxon of visualisationStore.highlightedTaxa" :key="taxon" class="d-flex">
-                <div :style="{ width: '20px', height: '20px', background: computeTaxonColor(taxon) }" class="mr-2"></div>
-                <span>{{ fileStore.parsedFile?.taxa.get(taxon).name }}</span>
+            <div v-if="visualisationStore.highlightedTaxa.length === 0">
+                No species selected to highlight...
+            </div>
+            <div>
+                <div v-for="taxon of visualisationStore.highlightedTaxa" :key="taxon" class="d-flex">
+                    <div :style="{ width: '20px', height: '20px', background: computeTaxonColor(taxon) }" class="mr-2"></div>
+                    <span>{{ fileStore.parsedFile?.taxa.get(taxon).name }}</span>
+                </div>
             </div>
         </div>
     </div>
