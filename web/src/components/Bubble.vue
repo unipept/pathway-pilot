@@ -4,17 +4,23 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import * as d3 from "d3";
-import { pathway_counts } from "../dummyData";
+// import { pathway_counts } from "../dummyData";
 import { pathway2count,pathwayID2cat, pathwayID2name} from "../currentData";
+import { onMounted } from 'vue';
 
-export default {
-  name: "Bubble",
-  mounted() {
+export interface Props {
+  pathway_counts: any
+}
+
+const props = defineProps<Props>();
+// console.log(props.pathway_counts);
+
+onMounted(() => {
     const width = 1000;
     
-    const height = 450;
+    const height = 380;
     const svg = d3
         .select("#svgcontainer")
         .append("svg")
@@ -38,16 +44,20 @@ export default {
         "Chemical structure transformation maps",
         "Others"
     ]
-    for (let p in pathway_counts) {
-        inputData.push(
-        {'id':p, 
-            'groupname': pathwayID2cat[p], 
-            'name': pathwayID2name[p],
-        'group':groupArray.indexOf(pathwayID2cat[p]),
-        'value':pathway_counts[p]} 
-        )
+    for (let p of props.pathway_counts.keys()) {
+        if (p !== undefined){
+            const new_p = p.replace('path:','');
+            inputData.push(
+                    {'id':new_p, 
+                      'groupname': pathwayID2cat[new_p], 
+                      'name': pathwayID2name[new_p],
+                    'group':groupArray.indexOf(pathwayID2cat[new_p]),
+                    'value':props.pathway_counts.get(p)} 
+                    )
+        }
 
     };
+    // console.log(inputData);
     const legend_radius = 10;
     const line_size = 20;
 
@@ -83,14 +93,14 @@ export default {
     let bubbles = null;
     let nodes = [];
     let forceStrength = 0.03;
-    let center = { x: (width+400) / 2, y: height / 2 };
+    let center = { x: (width+300) / 2, y: height / 2 };
 
     // return fillColor;
     function createNodes(rawData) {
-    
+
         let maxAmount = d3.max(rawData, function (d) { return +d.value/pathway2count[d.id]; });
         // let minAmount = d3.min(rawData, function (d) { return +d.value/pathway2count[d.id]; });
-        // console.log(minAmount);
+        // console.log(maxAmount);
         // Sizes bubbles based on area.
         // @v4: new flattened scale names.
         let radiusScale = d3.scalePow()
@@ -142,9 +152,9 @@ export default {
           .attr("id", 'selectedBackground')
           .attr("stroke",fillColor[d.group])
           .attr('stroke-width', 1.5)
-          .attr('x', d.x-(d.name.length+ 10)*4.1)
+          .attr('x', d.x-(d.name.length+ 23)*4.1)
           .attr('y', d.y-20)
-          .attr('width',(d.name.length+10)*8.2)
+          .attr('width',(d.name.length+23)*8.2)
           .attr('height',30)
           .attr("fill", "white")
           .attr("anchor", "middle")
@@ -158,7 +168,7 @@ export default {
           .attr("text-anchor", "middle")
           .attr("style", "pointer-events: none;")
           .attr("fill", "#515151")
-          .text(d.name + ' (' + d.value + ' / ' + pathway2count[d.id] + ')')
+          .text('path:'+ d.id + ' ' + d.name + ' (' + d.value + ' / ' + pathway2count[d.id] + ')')
        d3.select('#legend_'+d.group)
           .attr('r',legend_radius*1.3)
           // .attr('stroke', 'black');
@@ -189,6 +199,7 @@ export default {
   
   // simulation.stop();
   nodes = createNodes(inputData);
+  // console.log(nodes);
   bubbles = svg.selectAll('.bubble')
       .data(nodes, function (d) { return d.id; });
   let bubblesE = bubbles.enter().append('circle')
@@ -208,6 +219,6 @@ export default {
   
   simulation.nodes(nodes);
 
-}}
-;
+});
+
 </script>

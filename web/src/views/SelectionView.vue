@@ -1,10 +1,12 @@
 <template>
     <h1>DETECTED PATHWAYS</h1>
 
-    <p>
+    <v-row class="mt-5">
+        <bubble :pathway_counts="pathway_counts"/>
+    </v-row>
+     <p>
         On the left, the pathways are shown where at least one protein could be matched to. Selecting a pathway will show which species carry this protein on the right. <br>
         To view the KEGG pathway, select a pathway, the species you want to visualize (up to 4), and click on Continue.    </p>
-
     <v-row class="mt-5">
         <v-col>
             <h3>Select a pathway</h3>
@@ -62,6 +64,7 @@ import { Router } from 'vue-router';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import Taxon from '@/logic/entities/Taxon';
 import PathwayEntry from '@/logic/entities/PathwayEntry';
+import Bubble from '../components/Bubble.vue';
 
 const fileStore = useFileStore();
 const visualisationStore = useVisualisationStore();
@@ -71,6 +74,8 @@ const speciesSearch = ref<string>("");
 
 const pathwaySelected = ref<PathwayEntry | undefined>(undefined);
 const speciesSelected = ref<Taxon[]>([]);
+
+const pathway_counts = fileStore.parsedFile?.pathwaysToPeptideCounts;
 
 const speciesItems = computed(() => {
     if (!pathwaySelected.value) {
