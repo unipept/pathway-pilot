@@ -1,4 +1,6 @@
+import Taxon from "@/logic/entities/Taxon"
+
 export interface SpeciesTableItem {
-    species: string
+    species: Taxon
     count: number
 };
