@@ -24,26 +24,29 @@ export default class KEGGCommunicator {
         pathwayId: string,
         highlightedTaxa?: number[]
     ): Promise<string> {
-        console.log(highlightedTaxa);
-
-        const highlightedEcs: Map<string, number> = new Map();
+        const highlightedEcs: Map<string, number[]> = new Map();
         if (highlightedTaxa && highlightedTaxa.length > 0) {
             for (const taxonId of highlightedTaxa) {
                 const ecSet = this.parsedFile.taxaToEcs.get(taxonId);
                 if (ecSet) {
                     for (const ec of ecSet) {
-                        highlightedEcs.set(ec.id, taxonId);
+                        if (!highlightedEcs.has(ec.id)) {
+                            highlightedEcs.set(ec.id, []);
+                        }
+                        highlightedEcs.get(ec.id)!.push(taxonId);
                     }
                 }
             }
         }
 
         const urlParams = [];
-        for (const [ec, taxonId] of highlightedEcs.entries()) {
-            urlParams.push(`${ec}%09white,${KEGGCommunicator.COLORS[highlightedTaxa?.indexOf(taxonId) ?? 0]}`);
+        for (const [ec, taxa] of highlightedEcs.entries()) {
+            for (const taxon of taxa) {
+                urlParams.push(`${ec}%09${KEGGCommunicator.COLORS[highlightedTaxa?.indexOf(taxon) ?? 0]},black`);
+            }
         }
 
-        const fullUrl = `https://www.kegg.jp/kegg-bin/show_pathway?${pathwayId.replace("path:", "")}/${urlParams.join("/")}/default%3dwhite/multi`;
+        const fullUrl = `https://www.kegg.jp/kegg-bin/show_pathway?${pathwayId.replace("path:", "")}/${urlParams.join("/")}/multi/nocolor`;
         const response = await fetch(fullUrl);
 
         const contents = await response.text();

@@ -23,6 +23,7 @@
                 v-model="speciesSelected"
                 :items="speciesItems"
                 :search="speciesSearch"
+                max="4"
             />
         </v-col>
     </v-row>
@@ -84,10 +85,10 @@ const clearSelection = () => {
 };
 
 const onContinue = async (router: Router) => {
-    visualisationStore.setPathwayId("path:ec00592");
-    visualisationStore.setHighlightedTaxa([3398, 3814]);
-    // visualisationStore.setPathwayId(pathwaySelected.value?.id!);
-    // visualisationStore.setHighlightedTaxa(speciesSelected.value.map((s: Taxon) => s.id));
+    // visualisationStore.setPathwayId("path:ec00592");
+    // visualisationStore.setHighlightedTaxa([3398, 3814]);
+    visualisationStore.setPathwayId(pathwaySelected.value?.id!);
+    visualisationStore.setHighlightedTaxa(speciesSelected.value.map((s: Taxon) => s.id));
     await router.push("/visualisation");
 };
 </script>
