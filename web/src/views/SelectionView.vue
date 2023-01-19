@@ -40,6 +40,7 @@ import useFileStore from '@/stores/FileStore';
 import { Router } from 'vue-router';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import Taxon from '@/logic/entities/Taxon';
+import PathwayEntry from '@/logic/entities/PathwayEntry';
 
 const fileStore = useFileStore();
 const visualisationStore = useVisualisationStore();
@@ -47,33 +48,33 @@ const visualisationStore = useVisualisationStore();
 const pathwaySearch = ref<string>("");
 const speciesSearch = ref<string>("");
 
-const pathwaySelected = ref<any>(undefined);
-const speciesSelected = ref<any[]>([]);
+const pathwaySelected = ref<PathwayEntry | undefined>(undefined);
+const speciesSelected = ref<Taxon[]>([]);
 
 const speciesItems = computed(() => {
     if (!pathwaySelected.value) {
         return [];
     }
 
-    return [...fileStore.parsedFile?.pathwaysToTaxa.get(pathwaySelected.value)!].map((key: any) => {
+    return [...fileStore.parsedFile?.pathwaysToTaxa.get(pathwaySelected.value?.id)!].map((taxon: Taxon) => {
         return {
-            species: key.name,
+            species: taxon,
             count: 0
         };
     });
 })
 
-const pathwayItems = [...fileStore.parsedFile?.pathways.keys()!].map((key: any) => {
+const pathwayItems = [...fileStore.parsedFile?.pathways.values()!].map((pathway: PathwayEntry) => {
     return {
-        pathway: key,
+        pathway: pathway,
         count: 0
     };
 });
 
 const onContinue = async (router: Router) => {
-    // visualisationStore.setPathwayId(pathwaySelected.value);
     visualisationStore.setPathwayId("path:ec00592");
     visualisationStore.setHighlightedTaxa([3398, 3814]);
+    // visualisationStore.setPathwayId(pathwaySelected.value?.id!);
     // visualisationStore.setHighlightedTaxa(speciesSelected.value.map((s: Taxon) => s.id));
     await router.push("/visualisation");
 };
