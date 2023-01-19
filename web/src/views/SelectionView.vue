@@ -78,6 +78,7 @@ const speciesItems = computed(() => {
     }
 
     return [...fileStore.parsedFile?.pathwaysToTaxa.get(pathwaySelected.value?.id)!]
+        .filter((taxon: Taxon) => taxon.id !== 1)
         .map((taxon: Taxon) => {
             return {
                 species: taxon,
