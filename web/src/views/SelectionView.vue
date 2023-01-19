@@ -93,7 +93,7 @@ const pathwayItems = [...fileStore.parsedFile?.pathways.values()!]
     .filter((pathway: PathwayEntry) => pathway.id)
     .map((pathway: PathwayEntry) => {
         return {
-            pathway: pathway,
+            id: pathway.id,
             count: fileStore.parsedFile?.pathwaysToPeptideCounts.get(pathway.id)!
         };
     });

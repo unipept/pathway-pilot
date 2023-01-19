@@ -1,6 +1,6 @@
 import PathwayEntry from "@/logic/entities/PathwayEntry"
 
 export interface PathwayTableItem {
-    pathway: PathwayEntry
+    id: string
     count: number
 };

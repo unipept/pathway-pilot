@@ -9,15 +9,15 @@
         density="compact"
         @click:row="onRowClicked"
     >
-        <template #item.pathway="{ item }">
+        <template #item.id="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.value.id }}
+                {{ item.raw.id }}
             </div>
         </template>
 
         <template #item.count="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.props.title.count }}
+                {{ item.raw.count }}
             </div>
         </template>
     </v-data-table-virtual>
@@ -41,16 +41,16 @@ const emits = defineEmits(["update:model-value"]);
 const selected = ref<PathwayEntry | undefined>(undefined);
 
 const onRowClicked = (e: any, i: any) => {
-    selected.value = i.item.value.id === selected.value?.id ? undefined : i.item.value;
+    selected.value = i.item.raw.id === selected.value?.id ? undefined : i.item.raw.id;
     emits("update:model-value", selected.value);
 };
 
 const rowActive = (item: any) => {
-    return item.value.id === selected.value?.id;
+    return item.raw.id === selected.value;
 };
 
 const filterPathways = (value: PathwayEntry, search: string, item: PathwayTableItem) => {
-    const pathwayId = toRaw(item).pathway.id
+    const pathwayId = toRaw(item).id
 
     if (!pathwayId) {
         return false;
@@ -63,7 +63,7 @@ const headers = [
     {
         title: "Pathway",
         align: "start",
-        key: "pathway"
+        key: "id"
     },
     {
         title: "Count",
