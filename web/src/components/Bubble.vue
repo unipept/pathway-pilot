@@ -21,96 +21,96 @@ export default {
         .attr("width", width)
         .attr("height", height);
 
-let inputData = [];
-const groupArray = [
-    "Global and overview maps",
-    "Carbohydrate metabolism",
-    "Energy metabolism",
-    "Lipid metabolism",
-    "Nucleotide metabolism",
-    "Amino acid metabolism",
-    "Metabolism of other amino acids",
-    "Glycan biosynthesis and metabolism",
-    "Metabolism of cofactors and vitamins",
-    "Metabolism of terpenoids and polyketides",
-    "Biosynthesis of other secondary metabolites",
-    "Xenobiotics biodegradation and metabolism",
-    "Chemical structure transformation maps",
-    "Others"
-]
-for (let p in pathway_counts) {
-    inputData.push(
-    {'id':p, 
-        'groupname': pathwayID2cat[p], 
-        'name': pathwayID2name[p],
-    'group':groupArray.indexOf(pathwayID2cat[p]),
-    'value':pathway_counts[p]} 
-    )
+    let inputData = [];
+    const groupArray = [
+        "Global and overview maps",
+        "Carbohydrate metabolism",
+        "Energy metabolism",
+        "Lipid metabolism",
+        "Nucleotide metabolism",
+        "Amino acid metabolism",
+        "Metabolism of other amino acids",
+        "Glycan biosynthesis and metabolism",
+        "Metabolism of cofactors and vitamins",
+        "Metabolism of terpenoids and polyketides",
+        "Biosynthesis of other secondary metabolites",
+        "Xenobiotics biodegradation and metabolism",
+        "Chemical structure transformation maps",
+        "Others"
+    ]
+    for (let p in pathway_counts) {
+        inputData.push(
+        {'id':p, 
+            'groupname': pathwayID2cat[p], 
+            'name': pathwayID2name[p],
+        'group':groupArray.indexOf(pathwayID2cat[p]),
+        'value':pathway_counts[p]} 
+        )
 
-};
-const legend_radius = 10;
-const line_size = 20;
+    };
+    const legend_radius = 10;
+    const line_size = 20;
 
 
-let fillColor = {};
-const noColor = groupArray.length -1 ;
-for (let i = 0 ;i < noColor;i++){
-    fillColor[i] = d3.hsl(1.9+i*360/noColor, 0.721, 0.747);
-}
+    let fillColor = {};
+    const noColor = groupArray.length -1 ;
+    for (let i = 0 ;i < noColor;i++){
+        fillColor[i] = d3.hsl(1.9+i*360/noColor, 0.721, 0.747);
+    }
 
-fillColor[noColor] = 'grey'
+    fillColor[noColor] = 'grey'
 
-let legend = svg.append('g');
-groupArray.forEach(function (g, i) {
+    let legend = svg.append('g');
+    groupArray.forEach(function (g, i) {
 
-legend.append('circle')
-    .attr('id', 'legend_'+i)
-    .attr('cx', line_size)
-    .attr('cy', line_size+line_size*1.3*i)
-    .attr('fill', fillColor[i])
-    .attr('r',legend_radius)
-legend.append('text')
-    .attr('x', line_size*2)
-    .attr('y', line_size*1.2+line_size*1.3*i)
-    .text(groupArray[i])
-    .attr('text-anchor', 'left')
-    .attr('font-family', 'sans-serif')
-    .attr("font-size", "14px")
-    .attr("fill", "#515151");;
-});
-  
-  
-let bubbles = null;
-let nodes = [];
-let forceStrength = 0.03;
-let center = { x: (width+400) / 2, y: height / 2 };
-
-// return fillColor;
-function createNodes(rawData) {
+    legend.append('circle')
+        .attr('id', 'legend_'+i)
+        .attr('cx', line_size)
+        .attr('cy', line_size+line_size*1.3*i)
+        .attr('fill', fillColor[i])
+        .attr('r',legend_radius)
+    legend.append('text')
+        .attr('x', line_size*2)
+        .attr('y', line_size*1.2+line_size*1.3*i)
+        .text(groupArray[i])
+        .attr('text-anchor', 'left')
+        .attr('font-family', 'sans-serif')
+        .attr("font-size", "14px")
+        .attr("fill", "#515151");;
+    });
     
-    let maxAmount = d3.max(rawData, function (d) { return +d.value/pathway2count[d.id]; });
-    // let minAmount = d3.min(rawData, function (d) { return +d.value/pathway2count[d.id]; });
-    // console.log(minAmount);
-    // Sizes bubbles based on area.
-    // @v4: new flattened scale names.
-    let radiusScale = d3.scalePow()
-      .exponent(0.8)
-      .range([2, 58])
-      .domain([0, maxAmount]);
+    
+    let bubbles = null;
+    let nodes = [];
+    let forceStrength = 0.03;
+    let center = { x: (width+400) / 2, y: height / 2 };
 
-    // Use map() to convert raw data into node data.
-    // Checkout http://learnjsdata.com/ for more on
-    // working with data.
-    let myNodes = rawData.map(function (d) {
-      return {
-        id: d.id,
-        radius: radiusScale(+d.value/pathway2count[d.id]),
-        value: +d.value,
-        group: d.group,
-        name: d.name,
-        x: Math.random() * 900,
-        y: Math.random() * 800
-      };
+    // return fillColor;
+    function createNodes(rawData) {
+    
+        let maxAmount = d3.max(rawData, function (d) { return +d.value/pathway2count[d.id]; });
+        // let minAmount = d3.min(rawData, function (d) { return +d.value/pathway2count[d.id]; });
+        // console.log(minAmount);
+        // Sizes bubbles based on area.
+        // @v4: new flattened scale names.
+        let radiusScale = d3.scalePow()
+        .exponent(0.8)
+        .range([2, 58])
+        .domain([0, maxAmount]);
+
+        // Use map() to convert raw data into node data.
+        // Checkout http://learnjsdata.com/ for more on
+        // working with data.
+        let myNodes = rawData.map(function (d) {
+        return {
+            id: d.id,
+            radius: radiusScale(+d.value/pathway2count[d.id]),
+            value: +d.value,
+            group: d.group,
+            name: d.name,
+            x: Math.random() * 900,
+            y: Math.random() * 800
+        };
     });
 
     // sort them to prevent occlusion of smaller nodes.
