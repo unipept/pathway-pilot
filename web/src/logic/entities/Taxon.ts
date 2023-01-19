@@ -1,7 +1,7 @@
 export default class Taxon {
     constructor(
-        public readonly id: Number,
-        public readonly name: String,
-        public readonly rank: String
+        public readonly id: number,
+        public readonly name: string,
+        public readonly rank: string
     ) {}
 }

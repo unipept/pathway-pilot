@@ -2,7 +2,6 @@ import ParsedFile from "@/logic/parser/ParsedFile";
 import Taxon from "@/logic/entities/Taxon";
 import ECEntry from "@/logic/entities/ECEntry";
 import PathwayEntry from "@/logic/entities/PathwayEntry";
-import * as querystring from "querystring";
 
 export default class TSVParser {
     private readonly LCA_ID_COLUMN_IDX = 1;
@@ -18,10 +17,11 @@ export default class TSVParser {
         const pathways: Map<string, PathwayEntry> = new Map();
         const ecs: Map<string, ECEntry> = new Map();
 
-        const taxaToPathways: Map<number, PathwayEntry[]> = new Map();
-        const taxaToEcs: Map<number, ECEntry[]> = new Map();
+        const taxaToPathways: Map<number, Set<PathwayEntry>> = new Map();
+        const taxaToEcs: Map<number, Set<ECEntry>> = new Map();
 
-        const pathwaysToEcs: Map<string, ECEntry[]> = new Map();
+        const pathwaysToEcs: Map<string, Set<ECEntry>> = new Map();
+        const pathwaysToTaxa: Map<string, Set<Taxon>> = new Map();
 
         const inputLines = fileContents.split("\n");
 
@@ -64,22 +64,24 @@ export default class TSVParser {
             }
 
             if (!taxaToPathways.has(taxaId)) {
-                taxaToPathways.set(taxaId, [pathwayObj]);
-            } else {
-                taxaToPathways.get(taxaId)!.push(pathwayObj);
+                taxaToPathways.set(taxaId, new Set());
             }
+            taxaToPathways.get(taxaId)!.add(pathwayObj);
 
             if (!taxaToEcs.has(taxaId)) {
-                taxaToEcs.set(taxaId, [ecObj]);
-            } else {
-                taxaToEcs.get(taxaId)!.push(ecObj);
+                taxaToEcs.set(taxaId, new Set());
             }
+            taxaToEcs.get(taxaId)!.add(ecObj);
 
             if (!pathwaysToEcs.has(pathwayId)) {
-                pathwaysToEcs.set(pathwayId, [ecObj]);
-            } else {
-                pathwaysToEcs.get(pathwayId)!.push(ecObj);
+                pathwaysToEcs.set(pathwayId, new Set());
             }
+            pathwaysToEcs.get(pathwayId)!.add(ecObj);
+
+            if (!pathwaysToTaxa.has(pathwayId)) {
+                pathwaysToTaxa.set(pathwayId, new Set());
+            }
+            pathwaysToTaxa.get(pathwayId)!.add(taxonObj);
         }
 
         return new ParsedFile(
@@ -88,7 +90,8 @@ export default class TSVParser {
             ecs,
             taxaToPathways,
             taxaToEcs,
-            pathwaysToEcs
+            pathwaysToEcs,
+            pathwaysToTaxa,
         );
     }
 }

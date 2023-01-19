@@ -26,16 +26,23 @@
             />
         </v-col>
     </v-row>
->>>>>>> f950a5a6e25d7d4fff1750e0fc3c0ff24df72bc8
+
+    <v-btn class="mt-5 float-right" color="primary" @click="() => onContinue($router)" >
+        Continue
+    </v-btn>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import PathwayTable from '@/components/tables/PathwayTable.vue';
 import SpeciesTable from '@/components/tables/SpeciesTable.vue';
 import useFileStore from '@/stores/FileStore';
+import { Router } from 'vue-router';
+import useVisualisationStore from '@/stores/VisualisationStore';
+import Taxon from '@/logic/entities/Taxon';
 
 const fileStore = useFileStore();
+const visualisationStore = useVisualisationStore();
 
 const pathwaySearch = ref<string>("");
 const speciesSearch = ref<string>("");
@@ -43,53 +50,29 @@ const speciesSearch = ref<string>("");
 const pathwaySelected = ref<any>(undefined);
 const speciesSelected = ref<any[]>([]);
 
-const pathwayItems = [
-{
-        pathway: "A",
-        count: 1
-    },
-    {
-        pathway: "B",
-        count: 2
-    },
-    {
-        pathway: "C",
-        count: 3
-    },
-    {
-        pathway: "D",
-        count: 1
-    },
-    {
-        pathway: "E",
-        count: 2
-    },
-    {
-        pathway: "F",
-        count: 3
-    },
-    {
-        pathway: "G",
-        count: 1
+const speciesItems = computed(() => {
+    if (!pathwaySelected.value) {
+        return [];
     }
-];
 
-const speciesItems = [
-{
-        species: "A",
-        count: 1
-    },
-    {
-        species: "B",
-        count: 2
-    },
-    {
-        species: "C",
-        count: 3
-    },
-    {
-        species: "D",
-        count: 1
-    }
-];
+    return [...fileStore.parsedFile?.pathwaysToTaxa.get(pathwaySelected.value)!].map((key: any) => {
+        return {
+            species: key.name,
+            count: 0
+        };
+    });
+})
+
+const pathwayItems = [...fileStore.parsedFile?.pathways.keys()!].map((key: any) => {
+    return {
+        pathway: key,
+        count: 0
+    };
+});
+
+const onContinue = async (router: Router) => {
+    visualisationStore.setPathwayId(pathwaySelected.value);
+    visualisationStore.setHighlightedTaxa(speciesSelected.value.map((s: Taxon) => s.id));
+    await router.push("/visualisation");
+};
 </script>
