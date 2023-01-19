@@ -34,17 +34,40 @@ export default class KEGGCommunicator {
         }
 
         const urlParams = [];
-        for (const [ec, taxa] of highlightedEcs.entries()) {
-            for (const taxon of taxa) {
-                urlParams.push(`${ec}%09${ColorConstants.LEGEND[highlightedTaxa?.indexOf(taxon) ?? 0].replace("#", "%23")},black`);
+        if (highlightedEcs.size > 0) {
+            for (const [ec, taxa] of highlightedEcs.entries()) {
+                for (const taxon of taxa) {
+                    urlParams.push(`${ec}%09${ColorConstants.LEGEND[highlightedTaxa?.indexOf(taxon) ?? 0].replace("#", "%23")},black`);
+                }
             }
         }
 
-        const fullUrl = `https://www.kegg.jp/kegg-bin/show_pathway?${pathwayId.replace("path:", "")}/${urlParams.join("/")}/multi/nocolor`;
-        const response = await fetch(fullUrl);
 
-        const contents = await response.text();
-        const path = contents.match(/(\/tmp\/mark_pathway[^"]*)/)![0]
-        return `https://www.kegg.jp${path}`;
+        // const fullUrl = `https://www.kegg.jp/kegg-bin/show_pathway?${pathwayId.replace("path:", "")}/${urlParams.join("/")}/multi/nocolor`;
+        // const response = await fetch(fullUrl);
+        // const contents = await response.text();
+        //
+        // console.log(fullUrl);
+        // console.log(contents);
+        //
+        // const path = contents.match(/(\/tmp\/mark_pathway[^"]*)/)![0];
+        // return `https://www.kegg.jp${path}`;
+
+        if (highlightedEcs.size > 0) {
+            const fullUrl = `https://www.kegg.jp/kegg-bin/show_pathway?${pathwayId.replace("path:", "")}/${urlParams.join("/")}/multi/nocolor`;
+            const response = await fetch(fullUrl);
+            const contents = await response.text();
+
+            const path = contents.match(/(\/tmp\/mark_pathway[^"]*)/)![0];
+            return `https://www.kegg.jp${path}`;
+        } else {
+            const fullUrl = `https://www.kegg.jp/kegg-bin/show_pathway?${pathwayId.replace("path:", "")}/nocolor`;
+
+            const response = await fetch(fullUrl);
+            const contents = await response.text();
+
+            const path = contents.match(/(\/kegg\/pathway[^"]*png)/)![0]
+            return `https://www.kegg.jp${path}`;
+        }
     }
 }
