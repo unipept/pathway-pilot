@@ -15,6 +15,11 @@ const routes = [
         path: 'selection',
         name: 'About',
         component: () => import('@/views/SelectionView.vue'),
+      },
+      {
+        path: 'bubble',
+        name: 'Bubble',
+        component: () => import('@/views/BubbleView.vue'),
       }
     ]
   },
