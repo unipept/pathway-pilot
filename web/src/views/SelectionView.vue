@@ -23,7 +23,7 @@
         </v-col>
 
         <v-col>
-            <h3>Select species</h3>
+            <h3>Select multiple species <span style="font-size: x-small; color: #7a7a7a;">OPTIONAL</span></h3>
             <v-text-field 
                 class="mt-3"
                 v-model="speciesSearch"
