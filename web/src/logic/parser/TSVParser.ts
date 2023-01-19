@@ -25,7 +25,7 @@ export default class TSVParser {
 
         const inputLines = fileContents.split("\n");
 
-        for (const line of inputLines) {
+        for (const line of inputLines.slice(1)) {
             const fields = line.split(",");
 
             const taxaId = parseInt(fields[this.LCA_ID_COLUMN_IDX]);
