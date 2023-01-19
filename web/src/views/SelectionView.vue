@@ -30,6 +30,10 @@
     <v-btn class="mt-5 float-right" color="primary" @click="() => onContinue($router)" >
         Continue
     </v-btn>
+
+    <v-btn class="me-5 mt-5 float-right" color="error" @click="clearSelection">
+        <v-icon class="me-2">mdi-delete-outline</v-icon> Clear selection
+    </v-btn>
 </template>
 
 <script setup lang="ts">
@@ -70,6 +74,14 @@ const pathwayItems = [...fileStore.parsedFile?.pathways.values()!].map((pathway:
         count: 0
     };
 });
+
+const clearSelection = () => {
+    pathwaySearch.value = "";
+    speciesSearch.value = "";
+    
+    pathwaySelected.value = undefined;
+    speciesSelected.value = [];
+};
 
 const onContinue = async (router: Router) => {
     visualisationStore.setPathwayId("path:ec00592");

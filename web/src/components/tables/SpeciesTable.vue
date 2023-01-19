@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import Taxon from '@/logic/entities/Taxon';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { SpeciesTableItem } from './SpeciesTableItem';
 
 export interface Props {
@@ -68,6 +68,10 @@ const headers = [
         key: "count"
     }
 ];
+
+watch(() => props.modelValue, (value) => {
+    selected.value = value;
+});
 </script>
 
 <style scoped>

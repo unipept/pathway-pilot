@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import PathwayEntry from '@/logic/entities/PathwayEntry';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { PathwayTableItem } from './PathwayTableItem';
 
 export interface Props {
@@ -33,7 +33,7 @@ export interface Props {
     items: PathwayTableItem[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const emits = defineEmits(["update:model-value"]);
 
@@ -60,6 +60,10 @@ const headers = [
         key: "count"
     }
 ];
+
+watch(() => props.modelValue, (value) => {
+    selected.value = value;
+});
 </script>
 
 <style scoped>
