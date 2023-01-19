@@ -77,20 +77,23 @@ const speciesItems = computed(() => {
         return [];
     }
 
-    return [...fileStore.parsedFile?.pathwaysToTaxa.get(pathwaySelected.value?.id)!].map((taxon: Taxon) => {
-        return {
-            species: taxon,
-            count: 0
-        };
-    });
+    return [...fileStore.parsedFile?.pathwaysToTaxa.get(pathwaySelected.value?.id)!]
+        .map((taxon: Taxon) => {
+            return {
+                species: taxon,
+                count: 0
+            };
+        });
 })
 
-const pathwayItems = [...fileStore.parsedFile?.pathways.values()!].map((pathway: PathwayEntry) => {
-    return {
-        pathway: pathway,
-        count: fileStore.parsedFile?.pathwaysToPeptideCounts.get(pathway.id)!
-    };
-});
+const pathwayItems = [...fileStore.parsedFile?.pathways.values()!]
+    .filter((pathway: PathwayEntry) => pathway.id)
+    .map((pathway: PathwayEntry) => {
+        return {
+            pathway: pathway,
+            count: fileStore.parsedFile?.pathwaysToPeptideCounts.get(pathway.id)!
+        };
+    });
 
 const canClearSelection = computed(() => {
     return pathwaySelected.value !== undefined 
