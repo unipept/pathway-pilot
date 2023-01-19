@@ -42,36 +42,12 @@ const speciesSearch = ref<string>("");
 const pathwaySelected = ref<any>(undefined);
 const speciesSelected = ref<any[]>([]);
 
-const pathwayItems = [
-{
-        pathway: "A",
-        count: 1
-    },
-    {
-        pathway: "B",
-        count: 2
-    },
-    {
-        pathway: "C",
-        count: 3
-    },
-    {
-        pathway: "D",
-        count: 1
-    },
-    {
-        pathway: "E",
-        count: 2
-    },
-    {
-        pathway: "F",
-        count: 3
-    },
-    {
-        pathway: "G",
-        count: 1
-    }
-];
+const pathwayItems = [...fileStore.parsedFile?.pathways.keys()!].map((key: any) => {
+    return {
+        pathway: key,
+        count: 0
+    };
+});
 
 const speciesItems = [
 {
