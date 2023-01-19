@@ -1,7 +1,7 @@
 # Van 't pathje
 Van 't pathje is a taxonomy assignment and pathway visualisation tool for metaproteomics data. It combines UniPept [[1]](#1) and KEGG [[2]](#2) to provide pathway visualisations showing which pathways are represented in which species. It works both with peptide and protein input. 
 
-![Workflow](/readme_images/workflow.png) 
+![Workflow](/readme_images/workflow2.png) 
 
 ### Peptide-centric approach 
 Given a list of peptides, Van 't pathje will first do taxonomy assignment and functional annotation with UniPept [cite]. Pathway visualisations are retrieved by querying the KEGG API.
