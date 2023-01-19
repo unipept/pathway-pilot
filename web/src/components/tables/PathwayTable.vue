@@ -3,6 +3,7 @@
         :headers="headers"
         :items="items"
         :search="search"
+        :custom-filter="filterPathways"
         height="300"
         item-value="pathway"
         density="compact"
@@ -24,7 +25,7 @@
 
 <script setup lang="ts">
 import PathwayEntry from '@/logic/entities/PathwayEntry';
-import { ref, watch } from 'vue';
+import { ref, watch, toRaw } from 'vue';
 import { PathwayTableItem } from './PathwayTableItem';
 
 export interface Props {
@@ -47,6 +48,16 @@ const onRowClicked = (e: any, i: any) => {
 const rowActive = (item: any) => {
     return item.value.id === selected.value?.id;
 };
+
+const filterPathways = (value: PathwayEntry, search: string, item: PathwayTableItem) => {
+    const pathwayId = toRaw(item).pathway.id
+
+    if (!pathwayId) {
+        return false;
+    }
+
+    return pathwayId.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+}
 
 const headers = [
     {

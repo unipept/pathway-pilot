@@ -55,7 +55,7 @@ export default class TSVParser {
 
             const pathwayId = fields[this.PATHWAY_COLUMN_ID];
             let pathwayObj: PathwayEntry;
-
+            
             if (!pathways.has(pathwayId)) {
                 pathwayObj = new PathwayEntry(pathwayId);
                 pathways.set(pathwayId, pathwayObj);

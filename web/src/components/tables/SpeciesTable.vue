@@ -3,6 +3,7 @@
         :headers="headers"
         :items="items"
         :search="search"
+        :custom-filter="filterSpecies"
         height="300"
         item-value="species"
         density="compact"
@@ -24,7 +25,7 @@
 
 <script setup lang="ts">
 import Taxon from '@/logic/entities/Taxon';
-import { ref, watch } from 'vue';
+import { ref, toRaw, watch } from 'vue';
 import { SpeciesTableItem } from './SpeciesTableItem';
 
 export interface Props {
@@ -55,6 +56,16 @@ const onRowClicked = (e: any, i: any) => {
 const rowActive = (item: any) => {
     return selected.value.map((taxon: Taxon) => taxon.id).includes(item.value.id);
 };
+
+const filterSpecies = (value: Taxon, search: string, item: SpeciesTableItem) => {
+    const speciesName = toRaw(item).species.name
+
+    if (!speciesName) {
+        return false;
+    }
+    
+    return speciesName.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+}
 
 const headers = [
     {
