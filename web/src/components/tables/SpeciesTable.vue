@@ -5,19 +5,18 @@
         :search="search"
         :custom-filter="filterSpecies"
         height="300"
-        item-value="species"
         density="compact"
         @click:row="onRowClicked"
     >
-        <template #item.species="{ item }">
+        <template #item.name="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.value.name }}
+                {{ item.raw.name }}
             </div>
         </template>
 
         <template #item.rank="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.value.rank }}
+                {{ item.raw.rank }}
             </div>
         </template>
     </v-data-table-virtual>
@@ -39,26 +38,28 @@ const props = withDefaults(defineProps<Props>(), {
     max: 2
 });
 
+const l = console.log
+
 const emits = defineEmits(["update:model-value"]);
 
 const selected = ref<Taxon[]>([]);
 
 const onRowClicked = (e: any, i: any) => {
-    if (selected.value.map((taxon: Taxon) => taxon.id).includes(i.item.value.id)) {
-        selected.value = selected.value.filter((v) => v.id !== i.item.value.id);
+    if (selected.value.map((taxon: Taxon) => taxon.id).includes(i.item.raw.id)) {
+        selected.value = selected.value.filter((v) => v.id !== i.item.raw.id);
     } else if (selected.value.length < props.max) {
-        selected.value.push(i.item.value);
+        selected.value.push(i.item.raw);
     }
 
     emits("update:model-value", selected.value);
 };
 
 const rowActive = (item: any) => {
-    return selected.value.map((taxon: Taxon) => taxon.id).includes(item.value.id);
+    return selected.value.map((taxon: Taxon) => taxon.id).includes(item.raw.id);
 };
 
 const filterSpecies = (value: Taxon, search: string, item: SpeciesTableItem) => {
-    const speciesName = toRaw(item).species.name
+    const speciesName = toRaw(item).name
 
     if (!speciesName) {
         return false;
@@ -71,7 +72,7 @@ const headers = [
     {
         title: "Species",
         align: "start",
-        key: "species"
+        key: "name"
     },
     {
         title: "Rank",

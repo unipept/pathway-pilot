@@ -83,9 +83,12 @@ const speciesItems = computed(() => {
     }
 
     return [...fileStore.parsedFile?.pathwaysToTaxa.get(pathwaySelected.value?.id)!]
+        .filter((taxon: Taxon) => taxon.id !== 1)
         .map((taxon: Taxon) => {
             return {
-                species: taxon,
+                id: taxon.id,
+                name: taxon.name,
+                rank: taxon.rank,
                 count: 0
             };
         });
@@ -95,7 +98,7 @@ const pathwayItems = [...fileStore.parsedFile?.pathways.values()!]
     .filter((pathway: PathwayEntry) => pathway.id)
     .map((pathway: PathwayEntry) => {
         return {
-            pathway: pathway,
+            id: pathway.id,
             count: fileStore.parsedFile?.pathwaysToPeptideCounts.get(pathway.id)!
         };
     });
