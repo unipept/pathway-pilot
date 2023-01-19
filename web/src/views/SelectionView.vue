@@ -71,8 +71,10 @@ const pathwayItems = [...fileStore.parsedFile?.pathways.keys()!].map((key: any) 
 });
 
 const onContinue = async (router: Router) => {
-    visualisationStore.setPathwayId(pathwaySelected.value);
-    visualisationStore.setHighlightedTaxa(speciesSelected.value.map((s: Taxon) => s.id));
+    // visualisationStore.setPathwayId(pathwaySelected.value);
+    visualisationStore.setPathwayId("path:ec00592");
+    visualisationStore.setHighlightedTaxa([3398, 3814]);
+    // visualisationStore.setHighlightedTaxa(speciesSelected.value.map((s: Taxon) => s.id));
     await router.push("/visualisation");
 };
 </script>
