@@ -41,6 +41,6 @@ export default class KEGGCommunicator {
             urlParams.push(`${ec}%09,${KEGGCommunicator.COLORS[highlightedTaxa?.indexOf(taxonId) ?? 0]}`);
         }
 
-        return `https://www.kegg.jp/kegg-bin/show_pathway?map00400/${urlParams.join("/")}/multi`
+        return `https://www.kegg.jp/kegg-bin/show_pathway?${pathwayId}/${urlParams.join("/")}/multi`
     }
 }
