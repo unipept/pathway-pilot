@@ -42,6 +42,7 @@ const onDrop = (event: any) => {
         console.log("TODO: error message");
     } else {
         fileStore.upload(event.dataTransfer.files[0]);
+        console.log(event.dataTransfer.files[0]);
     }
 }
 </script>

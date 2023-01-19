@@ -1,4 +1,4 @@
-export default class ECEntry {
+export default class PathwayEntry {
     constructor(
         public readonly id: string
     ) {}
