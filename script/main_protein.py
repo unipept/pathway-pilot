@@ -90,8 +90,7 @@ def ECTaxonFrame(ECDictionary, ProteinWeightFrame):
     ec_pandas['taxon']=ec_pandas['taxon'].apply(lambda x: re.sub("\(.*?\)", "", x)[:-1])
     ec_pandas['taxid'] = ec_pandas['taxon'].apply(lambda x:ncbi.get_name_translator([x])[x][0])
     ec_pandas['rank']='species'
-    ec_pandas=ec_pandas.groupby(['ec', 'taxon', 'taxid', 'rank'])['Weights'].sum()
-
+    ec_pandas=ec_pandas.groupby(['ec', 'taxon', 'taxid', 'rank'])['Weights'].sum().reset_index()
     return ec_pandas
 
 def FetchKeggECMapping():
@@ -136,6 +135,9 @@ def AddPathwayInfo(ECTaxaFrame, EC2PathDict):
 
 ec_dict, protein_data = get_ec(args.ProteinFile)
 InputFrame = ECTaxonFrame(ec_dict, protein_data)
+
 EC2PathDicty = FetchKeggECMapping()
 FullFrame, AllNAs = AddPathwayInfo(InputFrame,EC2PathDicty)
 FullFrame.to_csv(args.out)
+
+
