@@ -25,28 +25,26 @@ const attributeToNode = (attribute: any): PathwayNode => {
     if (attribute.shape === 'rect') {
         const coords = attribute.coords.split(',');
 
-        return {
-            x1: parseInt(coords[0], 10),
-            y1: parseInt(coords[1], 10),
-            x2: parseInt(coords[2], 10),
-            y2: parseInt(coords[3], 10)
-        } as RectanglePathwayNode;
+        return new RectanglePathwayNode(
+            parseInt(coords[0], 10),
+            parseInt(coords[1], 10),
+            parseInt(coords[2], 10),
+            parseInt(coords[3], 10)
+        );
     }
 
     else if (attribute.shape === 'circle') {
         const coords = attribute.coords.split(',');
 
-        return {
-            x: parseInt(coords[0], 10),
-            y: parseInt(coords[1], 10),
-            r: parseInt(coords[2], 10)
-        } as CirclePathwayNode;
+        return new CirclePathwayNode(
+            parseInt(coords[0], 10),
+            parseInt(coords[1], 10),
+            parseInt(coords[2], 10)
+        );
     }
 
     else if (attribute.shape === 'poly') {
-        return {
-            points: attribute.coords
-        } as PolygonPathwayNode;
+        return new PolygonPathwayNode(attribute.coords);
     }
 
     throw new Error(`Unknown shape: ${attribute.shape}`);
