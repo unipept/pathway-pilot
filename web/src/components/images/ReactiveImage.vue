@@ -17,7 +17,6 @@ export interface Props {
     src: string
     alt: string
 };
-
 defineProps<Props>();
 
 const emits = defineEmits(['resize']);
@@ -31,7 +30,6 @@ const naturalWidth = ref<number>(0);
 const naturalHeight = ref<number>(0);
 
 const onResize = () => {
-    console.log(reactiveImage.value)
     naturalWidth.value = reactiveImage.value?.image.naturalWidth;
     naturalHeight.value = reactiveImage.value?.image.naturalHeight;
 
@@ -50,9 +48,10 @@ onMounted(() => {
     addEventListener('resize', onResize)
 
     // Timeout is required because the image inside the v-img component is not loaded yet
+    // This solution is not sufficient, but it works for now (TODO: find a better solution)
     setTimeout(() => {
         onResize();
-    }, 250);
+    }, 500);
 });
 
 onBeforeUnmount(() => {

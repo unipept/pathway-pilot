@@ -1,7 +1,6 @@
 <template>
-    <div class="pathway-container">
+    <div v-if="pngUrl" class="pathway-container">
         <reactive-image 
-            v-if="pngUrl"
             :src="pngUrl" 
             alt="Pathway"
             @resize="onResize"
@@ -30,13 +29,23 @@
             </svg>
         </reactive-image>
     </div>
+
+    <div v-else>
+        <v-progress-circular
+            class="progress-loader"
+            size="50"
+            width="5"
+            color="secondary"
+            indeterminate
+        ></v-progress-circular>
+    </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import ReactiveImage from '@/components/images/ReactiveImage.vue';
 
-const pngUrl = ref<string>("")
+const pngUrl = ref<string | undefined>(undefined)
 const areas  = ref<any[]>([])
 
 const naturalWidth  = ref<number>(0)
@@ -73,5 +82,12 @@ svg {
 .pathway-container {
     position: relative;
     height: max-content;
+}
+
+.progress-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 </style>
