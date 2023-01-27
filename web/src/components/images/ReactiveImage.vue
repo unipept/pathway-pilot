@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, onUpdated, ref } from 'vue';
 import { VImg } from 'vuetify/components';
 
 export interface Props {
@@ -29,6 +29,11 @@ const height = ref<number>(0);
 const naturalWidth = ref<number>(0);
 const naturalHeight = ref<number>(0);
 
+// Observe the internal image element for changes
+// We need this because the image element is not reactive and 
+// We cannot access the image element directly
+const observer = new MutationObserver(() => onResize());
+
 const onResize = () => {
     naturalWidth.value = reactiveImage.value?.image.naturalWidth;
     naturalHeight.value = reactiveImage.value?.image.naturalHeight;
@@ -45,13 +50,17 @@ const onResize = () => {
 };
 
 onMounted(() => {
-    addEventListener('resize', onResize)
-
-    // Timeout is required because the image inside the v-img component is not loaded yet
-    // This solution is not sufficient, but it works for now (TODO: find a better solution)
-    setTimeout(() => {
+    addEventListener('resize', () => {
+        // Disconnect the observer from listening to changes
+        observer.disconnect();
         onResize();
-    }, 500);
+    });
+
+    observer.observe(reactiveImage.value?.$el, {
+        attributes: true,
+        childList: true,
+        subtree: true
+    });
 });
 
 onBeforeUnmount(() => {
