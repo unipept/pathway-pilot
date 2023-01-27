@@ -53,6 +53,14 @@ export default class KEGGCommunicator {
         // const path = contents.match(/(\/tmp\/mark_pathway[^"]*)/)![0];
         // return `https://www.kegg.jp${path}`;
 
+        return "https://www.kegg.jp/kegg/pathway/map/map00053.png"
+
+        const response = await fetch("https://www.kegg.jp/pathway/map00053@2x.png");
+        const contents = await response.text();
+
+        const path = contents.match(/(\/tmp\/mark_pathway[^"]*)/)![0];
+        return `https://www.kegg.jp${path}`;
+
         if (highlightedEcs.size > 0) {
             const fullUrl = `https://www.kegg.jp/kegg-bin/show_pathway?${pathwayId.replace("path:", "")}/${urlParams.join("/")}/multi/nocolor`;
             const response = await fetch(fullUrl);
