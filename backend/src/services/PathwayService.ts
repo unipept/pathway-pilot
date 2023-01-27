@@ -29,7 +29,8 @@ const attributeToNode = (attribute: any, scale: number): PathwayNode => {
             parseInt(coords[0], 10) * scale,
             parseInt(coords[1], 10) * scale,
             parseInt(coords[2], 10) * scale,
-            parseInt(coords[3], 10) * scale
+            parseInt(coords[3], 10) * scale,
+            attribute.title
         );
     }
 
@@ -39,14 +40,15 @@ const attributeToNode = (attribute: any, scale: number): PathwayNode => {
         return new CirclePathwayNode(
             parseInt(coords[0], 10) * scale,
             parseInt(coords[1], 10) * scale,
-            parseInt(coords[2], 10) * scale
+            parseInt(coords[2], 10) * scale,
+            attribute.title
         );
     }
 
     else if (attribute.shape === 'poly') {
         // TODO: scale
-        return new PolygonPathwayNode(attribute['data-coords']);
+        return new PolygonPathwayNode(attribute['data-coords'], attribute.title);
     }
 
     throw new Error(`Unknown shape: ${attribute.shape}`);
-}
+};
