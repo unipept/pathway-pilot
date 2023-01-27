@@ -5,28 +5,11 @@
             alt="Pathway"
             @resize="onResize"
         >
-            <svg v-if="imageLoaded" width="100%" height="100%">
-                <rect v-for="area in areas.filter(a => a.shape === 'rect')"
-                    :x="area.x1 / naturalWidth * width"
-                    :y="area.y1 / naturalHeight * height"
-                    :width="(area.x2 - area.x1) / naturalWidth * width"
-                    :height="(area.y2 - area.y1) / naturalHeight * height"
-                    stroke="green"
-                    fill="green"
-                    fill-opacity="0.1"
-                    :onclick="onClick"
-                />
-
-                <circle v-for="area in areas.filter(a => a.shape === 'circle')"
-                    :cx="area.x / naturalWidth * width"
-                    :cy="area.y / naturalHeight * height"
-                    :r="area.r / naturalWidth * width"
-                    stroke="red"
-                    fill="red"
-                    fill-opacity="0.1"
-                    :onclick="onClick"
-                />
-            </svg>
+            <image-overlay 
+                :areas="areas"
+                :scale="width / naturalWidth"
+                :onClick="onClick"
+            />
         </reactive-image>
     </div>
 
@@ -44,6 +27,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import ReactiveImage from '@/components/images/ReactiveImage.vue';
+import ImageOverlay from '@/components/images/ImageOverlay.vue';
 
 const pngUrl = ref<string | undefined>(undefined)
 const areas  = ref<any[]>([])
@@ -67,10 +51,10 @@ const onResize = (event: any) => {
 }
 
 onMounted(async () => {
-    const response = await fetch("http://localhost:4000/pathway/map00620");
+    const response = await fetch("http://localhost:4000/pathway/map00053");
     const data     = await response.json();
     pngUrl.value = data.image;
-    areas.value  = data.nodes;
+    areas.value  = data.nodes
 });
 </script>
 

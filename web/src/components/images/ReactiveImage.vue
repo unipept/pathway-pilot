@@ -10,13 +10,14 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, onUpdated, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { VImg } from 'vuetify/components';
 
 export interface Props {
     src: string
     alt: string
 };
+
 defineProps<Props>();
 
 const emits = defineEmits(['resize']);
