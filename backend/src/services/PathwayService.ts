@@ -7,7 +7,7 @@ import { PathwayNode, RectanglePathwayNode, CirclePathwayNode, PolygonPathwayNod
 
 export const getPathway = async (pathway: string): Promise<Pathway> => {
     const htmlUrl = `${config.keggPathwayEndpoint}${pathway}`;
-    const pngUrl = `${config.keggPathwayPngEndpoint}${pathway}.png`;
+    const pngUrl = `${config.keggPathwayPngEndpoint}${pathway}@2x.png`;
 
     const html = await axios
         .get(htmlUrl)
@@ -26,10 +26,10 @@ const attributeToNode = (attribute: any): PathwayNode => {
         const coords = attribute.coords.split(',');
 
         return new RectanglePathwayNode(
-            parseInt(coords[0], 10),
-            parseInt(coords[1], 10),
-            parseInt(coords[2], 10),
-            parseInt(coords[3], 10)
+            parseInt(coords[0], 10) * 2,
+            parseInt(coords[1], 10) * 2,
+            parseInt(coords[2], 10) * 2,
+            parseInt(coords[3], 10) * 2
         );
     }
 
@@ -37,9 +37,9 @@ const attributeToNode = (attribute: any): PathwayNode => {
         const coords = attribute.coords.split(',');
 
         return new CirclePathwayNode(
-            parseInt(coords[0], 10),
-            parseInt(coords[1], 10),
-            parseInt(coords[2], 10)
+            parseInt(coords[0], 10) * 2,
+            parseInt(coords[1], 10) * 2,
+            parseInt(coords[2], 10) * 2
         );
     }
 
