@@ -17,34 +17,35 @@ export const getPathway = async (pathway: string): Promise<Pathway> => {
     
     return {
         image: pngUrl,
-        nodes: areas.map(area => attributeToNode(area.attributes))
+        nodes: areas.map(area => attributeToNode(area.attributes, 2))
     }
 };
 
-const attributeToNode = (attribute: any): PathwayNode => {
+const attributeToNode = (attribute: any, scale: number): PathwayNode => {
     if (attribute.shape === 'rect') {
-        const coords = attribute.coords.split(',');
+        const coords = attribute['data-coords'].split(',');
 
         return new RectanglePathwayNode(
-            parseInt(coords[0], 10) * 2,
-            parseInt(coords[1], 10) * 2,
-            parseInt(coords[2], 10) * 2,
-            parseInt(coords[3], 10) * 2
+            parseInt(coords[0], 10) * scale,
+            parseInt(coords[1], 10) * scale,
+            parseInt(coords[2], 10) * scale,
+            parseInt(coords[3], 10) * scale
         );
     }
 
     else if (attribute.shape === 'circle') {
-        const coords = attribute.coords.split(',');
+        const coords = attribute['data-coords'].split(',');
 
         return new CirclePathwayNode(
-            parseInt(coords[0], 10) * 2,
-            parseInt(coords[1], 10) * 2,
-            parseInt(coords[2], 10) * 2
+            parseInt(coords[0], 10) * scale,
+            parseInt(coords[1], 10) * scale,
+            parseInt(coords[2], 10) * scale
         );
     }
 
     else if (attribute.shape === 'poly') {
-        return new PolygonPathwayNode(attribute.coords);
+        // TODO: scale
+        return new PolygonPathwayNode(attribute['data-coords']);
     }
 
     throw new Error(`Unknown shape: ${attribute.shape}`);
