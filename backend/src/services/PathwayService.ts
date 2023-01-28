@@ -14,9 +14,12 @@ export const getPathway = async (pathway: string): Promise<Pathway> => {
         .then(res => parse(res.data))
 
     const areas = html.querySelector('#mapdata')?.querySelectorAll('area') ?? [];
+
+    const image = await axios.get(pngUrl, {responseType: 'arraybuffer'});
+    const imageBase64 = Buffer.from(image.data).toString('base64');
     
     return {
-        image: pngUrl,
+        image: `data:image/png;base64,${imageBase64}`,
         nodes: areas.map(area => attributeToNode(area.attributes, 2))
     }
 };
