@@ -28,8 +28,8 @@ export default class NodeInformation {
             const trimmed = part.trim();
 
             if (trimmed.startsWith('map')) {
-                const [ id, name ] = trimmed.split(' ');
-                this.keggMaps.push({ id: id.slice(-1), name: name });
+                const [ id, name ] = trimmed.split(':');
+                this.keggMaps.push({ id: id, name: name.trim() });
             }
 
             else if (trimmed.startsWith('K')) {
