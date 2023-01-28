@@ -6,9 +6,9 @@
             @resize="onResize"
         >
             <image-overlay 
+                v-if="imageLoaded"
                 :areas="areas"
                 :scale="width / naturalWidth"
-                :onClick="onClick"
             />
         </reactive-image>
     </div>
@@ -38,10 +38,6 @@ const width         = ref<number>(0)
 const height        = ref<number>(0)
 
 const imageLoaded = computed(() => width.value !== 0)
-
-const onClick = () => {
-    console.log("ok")
-}
 
 const onResize = (event: any) => {
     naturalWidth.value  = event.naturalWidth

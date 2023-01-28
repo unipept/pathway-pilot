@@ -1,25 +1,31 @@
 <template>
     <svg width="100%" height="100%">
-        <g v-for="area in areas.filter(a => a.shape === 'rect')">
+        <g v-for="area in areas.filter(a => a.shape === 'rect')"
+            :transform="`scale(${scale})`"
+            :onclick="() => l('rect clicked: ', area)"
+        >
             <rect v-for="rect in splitRectangle(area, 3)"
-                :x="rect.x1 * scale"
-                :y="rect.y1 * scale"
-                :width="(rect.x2 - rect.x1) * scale"
-                :height="(rect.y2 - rect.y1) * scale"
+                :x="rect.x1"
+                :y="rect.y1"
+                :width="(rect.x2 - rect.x1)"
+                :height="(rect.y2 - rect.y1)"
                 :fill="rect.color"
                 fill-opacity="0.3"
-                :onclick="onClick"
             />
         </g>
 
-        <circle v-for="area in areas.filter(a => a.shape === 'circle')"
-            :cx="area.x * scale"
-            :cy="area.y * scale"
-            :r="area.r * scale"
-            fill="red"
-            fill-opacity="0.1"
-            :onclick="onClick"
-        />
+        <g v-for="area in areas.filter(a => a.shape === 'circle')"
+            :transform="`scale(${scale})`"
+            :onclick="() => l('circle clicked: ', area)"
+        >
+            <circle
+                :cx="area.x"
+                :cy="area.y"
+                :r="area.r"
+                fill="red"
+                fill-opacity="0.1"
+            />
+        </g>
     </svg>
 </template>
 
@@ -27,10 +33,11 @@
 export interface Props {
     areas: any[];
     scale: number;
-    onClick: () => void;
 };
 
 defineProps<Props>();
+
+const l = console.log
 
 const splitRectangle = (rectangle: any, parts: number) => {
     const width = rectangle.x2 - rectangle.x1;
