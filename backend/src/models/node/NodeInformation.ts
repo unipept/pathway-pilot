@@ -11,6 +11,12 @@ export default class NodeInformation {
     private compounds: Compound[];          /* Compounds */
     private keggMaps: KeggMap[];            /* Kegg maps */
 
+    private koRegex: RegExp = /K\d{5}/;     /* Regex for KO numbers */
+    private cpdRegex: RegExp = /C\d{5}/;    /* Regex for compound numbers */
+    private rnRegex: RegExp = /R\d{5}/;     /* Regex for reaction numbers */
+    private mapRegex: RegExp = /map\d{5}:/; /* Regex for map numbers */
+    private ecRegex: RegExp = /(\d+\.)+\d+/;/* Regex for EC numbers */
+
     constructor(
         title: string,                      /* Title of the node */
     ) {
@@ -24,30 +30,21 @@ export default class NodeInformation {
     }
 
     private parseTitle(title: string): void {
-        for (const part of title.split(',')) {
-            const trimmed = part.trim();
+        const items = title.trim().split(',').flatMap(item => item.trim().split(' '));
 
-            if (trimmed.startsWith('map')) {
-                const [ id, name ] = trimmed.split(':');
-                this.keggMaps.push({ id: id, name: name.trim() });
-            }
+        for (const item of items) {
+            const id = item.trim();
 
-            else if (trimmed.startsWith('K')) {
-                const [ id, name ] = trimmed.split(' ');
-                this.koNumbers.push({ id: id, name: name.slice(1, -1) });
-            }
-
-            else if (trimmed.startsWith('C')) {
-                const [ id, name ] = trimmed.split(' ')
-                this.compounds.push({ id: id, name: name.slice(1, -1) });
-            }
-
-            else if (trimmed.startsWith('R')) {
-                this.reactions.push({ id: trimmed });
-            }
-
-            else {
-                this.ecNumbers.push({ id: trimmed });
+            if (this.koRegex.test(id)) {
+                this.koNumbers.push({ id: id, name: 'TODO' });
+            } else if (this.cpdRegex.test(id)) {
+                this.compounds.push({ id: id, name: 'TODO' });
+            } else if (this.rnRegex.test(id)) {
+                this.reactions.push({ id: id });
+            } else if (this.mapRegex.test(id)) {
+                this.keggMaps.push({ id: id, name: 'TODO' });
+            } else if (this.ecRegex.test(id)) {
+                this.ecNumbers.push({ id: id });
             }
         }
     }

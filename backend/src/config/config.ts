@@ -9,7 +9,8 @@ const keggUrl = (path: string) => {
 const config = {
     port: process.env.PORT,
     keggPathwayEndpoint: keggUrl(process.env.KEGG_API_ENDPOINT__PATHWAY!),
-    keggPathwayPngEndpoint: keggUrl(process.env.KEGG_API_ENDPOINT__PATHWAY_PNG!)
+    keggPathwayPngEndpoint: keggUrl(process.env.KEGG_API_ENDPOINT__PATHWAY_PNG!),
+    keggPathwayNamesEndpoint: keggUrl(process.env.KEGG_API_ENDPOINT__PATHWAY_NAMES!)
 };
 
 export default config;

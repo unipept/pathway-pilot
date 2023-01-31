@@ -4,10 +4,13 @@ import { parse } from 'node-html-parser';
 import config from '../config/config';
 import { Pathway } from '../models/Pathway';
 import { PathwayNode, RectanglePathwayNode, CirclePathwayNode, PolygonPathwayNode } from '../models/PathwayNode';
+import { KoMap } from '../mappings/KoMap';
 
 export const getPathway = async (pathway: string): Promise<Pathway> => {
     const htmlUrl = `${config.keggPathwayEndpoint}${pathway}`;
     const pngUrl = `${config.keggPathwayPngEndpoint}${pathway}@2x.png`;
+
+    const koMap = new KoMap().fromKoMapFile('/Users/tibvdm/van-t-pathje/backend/data/ko');
 
     const html = await axios
         .get(htmlUrl)
