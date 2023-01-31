@@ -32,7 +32,7 @@ export const findPathway = async (pathwayId: string): Promise<Pathway> => {
     
     return {
         image: `data:image/png;base64,${imageBase64}`,
-        nodes: areas.map(areaToNode)
+        nodes: areas.map(area => areaToNode(area))
     }
 };
 

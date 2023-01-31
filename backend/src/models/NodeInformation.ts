@@ -1,8 +1,8 @@
-import { Compound } from "./Compound";
-import { EcNumber } from "./EcNumber";
-import { KeggMap } from "./KeggMap";
-import { KoNumber } from "./KoNumber";
-import { Reaction } from "./Reaction";
+import { Compound } from "./annotations/Compound";
+import { EcNumber } from "./annotations/EcNumber";
+import { KeggMap } from "./annotations/KeggMap";
+import { KoNumber } from "./annotations/KoNumber";
+import { Reaction } from "./annotations/Reaction";
 
 const koRegex: RegExp = /K\d{5}/;       /* Regex for KO numbers */
 const cpdRegex: RegExp = /C\d{5}/;      /* Regex for compound numbers */

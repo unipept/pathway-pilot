@@ -1,4 +1,4 @@
-import NodeInformation from "./node/NodeInformation";
+import NodeInformation from "./NodeInformation";
 import PathwayShape from "./PathwayShapes";
 
 export class PathwayNode {
