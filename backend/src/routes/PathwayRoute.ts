@@ -4,6 +4,6 @@ import { getPathway } from '../controllers/PathwayController';
 
 const router = express.Router();
 
-router.get('/:mapId', getPathway);
+router.get('/:pathwayId', getPathway);
 
 export default router;
