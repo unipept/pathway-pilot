@@ -13,9 +13,9 @@ export type KoMapValue = {
 };
 
 export class KoMap {
-    private readonly koMap: Map<KoMapKey, KoMapValue>
-
-    constructor() { this.koMap = new Map<KoMapKey, KoMapValue>(); }
+    constructor(
+        private readonly koMap: Map<KoMapKey, KoMapValue> = new Map()
+    ) {}
 
     /**
      * Adds a new entry to the koMap
@@ -74,6 +74,11 @@ export class KoMap {
     // TODO: Add the option to create this map from a URL
     // Then a saved file can be the backup in case of a failed request
 
+    /**
+     * Converts the koMap to a JSON object
+     * 
+     * @returns The JSON object
+     */
     public toJson(): { [key: string]: KoMapValue } {
         return Object.fromEntries(this.koMap);
     }

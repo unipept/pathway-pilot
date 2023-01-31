@@ -9,13 +9,13 @@ import { PathwayNode, RectanglePathwayNode, CirclePathwayNode, PolygonPathwayNod
  * Gets the pathway information from the Kegg website
  * and converts it to a Pathway object
  * 
- * @param pathway   The pathway (id) to get the information from
+ * @param pathwayId The pathway id to get the information from
  * @returns         The converted Pathway object
  */
-export const getPathway = async (pathway: string): Promise<Pathway> => {
+export const findPathway = async (pathwayId: string): Promise<Pathway> => {
     // Request the correct information from the configuration
-    const htmlUrl = `${config.keggPathwayEndpoint}${pathway}`;
-    const pngUrl = `${config.keggPathwayPngEndpoint}${pathway}@2x.png`;
+    const htmlUrl = `${config.keggPathwayEndpoint}${pathwayId}`;
+    const pngUrl = `${config.keggPathwayPngEndpoint}${pathwayId}@2x.png`;
 
     // Request the html from the Kegg website and parse it
     const html = await axios

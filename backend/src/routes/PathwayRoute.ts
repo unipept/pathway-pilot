@@ -1,9 +1,9 @@
 import express from 'express';
 
-import { get } from '../controllers/PathwayController';
+import { getPathway } from '../controllers/PathwayController';
 
 const router = express.Router();
 
-router.get('/:mapId', get);
+router.get('/:mapId', getPathway);
 
 export default router;

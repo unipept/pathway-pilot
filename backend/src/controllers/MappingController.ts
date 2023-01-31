@@ -6,6 +6,15 @@ import {
     findPathwayMappings
 } from "../services/MappingService";
 
+// TODO: Error handling
+
+/**
+ * Get pathway by mapId
+ * 
+ * @param req The request (params: pathwayId)
+ * @param res The response
+ * @returns   The resulting pathway
+ */
 export const getPathwayMapping = async (req: Request, res: Response) => {
     try {
         return res.status(200).json(await findPathwayMapping(req.params.pathwayId))
@@ -14,6 +23,13 @@ export const getPathwayMapping = async (req: Request, res: Response) => {
     }
 }
 
+/**
+ * Get the mapping for all pathways
+ * 
+ * @param req   The request
+ * @param res   The response
+ * @returns     The resulting pathway mapping
+ */
 export const getPathwayMappings = async (req: Request, res: Response) => {
     try {
         const mapping = await findPathwayMappings();
@@ -23,6 +39,13 @@ export const getPathwayMappings = async (req: Request, res: Response) => {
     }
 }
 
+/**
+ * Get KO information by koId
+ * 
+ * @param req The request (params: koId)
+ * @param res The response
+ * @returns   The resulting KO information
+ */
 export const getKoMapping = async (req: Request, res: Response) => {
     try {
         return res.status(200).json(await findKoMapping(req.params.koId))
@@ -31,6 +54,13 @@ export const getKoMapping = async (req: Request, res: Response) => {
     }
 }
 
+/**
+ * Get the mapping for all KO numbers
+ * 
+ * @param req   The request
+ * @param res   The response
+ * @returns     The resulting KO mapping
+ */
 export const getKoMappings = async (req: Request, res: Response) => {
     try {
         const mapping = await findKoMappings();
