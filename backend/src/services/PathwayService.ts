@@ -1,60 +1,73 @@
 import axios from 'axios';
-import { parse } from 'node-html-parser';
+import { HTMLElement, parse } from 'node-html-parser';
 
 import config from '../config/config';
 import { Pathway } from '../models/Pathway';
 import { PathwayNode, RectanglePathwayNode, CirclePathwayNode, PolygonPathwayNode } from '../models/PathwayNode';
-import { KoMap } from '../mappings/KoMap';
 
+/**
+ * Gets the pathway information from the Kegg website
+ * and converts it to a Pathway object
+ * 
+ * @param pathway   The pathway (id) to get the information from
+ * @returns         The converted Pathway object
+ */
 export const getPathway = async (pathway: string): Promise<Pathway> => {
+    // Request the correct information from the configuration
     const htmlUrl = `${config.keggPathwayEndpoint}${pathway}`;
     const pngUrl = `${config.keggPathwayPngEndpoint}${pathway}@2x.png`;
 
-    const koMap = new KoMap().fromKoMapFile('/Users/tibvdm/van-t-pathje/backend/data/ko');
-
+    // Request the html from the Kegg website and parse it
     const html = await axios
         .get(htmlUrl)
         .then(res => parse(res.data))
 
+    // Get all area overlays from the map
     const areas = html.querySelector('#mapdata')?.querySelectorAll('area') ?? [];
 
+    // Get the image from the Kegg website and convert it to base64
+    // This way it can be directly used in the frontend without having to request it again
     const image = await axios.get(pngUrl, {responseType: 'arraybuffer'});
     const imageBase64 = Buffer.from(image.data).toString('base64');
     
     return {
         image: `data:image/png;base64,${imageBase64}`,
-        nodes: areas.map(area => attributeToNode(area.attributes, 2))
+        nodes: areas.map(areaToNode)
     }
 };
 
-const attributeToNode = (attribute: any, scale: number): PathwayNode => {
-    if (attribute.shape === 'rect') {
-        const coords = attribute['data-coords'].split(',');
+/**
+ * Converts an area html element to a PathwayNode
+ * 
+ * @param area  The area to convert
+ * @param scale The correcting scale for the coordinates
+ * @returns     The converted PathwayNode
+ */
+const areaToNode = (area: HTMLElement, scale: number = 2): PathwayNode => {
+    const attributes = area.attributes;
+    const coords = attributes['data-coords'].split(',');
 
-        return new RectanglePathwayNode(
+    switch (attributes.shape) {
+        case 'rect': return new RectanglePathwayNode(
             parseInt(coords[0], 10) * scale,
             parseInt(coords[1], 10) * scale,
             parseInt(coords[2], 10) * scale,
             parseInt(coords[3], 10) * scale,
-            attribute.title
+            attributes.title
         );
-    }
 
-    else if (attribute.shape === 'circle') {
-        const coords = attribute['data-coords'].split(',');
-
-        return new CirclePathwayNode(
+        case 'circle': return new CirclePathwayNode(
             parseInt(coords[0], 10) * scale,
             parseInt(coords[1], 10) * scale,
             parseInt(coords[2], 10) * scale,
-            attribute.title
+            attributes.title
         );
-    }
 
-    else if (attribute.shape === 'poly') {
-        // TODO: scale
-        return new PolygonPathwayNode(attribute['data-coords'], attribute.title);
-    }
+        case 'poly': return new PolygonPathwayNode(
+            attributes['data-coords'], // TODO: scaling
+            attributes.title
+        );
 
-    throw new Error(`Unknown shape: ${attribute.shape}`);
+        default: throw new Error(`Unknown shape: ${attributes.shape}`);
+    }
 };

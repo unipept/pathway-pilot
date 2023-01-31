@@ -1,6 +1,8 @@
 import fs from 'fs';
 import readline from 'readline';
 
+const ecRegex: RegExp = /\[[^\]]*\]/;   /* Regex for EC numbers */
+
 export type KoMapKey = string;
 
 export type KoMapValue = { 
@@ -12,18 +14,34 @@ export type KoMapValue = {
 export class KoMap {
     private readonly koMap: Map<KoMapKey, KoMapValue>
 
-    private ecRegex: RegExp = /\[[^\]]*\]/;
-
     constructor() { this.koMap = new Map<KoMapKey, KoMapValue>(); }
 
-    public addKoNumber(koNumber: KoMapKey, value: KoMapValue): void {
+    /**
+     * Adds a new entry to the koMap
+     * 
+     * @param koNumber  The koNumber of the entry 
+     * @param value     The value of the entry
+     */
+    public add(koNumber: KoMapKey, value: KoMapValue): void {
         this.koMap.set(koNumber, value);
     }
 
-    public get(koNumber: KoMapKey) {
+    /**
+     * Returns the value of the given koNumber
+     * 
+     * @param koNumber  The koNumber of the entry
+     * @returns         The value of the entry
+     */
+    public get(koNumber: KoMapKey): KoMapValue | undefined {
         return this.koMap.get(koNumber);
     }
 
+    /**
+     * Initializes the koMap from a file
+     * 
+     * @param file  The file to read from
+     * @returns     A promise that resolves when the map is initialized
+     */
     public async fromKoMapFile(file: string): Promise<void> {
         const fileStream = fs.createReadStream(file);
 
@@ -40,10 +58,10 @@ export class KoMap {
                 name = symbolString;
             }
 
-            this.addKoNumber(koNumber, { 
+            this.add(koNumber, { 
                 symbols: symbolString.split(',').map(symbol => symbol.trim()),
                 name: name.trim(),
-                ecNumbers: this.ecRegex.exec(name.trim())?.[0].slice(1, -1).split(' ').map(ecNumber => ecNumber.trim().slice(3)) ?? []
+                ecNumbers: ecRegex.exec(name.trim())?.[0].slice(1, -1).split(' ').map(ecNumber => ecNumber.trim().slice(3)) ?? []
             });
         }
     }
