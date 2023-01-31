@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import readline from 'readline';
 
 const ecRegex: RegExp = /\[[^\]]*\]/;   /* Regex for EC numbers */
@@ -42,8 +43,10 @@ export class KoMap {
      * @param file  The file to read from
      * @returns     A promise that resolves when the map is initialized
      */
-    public async fromKoMapFile(file: string): Promise<void> {
-        const fileStream = fs.createReadStream(file);
+    public static async fromKoMapFile(file: string): Promise<KoMap> {
+        const map = new KoMap();
+
+        const fileStream = fs.createReadStream(path.join(__dirname, file));
 
         const rl = readline.createInterface({
             input: fileStream,
@@ -58,14 +61,20 @@ export class KoMap {
                 name = symbolString;
             }
 
-            this.add(koNumber, { 
+            map.add(koNumber.replace('ko:', ''), { 
                 symbols: symbolString.split(',').map(symbol => symbol.trim()),
                 name: name.trim(),
-                ecNumbers: ecRegex.exec(name.trim())?.[0].slice(1, -1).split(' ').map(ecNumber => ecNumber.trim().slice(3)) ?? []
+                ecNumbers: ecRegex.exec(name.trim())?.[0].slice(1, -1).split(' ').map(ecNumber => ecNumber.trim().replace('EC:', '')) ?? []
             });
         }
+
+        return map;
     }
 
     // TODO: Add the option to create this map from a URL
     // Then a saved file can be the backup in case of a failed request
+
+    public toJson(): { [key: string]: KoMapValue } {
+        return Object.fromEntries(this.koMap);
+    }
 };
