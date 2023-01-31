@@ -4,13 +4,13 @@
             :transform="`scale(${scale})`"
             :onclick="() => l('rect clicked: ', area)"
         >
-            <rect v-for="rect in splitRectangle(area, 3)"
+            <rect v-for="rect in splitRectangle(area, area.colors.length)"
                 :x="rect.x1"
                 :y="rect.y1"
                 :width="(rect.x2 - rect.x1)"
                 :height="(rect.y2 - rect.y1)"
                 :fill="rect.color"
-                fill-opacity="0.3"
+                fill-opacity="0.5"
             />
         </g>
 
@@ -40,17 +40,15 @@ defineProps<Props>();
 const l = console.log
 
 const splitRectangle = (rectangle: any, parts: number) => {
+    if (parts === 0) {
+        rectangle.color = "transparent";
+        return [rectangle];
+    }
+
     const width = rectangle.x2 - rectangle.x1;
     const widthDelta = width / parts;
 
     const rectangles = [];
-
-    const colors = [
-        "red",
-        "green",
-        "blue",
-        "purple",
-    ];
 
     for (let i = 0; i < parts; i++) {
         rectangles.push({
@@ -59,7 +57,7 @@ const splitRectangle = (rectangle: any, parts: number) => {
             x2: rectangle.x1 + widthDelta * (i + 1),
             y2: rectangle.y2,
             shape: "rect",
-            color: colors[i],
+            color: rectangle.colors[i],
         });
     }
 
