@@ -2,7 +2,7 @@
     <svg width="100%" height="100%">
         <g v-for="area in areas.filter(a => a.shape === 'rect')"
             :transform="`scale(${scale})`"
-            :onclick="() => l('rect clicked: ', area)"
+            :onclick="() => onClick(area)"
         >
             <rect v-for="rect in splitRectangle(area, area.colors.length)"
                 :x="rect.x1"
@@ -16,14 +16,14 @@
 
         <g v-for="area in areas.filter(a => a.shape === 'circle')"
             :transform="`scale(${scale})`"
-            :onclick="() => l('circle clicked: ', area)"
+            :onclick="() => onClick(area)"
         >
             <circle
                 :cx="area.x"
                 :cy="area.y"
                 :r="area.r"
                 fill="red"
-                fill-opacity="0.1"
+                fill-opacity="0.5"
             />
         </g>
     </svg>
@@ -33,11 +33,11 @@
 export interface Props {
     areas: any[];
     scale: number;
+
+    onClick: (area: any) => void;
 };
 
 defineProps<Props>();
-
-const l = console.log
 
 const splitRectangle = (rectangle: any, parts: number) => {
     if (parts === 0) {

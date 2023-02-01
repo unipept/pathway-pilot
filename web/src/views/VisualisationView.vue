@@ -9,12 +9,18 @@
                 v-if="imageLoaded"
                 :areas="areas"
                 :scale="scale"
+                :onClick="onClickArea"
             />
         </reactive-image>
         <taxon-legend
             v-if="imageLoaded"
             class="legend"
             :items="computeItems()"
+        />
+
+        <area-modal
+            :model-value="areaModalOpen"
+            @update:model-value="areaModalOpen = $event"
         />
 
         <v-btn class="mt-5" color="primary" @click="() => onBack($router)">
@@ -38,13 +44,11 @@ import ReactiveImage from '@/components/images/ReactiveImage.vue';
 import ImageOverlay from '@/components/images/ImageOverlay.vue';
 import useFileStore from '@/stores/FileStore';
 import useVisualisationStore from '@/stores/VisualisationStore';
-import {computed, onMounted, ref} from "vue";
+import { onMounted, ref } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
 import { Router } from 'vue-router';
 import TaxonLegend from '@/components/legends/TaxonLegend.vue';
-import ECEntry from '@/logic/entities/ECEntry';
-
-const l = console.log
+import AreaModal from '@/components/modals/AreaModal.vue';
 
 const fileStore = useFileStore();
 const visualisationStore = useVisualisationStore();
@@ -54,6 +58,8 @@ const areas  = ref<any[]>([])
 
 const imageLoaded = ref<boolean>(false)
 const scale = ref<number>(1)
+
+const areaModalOpen = ref<boolean>(false)
 
 const computeItems = () => {
     return visualisationStore.highlightedTaxa.map(taxonId => {
@@ -71,11 +77,22 @@ const onResize = (event: any) => {
     }
 }
 
+const onBack = (router: Router) => {
+    router.push("/selection");
+};
+
+const onClickArea = (area: any) => {
+    areaModalOpen.value = true;
+}
+
+const computeTaxonColor = (taxonId: number) => {
+    return ColorConstants.LEGEND[visualisationStore.highlightedTaxa.indexOf(taxonId)];
+}
+
 onMounted(async () => {
     const response = await fetch(`http://localhost:4000/pathway/${visualisationStore.pathwayId!.replace("path:ec", "map")}`);
     const data     = await response.json();
     pngUrl.value = data.image;
-    //areas.value  = data.nodes;
 
     const tmp = []
     for (const node of data.nodes) {
@@ -83,6 +100,8 @@ onMounted(async () => {
         area.colors = []
 
         if (area.info.ecNumbers.length === 0) {
+            tmp.push(area);
+
             continue;
         }
 
@@ -96,18 +115,8 @@ onMounted(async () => {
         tmp.push(area);
     }
 
-    console.log(tmp)
-
     areas.value = tmp;
 });
-
-const computeTaxonColor = (taxonId: number) => {
-    return ColorConstants.LEGEND[visualisationStore.highlightedTaxa.indexOf(taxonId)];
-}
-
-const onBack = (router: Router) => {
-    router.push("/selection");
-};
 </script>
 
 <style scoped>
