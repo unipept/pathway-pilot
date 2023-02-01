@@ -1,7 +1,9 @@
 import express from 'express';
 import { 
     getKoMapping,
-    getKoMappings,  
+    getKoMappings,
+    getEcMapping,
+    getEcMappings,  
     getPathwayMapping, 
     getPathwayMappings 
 } from '../controllers/MappingController';
@@ -12,6 +14,9 @@ router.get('/pathway', getPathwayMappings);
 router.get('/pathway/:pathwayId', getPathwayMapping);
 
 router.get('/ko', getKoMappings);
-router.get('/ko/:koId', getKoMapping);
+router.get('/ko/:koNumber', getKoMapping);
+
+router.get('/ec', getEcMappings);
+router.get('/ec/:ecNumber', getEcMapping);
 
 export default router;

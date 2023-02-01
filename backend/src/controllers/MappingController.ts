@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { 
     findKoMapping, 
-    findKoMappings, 
+    findKoMappings,
+    findEcMapping, 
+    findEcMappings, 
     findPathwayMapping,
     findPathwayMappings
 } from "../services/MappingService";
@@ -33,22 +35,22 @@ export const getPathwayMapping = async (req: Request, res: Response) => {
 export const getPathwayMappings = async (req: Request, res: Response) => {
     try {
         const mapping = await findPathwayMappings();
-        return res.status(200).json(mapping.toJson());
+        return res.status(200).json(Object.fromEntries(mapping));
     } catch (err) {
         console.log(err);
     }
 }
 
 /**
- * Get KO information by koId
+ * Get KO information by KO number
  * 
- * @param req The request (params: koId)
+ * @param req The request (params: koNumber)
  * @param res The response
  * @returns   The resulting KO information
  */
 export const getKoMapping = async (req: Request, res: Response) => {
     try {
-        return res.status(200).json(await findKoMapping(req.params.koId))
+        return res.status(200).json(await findKoMapping(req.params.koNumber))
     } catch (err) {
         console.log(err);
     }
@@ -64,7 +66,38 @@ export const getKoMapping = async (req: Request, res: Response) => {
 export const getKoMappings = async (req: Request, res: Response) => {
     try {
         const mapping = await findKoMappings();
-        return res.status(200).json(mapping.toJson());
+        return res.status(200).json(Object.fromEntries(mapping));
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+/**
+ * Get EC information by EC number
+ * 
+ * @param req The request (params: ecNumber)
+ * @param res The response
+ * @returns   The resulting EC information
+ */
+export const getEcMapping = async (req: Request, res: Response) => {
+    try {
+        return res.status(200).json(await findEcMapping(req.params.ecNumber))
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+/**
+ * Get the mapping for all EC numbers
+ * 
+ * @param req   The request
+ * @param res   The response
+ * @returns     The resulting EC mapping
+ */
+export const getEcMappings = async (req: Request, res: Response) => {
+    try {
+        const mapping = await findEcMappings();
+        return res.status(200).json(Object.fromEntries(mapping));
     } catch (err) {
         console.log(err);
     }

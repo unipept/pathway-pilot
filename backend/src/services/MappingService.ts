@@ -1,5 +1,8 @@
 import { PathwayMap } from "../mappings/PathwayMap";
 import { KoMap } from "../mappings/KoMap";
+import { buildPathwayMap } from "./mapping/PathwayMappingService";
+import { buildKoMap } from "./mapping/KoMappingService";
+import { buildEcMap } from "./mapping/EcMappingService";
 
 // TODO: Put file locations in config file
 // TODO: Better error differentiation
@@ -12,7 +15,7 @@ import { KoMap } from "../mappings/KoMap";
  * @throws          Error if the pathwayId is not found
  */
 export const findPathwayMapping = async (pathwayId: string) => {
-    const mapping = await PathwayMap.fromPathwayMapFile("../../data/pathway");
+    const mapping = await buildPathwayMap();
 
     const pathway = mapping.get(pathwayId);
     if (!pathway) {
@@ -28,20 +31,20 @@ export const findPathwayMapping = async (pathwayId: string) => {
  * @returns All pathway mappings
  */
 export const findPathwayMappings = async () => {
-    return await PathwayMap.fromPathwayMapFile("../../data/pathway");
+    return await buildPathwayMap();
 };
 
 /**
  * Finds the KO mapping for the given KO number
  * 
- * @param koId The KO number to find the mapping for
- * @returns    The mapping for the given KO number
- * @throws     Error if the KO number is not found
+ * @param koNumber  The KO number to find the mapping for
+ * @returns         The mapping for the given KO number
+ * @throws          Error if the KO number is not found
  */
-export const findKoMapping = async (koId: string) => {
-    const mapping = await KoMap.fromKoMapFile("../../data/ko");
+export const findKoMapping = async (koNumber: string) => {
+    const mapping = await buildKoMap();
 
-    const pathway = mapping.get(koId);
+    const pathway = mapping.get(koNumber);
     if (!pathway) {
         throw new Error("KO number not found");
     }
@@ -55,5 +58,32 @@ export const findKoMapping = async (koId: string) => {
  * @returns All KO mappings
  */
 export const findKoMappings = async () => {
-    return await KoMap.fromKoMapFile("../../data/ko");
+    return await buildKoMap();
+};
+
+/**
+ * Finds the EC mapping for the given EC number
+ * 
+ * @param ecNumber  The EC number to find the mapping for
+ * @returns         The mapping for the given EC number
+ * @throws          Error if the EC number is not found
+ */
+export const findEcMapping = async (ecNumber: string) => {
+    const mapping = await buildEcMap();
+
+    const pathway = mapping.get(ecNumber);
+    if (!pathway) {
+        throw new Error("EC number not found");
+    }
+
+    return pathway;
+};
+
+/**
+ * Finds all EC mappings
+ * 
+ * @returns All EC mappings
+ */
+export const findEcMappings = async () => {
+    return await buildEcMap();
 };
