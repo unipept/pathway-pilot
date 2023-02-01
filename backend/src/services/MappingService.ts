@@ -1,10 +1,7 @@
-import { PathwayMap } from "../mappings/PathwayMap";
-import { KoMap } from "../mappings/KoMap";
-import { buildPathwayMap } from "./mapping/PathwayMappingService";
-import { buildKoMap } from "./mapping/KoMappingService";
-import { buildEcMap } from "./mapping/EcMappingService";
+import { buildPathwayMap } from "../mappings/PathwayMap";
+import { buildKoMap } from "../mappings/KoMap";
+import { buildEcMap } from "../mappings/EcMap";
 
-// TODO: Put file locations in config file
 // TODO: Better error differentiation
 
 /**

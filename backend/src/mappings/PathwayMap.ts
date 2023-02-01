@@ -1,70 +1,80 @@
-import fs from 'fs';
-import path from 'path';
-import readline from 'readline';
+import ReaderMap from "./ReaderMap";
+
+// TODO: Replaces could be done on fetch once a day
+// TODO: Then also throw out path:ko or path:ec from the file
+// TODO: So much duplicate code, refactor
+// TODO: Put file locations in config file
 
 export type PathwayKey = string;
 
-export type PathwayValue = string;
+export type PathwayValue = {
+    name: string;
+    ecNumbers: string[];
+    koNumbers: string[];
+};
 
-export class PathwayMap {
-    constructor(
-        private readonly pathwayMap: Map<PathwayKey, PathwayValue> = new Map()
-    ) {}
-
-    /**
-     * Adds a new entry to the pathwayMap
-     * 
-     * @param pathwayId The pathwayId of the entry 
-     * @param value     The value of the entry
-     */
-    public add(pathwayId: PathwayKey, value: PathwayValue): void {
-        this.pathwayMap.set(pathwayId, value);
+export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
+    constructor() {
+        super();
     }
 
-    /**
-     * Returns the value of the given pathwayId
-     * 
-     * @param pathwayId The pathwayId of the entry
-     * @returns         The value of the entry
-     */
-    public get(pathwayId: PathwayKey): PathwayValue | undefined {
-        return this.pathwayMap.get(pathwayId);
+    public async setup() {
+        await this.setupName();
+        await this.setupEcNumbers();
+        await this.setupKoNumbers();
+
+        return this;
     }
 
-    /**
-     * Initializes the pathwayMap from a file
-     * 
-     * @param file  The file to read from
-     * @returns     A promise that resolves when the map is initialized
-     */
-    public static async fromPathwayMapFile(file: string): Promise<PathwayMap> {
-        const map = new PathwayMap();
-        
-        const fileStream = fs.createReadStream(path.join(__dirname, file));
+    private async setupName() {
+        await this.readlines('../../data/pathway', (line: string) => {
+            const [ pathwayId, name ] = line.split('\t');
 
-        const rl = readline.createInterface({
-            input: fileStream,
-            crlfDelay: Infinity
+            this.set(pathwayId.replace('path:', ''), { 
+                name: name.trim(), 
+                ecNumbers: [], 
+                koNumbers: [] 
+            });
         });
-
-        for await (const line of rl) {
-            const [ pathwayId, name ] = line.split('\t')
-
-            map.add(pathwayId.slice(5), name.trim())
-        }
-
-        return map;
     }
 
-    // TODO: Add the option to create this map from a URL
-    // Then a saved file can be the backup in case of a failed request
+    private async setupEcNumbers() {
+        await this.readlines('../../data/link/pathway2ec', (line: string) => {
+            const [ pathwayId, ecNumber ] = line.split('\t');
 
-    /**
-     * Converts the pathwayMap to a JSON object
-     * 
-     * @returns The JSON object
-     */
-    public toJson(): { [key: string]: string } {
-        return Object.fromEntries(this.pathwayMap);
+            if (pathwayId.startsWith('path:ec')) {
+                return;
+            }
+
+            const pathway = this.get(pathwayId.replace('path:', ''));
+            if (pathway && !pathway.ecNumbers.includes(ecNumber.replace('ec:', ''))) {
+                pathway.ecNumbers.push(ecNumber.replace('ec:', ''));
+            } else {
+                // TODO: add logging or error handling
+                console.log(`Pathway ${pathwayId} not found`);
+            }
+        });
+    }
+
+    private async setupKoNumbers() {
+        await this.readlines('../../data/link/pathway2ko', (line: string) => {
+            const [ pathwayId, koNumber ] = line.split('\t');
+
+            if (pathwayId.startsWith('path:ko')) {
+                return;
+            }
+
+            const pathway = this.get(pathwayId.replace('path:', ''));
+            if (pathway && !pathway.koNumbers.includes(koNumber.replace('ko:', ''))) {
+                pathway.koNumbers.push(koNumber.replace('ko:', ''));
+            } else {
+                // TODO: add logging or error handling
+                console.log(`Pathway ${pathwayId} not found`);
+            }
+        });
     }
 }
+
+export const buildPathwayMap = async () => {
+    return await new PathwayMap().setup();
+};

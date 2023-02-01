@@ -1,85 +1,76 @@
-import fs from 'fs';
-import path from 'path';
-import readline from 'readline';
+import ReaderMap from './ReaderMap';
 
-const ecRegex: RegExp = /\[[^\]]*\]/;   /* Regex for EC numbers */
+// TODO: Replaces could be done on fetch once a day
+// TODO: Then also throw out path:ko or path:ec from the file
+// TODO: So much duplicate code, refactor
+// TODO: Put file locations in config file
 
-export type KoMapKey = string;
+export type KoKey = string;
 
-export type KoMapValue = { 
-    symbols: string[],
-    name: string,
-    ecNumbers: string[]
+export type KoValue = {
+    name: string;
+    pathways: string[];
+    ecNumbers: string[];
 };
 
-export class KoMap {
-    constructor(
-        private readonly koMap: Map<KoMapKey, KoMapValue> = new Map()
-    ) {}
-
-    /**
-     * Adds a new entry to the koMap
-     * 
-     * @param koNumber  The koNumber of the entry 
-     * @param value     The value of the entry
-     */
-    public add(koNumber: KoMapKey, value: KoMapValue): void {
-        this.koMap.set(koNumber, value);
+export class KoMap extends ReaderMap<KoKey, KoValue> {
+    constructor() {
+        super();
     }
 
-    /**
-     * Returns the value of the given koNumber
-     * 
-     * @param koNumber  The koNumber of the entry
-     * @returns         The value of the entry
-     */
-    public get(koNumber: KoMapKey): KoMapValue | undefined {
-        return this.koMap.get(koNumber);
+    public async setup() {
+        await this.setupName();
+        await this.setupPathways();
+        await this.setupEcNumbers();
+
+        return this;
     }
 
-    /**
-     * Initializes the koMap from a file
-     * 
-     * @param file  The file to read from
-     * @returns     A promise that resolves when the map is initialized
-     */
-    public static async fromKoMapFile(file: string): Promise<KoMap> {
-        const map = new KoMap();
+    private async setupName() {
+        await this.readlines('../../data/ko', (line: string) => {
+            const [ koNumber, name ] = line.split('\t');
 
-        const fileStream = fs.createReadStream(path.join(__dirname, file));
-
-        const rl = readline.createInterface({
-            input: fileStream,
-            crlfDelay: Infinity
+            this.set(koNumber.replace('ko:', ''), { 
+                name: name.trim(),
+                pathways: [], 
+                ecNumbers: [] 
+            });
         });
+    }
 
-        for await (const line of rl) {
-            const [ koNumber, information ] = line.split('\t');
-            let [ symbolString, name ] = information.split(';');
+    private async setupPathways() {
+        await this.readlines('../../data/link/ko2pathway', (line: string) => {
+            const [ koNumber, pathwayId ] = line.split('\t');
 
-            if (!name) {
-                name = symbolString;
+            if (pathwayId.startsWith('path:ko')) {
+                return;
             }
 
-            map.add(koNumber.replace('ko:', ''), { 
-                symbols: symbolString.split(',').map(symbol => symbol.trim()),
-                name: name.trim(),
-                ecNumbers: ecRegex.exec(name.trim())?.[0].slice(1, -1).split(' ').map(ecNumber => ecNumber.trim().replace('EC:', '')) ?? []
-            });
-        }
-
-        return map;
+            const ko = this.get(koNumber.replace('ko:', ''));
+            if (ko && !ko.pathways.includes(pathwayId.replace('path:', ''))) {
+                ko.pathways.push(pathwayId.replace('path:', ''));
+            } else {
+                // TODO: add logging or error handling
+                console.log(`KO number ${ko} not found`);
+            }
+        });
     }
 
-    // TODO: Add the option to create this map from a URL
-    // Then a saved file can be the backup in case of a failed request
+    private async setupEcNumbers() {
+        await this.readlines('../../data/link/ko2ec', (line: string) => {
+            const [ koNumber, ecNumber ] = line.split('\t');
 
-    /**
-     * Converts the koMap to a JSON object
-     * 
-     * @returns The JSON object
-     */
-    public toJson(): { [key: string]: KoMapValue } {
-        return Object.fromEntries(this.koMap);
+            const ko = this.get(koNumber.replace('ko:', ''));
+            if (ko && !ko.ecNumbers.includes(ecNumber.replace('ec:', ''))) {
+                ko.ecNumbers.push(ecNumber.replace('ec:', ''));
+            } else {
+                // TODO: add logging or error handling
+                console.log(`KO number ${ko} not found`);
+            }
+        });
     }
+};
+
+export const buildKoMap = async () => {
+    return await new KoMap().setup();
 };
