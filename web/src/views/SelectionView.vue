@@ -57,13 +57,13 @@
 import { computed, ref } from 'vue';
 import PathwayTable from '@/components/tables/PathwayTable.vue';
 import SpeciesTable from '@/components/tables/SpeciesTable.vue';
-import useFileStore from '@/stores/FileStore';
 import { Router } from 'vue-router';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import Taxon from '@/logic/entities/Taxon';
 import PathwayEntry from '@/logic/entities/PathwayEntry';
+import useMappingStore from '@/stores/MappingStore';
 
-const fileStore = useFileStore();
+const mappingStore = useMappingStore();
 const visualisationStore = useVisualisationStore();
 
 const pathwaySearch = ref<string>("");
@@ -77,7 +77,7 @@ const speciesItems = computed(() => {
         return [];
     }
 
-    return [...fileStore.parsedFile?.pathwaysToTaxa.get(pathwaySelected.value?.id)!]
+    return [...mappingStore.pathwaysToTaxa.get(pathwaySelected.value?.id)!]
         .filter((taxon: Taxon) => taxon.id !== 1)
         .map((taxon: Taxon) => {
             return {
@@ -89,12 +89,12 @@ const speciesItems = computed(() => {
         });
 })
 
-const pathwayItems = [...fileStore.parsedFile?.pathways.values()!]
+const pathwayItems = [...mappingStore.pathways.values()!]
     .filter((pathway: PathwayEntry) => pathway.id)
     .map((pathway: PathwayEntry) => {
         return {
             id: pathway.id,
-            count: fileStore.parsedFile?.pathwaysToPeptideCounts.get(pathway.id)!
+            count: mappingStore.pathwaysToPeptideCounts.get(pathway.id)!
         };
     });
 

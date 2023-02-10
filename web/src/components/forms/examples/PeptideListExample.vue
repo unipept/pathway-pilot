@@ -9,6 +9,7 @@
             readonly 
             dense
             hide-details 
+            no-resize
         />
 
         <span class="font-weight-bold text-caption">Info: </span>

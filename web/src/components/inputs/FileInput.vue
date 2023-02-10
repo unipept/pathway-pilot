@@ -5,6 +5,7 @@
         @dragenter.prevent="dragover = true"
         @dragleave.prevent="dragover = false"
         @click="openFilePicker"
+        :disabled="disabled"
         :class="{ 'grey lighten-2': dragover }"
         class="file-input d-flex align-center"
         flat
@@ -17,8 +18,8 @@
                 <p>
                     Drop your file here, or click anywhere to select it.
                 </p>
-                <p v-if="uploadedFile" class="text-green mt-3">
-                    {{ uploadedFile.name }} ({{ uploadedFile.size }} bytes)
+                <p v-if="file" class="text-green mt-3">
+                    {{ file.name }} ({{ file.size }} bytes)
                 </p>
             </v-row>
         </v-card-text>
@@ -26,13 +27,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import useFileStore from '@/stores/FileStore';
-import { storeToRefs } from 'pinia';
+import { ref, watch } from 'vue';
 
-const fileStore = useFileStore();
+export interface Props {
+    modelValue: File | undefined;
+    disabled: boolean;
+}
 
-const { uploadedFile } = storeToRefs(fileStore);
+const props = defineProps<Props>();
+
+const emits = defineEmits(["upload"]);
+
+const file = ref<File | undefined>(props.modelValue);
 
 const dragover = ref<boolean>(false);
 
@@ -42,20 +48,25 @@ const onDrop = (event: any) => {
     if (event.dataTransfer.files.length > 1) {
         console.log("TODO: error message");
     } else {
-        fileStore.upload(event.dataTransfer.files[0]);
-        console.log(event.dataTransfer.files[0]);
+        file.value = event.dataTransfer.files[0];
+        emits("upload", file.value);
     }
 }
 
 const openFilePicker = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.csv';
+    // input.accept = '.csv';
     input.onchange = (event: any) => {
-        fileStore.upload(event.target.files[0]);
+        file.value = event.target.files[0];
+        emits("upload", file.value);
     }
     input.click();
 }
+
+watch(() => props.modelValue, (newVal: File | undefined) => {
+    file.value = newVal;
+});
 </script>
 
 <style scoped>

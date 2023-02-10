@@ -42,15 +42,15 @@
 <script setup lang="ts">
 import ReactiveImage from '@/components/images/ReactiveImage.vue';
 import ImageOverlay from '@/components/images/ImageOverlay.vue';
-import useFileStore from '@/stores/FileStore';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import { onMounted, ref } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
 import { Router } from 'vue-router';
 import TaxonLegend from '@/components/legends/TaxonLegend.vue';
 import AreaModal from '@/components/modals/AreaModal.vue';
+import useMappingStore from '@/stores/MappingStore';
 
-const fileStore = useFileStore();
+const mappingStore = useMappingStore();
 const visualisationStore = useVisualisationStore();
 
 const pngUrl = ref<string | undefined>(undefined)
@@ -64,7 +64,7 @@ const areaModalOpen = ref<boolean>(false)
 const computeItems = () => {
     return visualisationStore.highlightedTaxa.map(taxonId => {
         return {
-            label: fileStore.parsedFile?.taxa.get(taxonId)?.name ?? "Unknown",
+            label: mappingStore.taxa.get(taxonId)?.name ?? "Unknown",
             color: computeTaxonColor(taxonId)
         };
     });
@@ -106,7 +106,7 @@ onMounted(async () => {
         }
 
         for (const taxonId of visualisationStore.highlightedTaxa) {
-            const ec = Array.from(fileStore.parsedFile?.taxaToEcs.get(taxonId)!).map(e => e.id);
+            const ec = Array.from(mappingStore.taxaToEcs.get(taxonId)!).map(e => e.id);
             if (ec.includes(area.info.ecNumbers[0].id)) {
                 area.colors.push(computeTaxonColor(taxonId));
             }

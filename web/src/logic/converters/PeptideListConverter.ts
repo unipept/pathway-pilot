@@ -32,7 +32,7 @@ export default class PeptideListConverter {
                             taxon_name: info.taxon_name,
                             taxon_rank: info.taxon_rank,
                             ec: ec.ec_number,
-                            pathways: pathway,
+                            pathway: pathway,
                             count: 0
                         };
                     }
