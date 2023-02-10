@@ -1,22 +1,23 @@
 <template>
-    <div v-if="pngUrl" class="image-container">
+    <div v-if="pngUrl">
+        <horizontal-legend v-if="imageLoaded"
+            class="legend"
+            :items="computeItems()"
+        />
+
         <reactive-image 
+            ref="image"
+            class="image-container"
             :src="pngUrl" 
             alt="Pathway"
             @resize="onResize"
         >
-            <image-overlay 
-                v-if="imageLoaded"
+            <image-overlay v-if="imageLoaded"
                 :areas="areas"
                 :scale="scale"
                 :onClick="onClickArea"
             />
         </reactive-image>
-        <taxon-legend
-            v-if="imageLoaded"
-            class="legend"
-            :items="computeItems()"
-        />
 
         <area-modal
             :model-value="areaModalOpen"
@@ -25,6 +26,10 @@
 
         <v-btn class="mt-5" color="primary" @click="() => onBack($router)">
             Back
+        </v-btn>
+
+        <v-btn class="mt-5 float-right" color="primary" @click="onDownload">
+            Download
         </v-btn>
     </div>
 
@@ -46,12 +51,15 @@ import useVisualisationStore from '@/stores/VisualisationStore';
 import { onMounted, ref } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
 import { Router } from 'vue-router';
-import TaxonLegend from '@/components/legends/TaxonLegend.vue';
+import HorizontalLegend from '@/components/legends/HorizontalLegend.vue';
 import AreaModal from '@/components/modals/AreaModal.vue';
 import useMappingStore from '@/stores/MappingStore';
+import { toPng } from 'html-to-image';
 
 const mappingStore = useMappingStore();
 const visualisationStore = useVisualisationStore();
+
+const image = ref<HTMLElement | null>(null);
 
 const pngUrl = ref<string | undefined>(undefined)
 const areas  = ref<any[]>([])
@@ -87,6 +95,20 @@ const onClickArea = (area: any) => {
 
 const computeTaxonColor = (taxonId: number) => {
     return ColorConstants.LEGEND[visualisationStore.highlightedTaxa.indexOf(taxonId)];
+}
+
+const onDownload = async (scale: number = 4) => {
+    if (!image.value) {
+        return;
+    }
+
+    // @ts-ignore
+    const url = await toPng(image.value.$el, { pixelRatio: scale });
+
+    const link = document.createElement('a');
+    link.download = 'pathway.png';
+    link.href = url;
+    link.click();
 }
 
 onMounted(async () => {
@@ -125,10 +147,8 @@ onMounted(async () => {
 }
 
 .legend {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  z-index: 10;
-  background-color: white;
+    margin-bottom: 12px;
+    font-size: 90%;
+    background-color: white;
 }
 </style>
