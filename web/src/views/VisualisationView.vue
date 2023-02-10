@@ -97,13 +97,13 @@ const computeTaxonColor = (taxonId: number) => {
     return ColorConstants.LEGEND[visualisationStore.highlightedTaxa.indexOf(taxonId)];
 }
 
-const onDownload = async (scale: number = 4) => {
+const onDownload = async () => {
     if (!image.value) {
         return;
     }
 
     // @ts-ignore
-    const url = await toPng(image.value.$el, { pixelRatio: scale });
+    const url = await toPng(image.value.$el, { pixelRatio: 4 });
 
     const link = document.createElement('a');
     link.download = 'pathway.png';

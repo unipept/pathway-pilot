@@ -22,7 +22,7 @@
                 :cx="area.x"
                 :cy="area.y"
                 :r="area.r"
-                fill="red"
+                fill="none"
                 fill-opacity="0.5"
             />
         </g>
