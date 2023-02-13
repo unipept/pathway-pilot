@@ -1,5 +1,5 @@
 import { buildPathwayMap } from "../mappings/PathwayMap";
-import { buildKoMap } from "../mappings/KoMap";
+import koMap from "../mappings/KoMap";
 import { buildEcMap } from "../mappings/EcMap";
 
 // TODO: Better error differentiation
@@ -38,10 +38,8 @@ export const findPathwayMappings = async () => {
  * @returns         The mapping for the given KO number
  * @throws          Error if the KO number is not found
  */
-export const findKoMapping = async (koNumber: string) => {
-    const mapping = await buildKoMap();
-
-    const pathway = mapping.get(koNumber);
+export const findKoMapping = (koNumber: string) => {
+    const pathway = koMap.get(koNumber);
     if (!pathway) {
         throw new Error("KO number not found");
     }
@@ -54,8 +52,8 @@ export const findKoMapping = async (koNumber: string) => {
  * 
  * @returns All KO mappings
  */
-export const findKoMappings = async () => {
-    return await buildKoMap();
+export const findKoMappings = () => {
+    return koMap;
 };
 
 /**

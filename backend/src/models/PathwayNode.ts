@@ -16,8 +16,7 @@ export class RectanglePathwayNode extends PathwayNode {
         private x2: number,             /* X coordinate of the bottom right corner */
         private y2: number,             /* Y coordinate of the bottom right corner */
         title: string,                  /* Title of the node */
-        koMap: KoMap
-    ) { super(PathwayShape.RECTANGLE, new NodeInformation(title, koMap)); }
+    ) { super(PathwayShape.RECTANGLE, new NodeInformation(title)); }
 };
 
 export class CirclePathwayNode extends PathwayNode {
@@ -26,14 +25,12 @@ export class CirclePathwayNode extends PathwayNode {
         private y: number,              /* Y coordinate of the center */
         private r: number,              /* Radius of the circle */
         title: string,                  /* Title of the node */
-        koMap: KoMap
-    ) { super(PathwayShape.CIRCLE, new NodeInformation(title, koMap)); }
+    ) { super(PathwayShape.CIRCLE, new NodeInformation(title)); }
 };
 
 export class PolygonPathwayNode extends PathwayNode {
     constructor(
         private points: string,         /* Points of the polygon */
         title: string,                  /* Title of the node */
-        koMap: KoMap
-    ) { super(PathwayShape.POLYGON, new NodeInformation(title, koMap)); }
+    ) { super(PathwayShape.POLYGON, new NodeInformation(title)); }
 };

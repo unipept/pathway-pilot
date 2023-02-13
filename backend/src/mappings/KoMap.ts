@@ -5,6 +5,8 @@ import ReaderMap from './ReaderMap';
 // TODO: So much duplicate code, refactor
 // TODO: Put file locations in config file
 
+const descriptionEcRegex: RegExp = /\[EC:([^\]]+)\]$/;
+
 export type KoKey = string;
 
 export type KoValue = {
@@ -14,63 +16,59 @@ export type KoValue = {
 };
 
 export class KoMap extends ReaderMap<KoKey, KoValue> {
-    constructor() {
+    constructor(
+        descriptionFile: string = '../../data/ko', 
+        pathwayLinkFile: string = '../../data/link/ko2pathway', 
+        ecLinkFile: string = '../../data/link/ko2ec'
+    ) {
         super();
+
+        this.handleDescriptionFile(descriptionFile);
+        this.handlePathwayLinkFile(pathwayLinkFile);
+        this.handleEcLinkFile(ecLinkFile);
     }
 
-    public async setup() {
-        await this.setupName();
-        await this.setupPathways();
-        await this.setupEcNumbers();
+    private handleDescriptionFile(descriptionFile: string) {
+        this.readlines(descriptionFile, (line: string) => {
+            const [ koNumber, description ] = line.split('\t');
 
-        return this;
-    }
-
-    private async setupName() {
-        await this.readlines('../../data/ko', (line: string) => {
-            const [ koNumber, name ] = line.split('\t');
+            const ecNumbers = description.match(descriptionEcRegex)?.[1]?.split(' ');
 
             this.set(koNumber.replace('ko:', ''), { 
-                name: name.trim(),
+                name: description.trim(),
                 pathways: [], 
-                ecNumbers: [] 
+                ecNumbers: ecNumbers ?? [] 
             });
         });
     }
 
-    private async setupPathways() {
-        await this.readlines('../../data/link/ko2pathway', (line: string) => {
+    private handlePathwayLinkFile(pathwayLinkFile: string) {
+        this.readlines(pathwayLinkFile, (line: string) => {
             const [ koNumber, pathwayId ] = line.split('\t');
-
-            if (pathwayId.startsWith('path:ko')) {
-                return;
-            }
 
             const ko = this.get(koNumber.replace('ko:', ''));
             if (ko && !ko.pathways.includes(pathwayId.replace('path:', ''))) {
                 ko.pathways.push(pathwayId.replace('path:', ''));
             } else {
-                // TODO: add logging or error handling
-                console.log(`KO number ${ko} not found`);
+                // TODO: add logging or error handling or add without description
+                console.log(`KO number ${koNumber.replace('ko:', '')} not found`);
             }
         });
     }
 
-    private async setupEcNumbers() {
-        await this.readlines('../../data/link/ko2ec', (line: string) => {
+    private handleEcLinkFile(ecLinkFile: string) {
+        this.readlines(ecLinkFile, (line: string) => {
             const [ koNumber, ecNumber ] = line.split('\t');
 
             const ko = this.get(koNumber.replace('ko:', ''));
             if (ko && !ko.ecNumbers.includes(ecNumber.replace('ec:', ''))) {
                 ko.ecNumbers.push(ecNumber.replace('ec:', ''));
             } else {
-                // TODO: add logging or error handling
-                console.log(`KO number ${ko} not found`);
+                // TODO: add logging or error handling or add without description
+                console.log(`KO number ${koNumber.replace('ko:', '')} not found`);
             }
         });
     }
 };
 
-export const buildKoMap = async () => {
-    return await new KoMap().setup();
-};
+export default new KoMap();

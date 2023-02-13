@@ -1,4 +1,4 @@
-import { KoMap } from "../mappings/KoMap";
+import koMap from "../mappings/KoMap";
 import { Compound } from "./annotations/Compound";
 import { EcNumber } from "./annotations/EcNumber";
 import { KeggMap } from "./annotations/KeggMap";
@@ -18,19 +18,14 @@ export default class NodeInformation {
     private compounds: Compound[];      /* Compounds */
     private keggMaps: KeggMap[];        /* Kegg maps */
 
-    private koMap: KoMap;               /* KO map */
-
     constructor(
-        title: string,                  /* Title of the node */
-        koMap: KoMap
+        title: string                   /* Title of the node */
     ) {
         this.ecNumbers = [];
         this.koNumbers = [];
         this.reactions = [];
         this.compounds = [];
         this.keggMaps  = [];
-
-        this.koMap = koMap;
 
         this.parseTitle(title);
     }
@@ -42,14 +37,9 @@ export default class NodeInformation {
             const id = item.trim();
 
             if (koRegex.test(id)) {
-                const koDesc = this.koMap.get(id);
+                this.koNumbers.push({ id: id, name: 'TODO' });
 
-                const m = koDesc?.name?.match(/\[([^\]]+)\]$/);
-
-                const ecNumbers = m?.[1]?.replace('EC:', '').split(' ');
-
-                this.koNumbers.push({ id: id, name: koDesc?.name ?? 'none' });
-
+                const ecNumbers = koMap.get(id)?.ecNumbers;
                 for (const ec of ecNumbers ?? []) {
                     this.ecNumbers.push({ id: ec });
                 }
