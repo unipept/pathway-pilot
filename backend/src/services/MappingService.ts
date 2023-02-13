@@ -1,6 +1,6 @@
 import { buildPathwayMap } from "../mappings/PathwayMap";
 import koMap from "../mappings/KoMap";
-import { buildEcMap } from "../mappings/EcMap";
+import ecMap from "../mappings/EcMap";
 
 // TODO: Better error differentiation
 
@@ -64,9 +64,7 @@ export const findKoMappings = () => {
  * @throws          Error if the EC number is not found
  */
 export const findEcMapping = async (ecNumber: string) => {
-    const mapping = await buildEcMap();
-
-    const pathway = mapping.get(ecNumber);
+    const pathway = ecMap.get(ecNumber);
     if (!pathway) {
         throw new Error("EC number not found");
     }
@@ -80,5 +78,5 @@ export const findEcMapping = async (ecNumber: string) => {
  * @returns All EC mappings
  */
 export const findEcMappings = async () => {
-    return await buildEcMap();
+    return ecMap;
 };

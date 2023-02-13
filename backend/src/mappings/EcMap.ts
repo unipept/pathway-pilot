@@ -14,63 +14,57 @@ export type EcValue = {
 };
 
 class EcMap extends ReaderMap<EcKey, EcValue> {
-    constructor() {
+    constructor(
+        private descriptionFile: string = '../../data/ec',
+        private pathwayLinkFile: string = '../../data/link/ec2pathway',
+        private koLinkFile: string = '../../data/link/ec2ko'
+    ) {
         super();
+
+        this.handleDescriptionFile(descriptionFile);
+        this.handlePathwayLinkFile(pathwayLinkFile);
+        this.handleKoLinkFile(koLinkFile);
     }
 
-    public async setup() {
-        await this.setupName();
-        await this.setupPathways();
-        await this.setupKoNumbers();
-
-        return this;
-    }
-
-    private async setupName() {
-        await this.readlines('../../data/ec', (line: string) => {
-            const [ ecNumber, name ] = line.split('\t');
+    private handleDescriptionFile(descriptionFile: string) {
+        this.readlines(descriptionFile, (line: string) => {
+            const [ ecNumber, description ] = line.split('\t');
 
             this.set(ecNumber.replace('ec:', ''), { 
-                name: name.trim(),
+                name: description.trim(),
                 pathways: [], 
                 koNumbers: [] 
             });
         });
     }
 
-    private async setupPathways() {
-        await this.readlines('../../data/link/ec2pathway', (line: string) => {
+    private handlePathwayLinkFile(pathwayLinkFile: string) {
+        this.readlines(pathwayLinkFile, (line: string) => {
             const [ ecNumber, pathwayId ] = line.split('\t');
-
-            if (pathwayId.startsWith('path:ec')) {
-                return;
-            }
 
             const ec = this.get(ecNumber.replace('ec:', ''));
             if (ec && !ec.pathways.includes(pathwayId.replace('path:', ''))) {
                 ec.pathways.push(pathwayId.replace('path:', ''));
             } else {
-                // TODO: add logging or error handling
-                console.log(`EC number ${ec} not found`);
+                // TODO: add logging or error handling or add without description
+                console.log(`EC number ${ecNumber.replace('ec:', '')} not found`);
             }
         });
     }
 
-    private async setupKoNumbers() {
-        await this.readlines('../../data/link/ec2ko', (line: string) => {
+    private handleKoLinkFile(koLinkFile: string) {
+        this.readlines(koLinkFile, (line: string) => {
             const [ ecNumber, koNumber ] = line.split('\t');
 
             const ec = this.get(ecNumber.replace('ec:', ''));
             if (ec && !ec.koNumbers.includes(koNumber.replace('ko:', ''))) {
                 ec.koNumbers.push(koNumber.replace('ko:', ''));
             } else {
-                // TODO: add logging or error handling
-                console.log(`EC number ${ec} not found`);
+                // TODO: add logging or error handling or add without description
+                console.log(`EC number ${ecNumber.replace('ec:', '')} not found`);
             }
         });
     }
 };
 
-export const buildEcMap = async () => {
-    return await new EcMap().setup();
-};
+export default new EcMap();
