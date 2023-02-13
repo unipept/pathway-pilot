@@ -1,4 +1,4 @@
-import { buildPathwayMap } from "../mappings/PathwayMap";
+import pathwayMap from "../mappings/PathwayMap";
 import koMap from "../mappings/KoMap";
 import ecMap from "../mappings/EcMap";
 
@@ -12,9 +12,7 @@ import ecMap from "../mappings/EcMap";
  * @throws          Error if the pathwayId is not found
  */
 export const findPathwayMapping = async (pathwayId: string) => {
-    const mapping = await buildPathwayMap();
-
-    const pathway = mapping.get(pathwayId);
+    const pathway = pathwayMap.get(pathwayId);
     if (!pathway) {
         throw new Error("Pathway not found");
     }
@@ -28,7 +26,7 @@ export const findPathwayMapping = async (pathwayId: string) => {
  * @returns All pathway mappings
  */
 export const findPathwayMappings = async () => {
-    return await buildPathwayMap();
+    return pathwayMap;
 };
 
 /**

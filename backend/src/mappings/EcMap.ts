@@ -15,9 +15,9 @@ export type EcValue = {
 
 class EcMap extends ReaderMap<EcKey, EcValue> {
     constructor(
-        private descriptionFile: string = '../../data/ec',
-        private pathwayLinkFile: string = '../../data/link/ec2pathway',
-        private koLinkFile: string = '../../data/link/ec2ko'
+        descriptionFile: string = '../../data/ec',
+        pathwayLinkFile: string = '../../data/link/ec2pathway',
+        koLinkFile: string = '../../data/link/ec2ko'
     ) {
         super();
 

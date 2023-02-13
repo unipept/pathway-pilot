@@ -14,37 +14,33 @@ export type PathwayValue = {
 };
 
 export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
-    constructor() {
+    constructor(
+        descriptionFile: string = '../../data/pathway',
+        ecLinkFile: string = '../../data/link/ec2pathway',
+        koLinkFile: string = '../../data/link/ko2pathway'
+    ) {
         super();
+
+        this.handleDescriptionFile(descriptionFile);
+        this.handleEcLinkFile(ecLinkFile);
+        this.handleKoLinkFile(koLinkFile);
     }
 
-    public async setup() {
-        await this.setupName();
-        await this.setupEcNumbers();
-        await this.setupKoNumbers();
-
-        return this;
-    }
-
-    private async setupName() {
-        await this.readlines('../../data/pathway', (line: string) => {
-            const [ pathwayId, name ] = line.split('\t');
+    private handleDescriptionFile(descriptionFile: string) {
+        this.readlines(descriptionFile, (line: string) => {
+            const [ pathwayId, description ] = line.split('\t');
 
             this.set(pathwayId.replace('path:', ''), { 
-                name: name.trim(), 
-                ecNumbers: [], 
-                koNumbers: [] 
+                name: description.trim(),
+                ecNumbers: [],
+                koNumbers: []
             });
         });
     }
 
-    private async setupEcNumbers() {
-        await this.readlines('../../data/link/pathway2ec', (line: string) => {
-            const [ pathwayId, ecNumber ] = line.split('\t');
-
-            if (pathwayId.startsWith('path:ec')) {
-                return;
-            }
+    private handleEcLinkFile(ecLinkFile: string) {
+        this.readlines(ecLinkFile, (line: string) => {
+            const [ ecNumber, pathwayId ] = line.split('\t');
 
             const pathway = this.get(pathwayId.replace('path:', ''));
             if (pathway && !pathway.ecNumbers.includes(ecNumber.replace('ec:', ''))) {
@@ -56,13 +52,9 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
         });
     }
 
-    private async setupKoNumbers() {
-        await this.readlines('../../data/link/pathway2ko', (line: string) => {
-            const [ pathwayId, koNumber ] = line.split('\t');
-
-            if (pathwayId.startsWith('path:ko')) {
-                return;
-            }
+    private handleKoLinkFile(koLinkFile: string) {
+        this.readlines(koLinkFile, (line: string) => {
+            const [ koNumber, pathwayId ] = line.split('\t');
 
             const pathway = this.get(pathwayId.replace('path:', ''));
             if (pathway && !pathway.koNumbers.includes(koNumber.replace('ko:', ''))) {
@@ -75,6 +67,4 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
     }
 }
 
-export const buildPathwayMap = async () => {
-    return await new PathwayMap().setup();
-};
+export default new PathwayMap();
