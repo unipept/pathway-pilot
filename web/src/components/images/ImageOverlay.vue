@@ -26,6 +26,16 @@
                 fill-opacity="0.5"
             />
         </g>
+
+        <g v-for="area in areas.filter(a => a.shape === 'poly')"
+            :transform="`scale(${scale})`"
+            :onclick="() => onClick(area)"
+        >
+            <polygon
+                :points="area.points"
+                fill="green"
+            />
+        </g>
     </svg>
 </template>
 

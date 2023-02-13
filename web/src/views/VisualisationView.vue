@@ -1,23 +1,25 @@
 <template>
     <div v-if="pngUrl">
-        <horizontal-legend v-if="imageLoaded"
-            class="legend"
-            :items="computeItems()"
-        />
-
-        <reactive-image 
-            ref="image"
-            class="image-container"
-            :src="pngUrl" 
-            alt="Pathway"
-            @resize="onResize"
-        >
-            <image-overlay v-if="imageLoaded"
-                :areas="areas"
-                :scale="scale"
-                :onClick="onClickArea"
+        <div ref="image">
+            <horizontal-legend v-if="imageLoaded"
+                class="legend"
+                :items="computeItems()"
             />
-        </reactive-image>
+
+            <reactive-image
+                
+                class="image-container"
+                :src="pngUrl" 
+                alt="Pathway"
+                @resize="onResize"
+            >
+                <image-overlay v-if="imageLoaded"
+                    :areas="areas"
+                    :scale="scale"
+                    :onClick="onClickArea"
+                />
+            </reactive-image>
+        </div>
 
         <area-modal
             :model-value="areaModalOpen"
@@ -103,7 +105,7 @@ const onDownload = async () => {
     }
 
     // @ts-ignore
-    const url = await toPng(image.value.$el, { pixelRatio: 4 });
+    const url = await toPng(image.value, { pixelRatio: 4 });
 
     const link = document.createElement('a');
     link.download = 'pathway.png';
