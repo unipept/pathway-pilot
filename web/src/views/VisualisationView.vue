@@ -80,6 +80,39 @@ const computeItems = () => {
     });
 };
 
+const colorAll = (areas: any[]) => {
+    return areas.map(area => {
+        area.colors = [];
+        for (const ecNumber of area.info.ecNumbers) {
+            if (mappingStore.ecs.has(ecNumber.id)) {
+                area.colors = [ColorConstants.LEGEND[0]];
+                break;
+            }
+        }
+
+        return area;
+    });
+};
+
+const colorHighlighted = (areas: any[]) => {
+    return areas.map(area => {
+        area.colors = [];
+
+        for (const taxonId of visualisationStore.highlightedTaxa) {
+            const taxonEcs = [...mappingStore.taxaToEcs.get(taxonId) ?? []].map(e => e.id);
+
+            for (const ecNumber of area.info.ecNumbers) {
+                if (taxonEcs.includes(ecNumber.id)) {
+                    area.colors.push(computeTaxonColor(taxonId));
+                    break;
+                }
+            }
+        }
+
+        return area;
+    });
+};
+
 const onResize = (event: any) => {
     if (event.width && event.width !== 0) {
         scale.value = event.width / event.naturalWidth;
@@ -104,7 +137,6 @@ const onDownload = async () => {
         return;
     }
 
-    // @ts-ignore
     const url = await toPng(image.value, { pixelRatio: 4 });
 
     const link = document.createElement('a');
@@ -116,30 +148,14 @@ const onDownload = async () => {
 onMounted(async () => {
     const response = await fetch(`http://localhost:4000/pathway/${visualisationStore.pathwayId!.replace("path:ec", "map")}`);
     const data     = await response.json();
+
     pngUrl.value = data.image;
 
-    const tmp = []
-    for (const node of data.nodes) {
-        const area = node
-        area.colors = []
-
-        if (area.info.ecNumbers.length === 0) {
-            tmp.push(area);
-
-            continue;
-        }
-
-        for (const taxonId of visualisationStore.highlightedTaxa) {
-            const ec = Array.from(mappingStore.taxaToEcs.get(taxonId)!).map(e => e.id);
-            if (ec.includes(area.info.ecNumbers[0].id)) {
-                area.colors.push(computeTaxonColor(taxonId));
-            }
-        }
-
-        tmp.push(area);
+    if (visualisationStore.highlightedTaxa.length === 0) {
+        areas.value = colorAll(data.nodes);
+    } else {
+        areas.value = colorHighlighted(data.nodes);
     }
-
-    areas.value = tmp;
 });
 </script>
 
