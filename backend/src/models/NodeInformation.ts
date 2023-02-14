@@ -9,7 +9,7 @@ const koRegex: RegExp = /K\d{5}/;       /* Regex for KO numbers */
 const cpdRegex: RegExp = /C\d{5}/;      /* Regex for compound numbers */
 const rnRegex: RegExp = /R\d{5}/;       /* Regex for reaction numbers */
 const mapRegex: RegExp = /map\d{5}:/;   /* Regex for map numbers */
-const ecRegex: RegExp = /(\d+\.)+\d+/;  /* Regex for EC numbers */
+const ecRegex: RegExp = /^((\d+|-)\.){3}(\d+|-)$/;  /* Regex for EC numbers */
 
 export default class NodeInformation {
     private ecNumbers: EcNumber[];      /* EC numbers */
@@ -39,9 +39,10 @@ export default class NodeInformation {
             if (koRegex.test(id)) {
                 this.koNumbers.push({ id: id, name: 'TODO' });
 
+                // Add the EC numbers linked to the KO number
                 const ecNumbers = koMap.get(id)?.ecNumbers;
                 for (const ec of ecNumbers ?? []) {
-                    this.ecNumbers.push({ id: ec });
+                    this.addEcNumber({ id: ec });
                 }
             } else if (cpdRegex.test(id)) {
                 this.compounds.push({ id: id, name: 'TODO' });
@@ -50,8 +51,14 @@ export default class NodeInformation {
             } else if (mapRegex.test(id)) {
                 this.keggMaps.push({ id: id, name: 'TODO' });
             } else if (ecRegex.test(id)) {
-                this.ecNumbers.push({ id: id });
+                this.addEcNumber({ id: id });
             }
+        }
+    }
+
+    private addEcNumber(ecNumber: EcNumber): void {
+        if (!this.ecNumbers.map(e => e.id).includes(ecNumber.id)) {
+            this.ecNumbers.push(ecNumber);
         }
     }
 }
