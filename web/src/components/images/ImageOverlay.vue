@@ -1,5 +1,7 @@
 <template>
     <svg width="100%" height="100%">
+        <rect width="100%" height="100%" fill="none" stroke="white" stroke-width="5"/>
+
         <g v-for="area in areas.filter(a => a.shape === 'rect')"
             :transform="`scale(${scale})`"
             :onclick="() => onClick(area)"

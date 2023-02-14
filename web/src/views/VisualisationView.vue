@@ -7,7 +7,6 @@
             />
 
             <reactive-image
-                
                 class="image-container"
                 :src="pngUrl" 
                 alt="Pathway"
