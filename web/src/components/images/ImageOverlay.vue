@@ -18,14 +18,17 @@
 
         <g v-for="area in areas.filter(a => a.shape === 'circle')"
             :transform="`scale(${scale})`"
-            :onclick="() => onClick(area)"
+            :onclick="() => {
+                l(area);
+                onClickCompound({ id: 'C00074', names: ['Phosphoenolpyruvate', 'Phosphoenolpyruvic acid', 'PEP']});
+            }"
         >
             <circle
                 :cx="area.x"
                 :cy="area.y"
                 :r="area.r"
-                fill="none"
-                fill-opacity="0.5"
+                fill="white"
+                fill-opacity="0"
             />
         </g>
 
@@ -47,9 +50,12 @@ export interface Props {
     scale: number;
 
     onClick: (area: any) => void;
+    onClickCompound: (compound: any) => void;
 };
 
 defineProps<Props>();
+
+const l = console.log;
 
 const splitRectangle = (rectangle: any, parts: number) => {
     if (parts === 0) {

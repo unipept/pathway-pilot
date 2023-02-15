@@ -55,8 +55,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import PathwayTable from '@/components/tables/PathwayTable.vue';
-import SpeciesTable from '@/components/tables/SpeciesTable.vue';
+import PathwayTable from '@/components/tables/selection/PathwayTable.vue';
+import SpeciesTable from '@/components/tables/selection/SpeciesTable.vue';
 import { Router } from 'vue-router';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import Taxon from '@/logic/entities/Taxon';
