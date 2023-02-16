@@ -2,6 +2,8 @@
     <v-dialog
         v-model="dialogOpen"
         @click:outside="onClickOutside"
+        width="90%"
+        max-height="90%"
     >
         <v-card flat>
             <v-card-title>Compound: {{ compound?.id }}</v-card-title>

@@ -1,5 +1,5 @@
 <template>
-    <div class="icon default" :style="{'fill': color}">
+    <div class="icon" :class="size" :style="{'fill': color}">
         <svg 
             width="100%"
             height="100%" 
@@ -20,7 +20,7 @@
                 font-family="AkayaTelivigala-Regular, Akaya Telivigala"
                 font-size="557.162px"
             >
-                E<tspan x="241.251px" y="360.484px">C</tspan>
+                EC
             </text>
         </svg>
     </div>
@@ -31,7 +31,7 @@ export type IconSize = 'x-small' | 'small' | 'default' | 'large' | 'x-large';
 
 export interface Props {
     color?: string
-    size?: IconSize | number
+    size?: IconSize
 };
 
 withDefaults(defineProps<Props>(), {
@@ -45,8 +45,29 @@ withDefaults(defineProps<Props>(), {
         display: flex;
         margin-inline-end: 6px;
     }
+
+    .icon.x-small {
+        width: 1em !important;
+        height: 1em !important;
+    }
+
+    .icon.small {
+        width: 1.25em !important;
+        height: 1.25em !important;
+    }
+
     .icon.default {
-        width: 21px !important;
-        height: 21px !important;
+        width: 1.5em !important;
+        height: 1.5em !important;
+    }
+
+    .icon.large {
+        width: 1.75em !important;
+        height: 1.75em !important;
+    }
+
+    .icon.x-large {
+        width: 2em !important;
+        height: 2em !important;
     }
 </style>
