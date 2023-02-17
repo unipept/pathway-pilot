@@ -1,5 +1,5 @@
 <template>
-    <v-data-table
+    <v-data-table v-if="hasItems"
         :headers="headers"
         :items="items"
         item-value="raw_input"
@@ -41,17 +41,29 @@
             </div>
         </template>
     </v-data-table>
+
+    <v-card v-else elevation="3">
+        <v-card-text>
+            <div class="error-container text-warning">
+                <v-icon class="me-2 mb-1" size="30">mdi-alert-outline</v-icon>
+                We were not able to match any input to the selected node.
+            </div>
+        </v-card-text>
+    </v-card>
 </template>
 
 <script setup lang="ts">
 import { MatchedInputTableItem } from './MatchedInputTableItem';
 import HighlightChip from '../chips/HighlightChip.vue';
+import { computed } from 'vue';
 
 export interface Props {
     items: MatchedInputTableItem[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const hasItems = computed(() => props.items.length > 0);
 
 const l = console.log;
 
@@ -93,12 +105,13 @@ const highlight = (annotation: string, matchedAnnotations: string[] | undefined)
 </script>
 
 <style scoped>
-.highlight {
-    font-weight: 600;
+.error-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
 }
-
-
-
 
 :deep(td) {
     padding: 0px !important;
