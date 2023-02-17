@@ -12,9 +12,10 @@
 
 <script setup lang="ts">
 import PathwayChip from '../chips/PathwayChip.vue';
+import { PathwayTableItem } from './PathwayTableItem';
 
 export interface Props {
-    items: { name: string, description: string }[]
+    items: PathwayTableItem[]
 };
 
 defineProps<Props>();

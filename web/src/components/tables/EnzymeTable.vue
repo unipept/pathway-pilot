@@ -13,9 +13,10 @@
 
 <script setup lang="ts">
 import EnzymeChip from '../chips/EnzymeChip.vue';
+import { EnzymeTableItem } from './EnzymeTableItem';
 
 export interface Props {
-    items: { name: string }[]
+    items: EnzymeTableItem[]
 };
 
 defineProps<Props>();

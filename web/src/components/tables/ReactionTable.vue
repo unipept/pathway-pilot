@@ -13,9 +13,10 @@
 
 <script setup lang="ts">
 import ReactionChip from '../chips/ReactionChip.vue';
+import { ReactionTableItem } from './ReactionTableItem';
 
 export interface Props {
-    items: { name: string }[]
+    items: ReactionTableItem[]
 };
 
 defineProps<Props>();
