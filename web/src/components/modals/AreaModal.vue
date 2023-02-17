@@ -10,6 +10,17 @@
         >
             <v-window v-model="currentTab">
                 <v-window-item :value=0>
+                    <v-card-title>Associated input</v-card-title>
+                    <v-card-subtitle class="mt-n2 text-subtitle-1">
+                        The following entries contain a match against the selected node. The matched annotations are highlighted for each entry in the Annotations column.
+                    </v-card-subtitle>
+
+                    <v-card-text>
+                        <matched-input-table :items="MatchedInputItems" />
+                    </v-card-text>
+                </v-window-item>
+
+                <v-window-item :value=1>
                     <v-card-title>Orthology: K01595</v-card-title>
                     <v-card-subtitle class="mt-n2 text-subtitle-1">
                         <span>
@@ -41,7 +52,7 @@
                     </v-card-text>
                 </v-window-item>
 
-                <v-window-item :value=1>
+                <v-window-item :value=2>
                     <v-card-title>Orthology: K01086</v-card-title>
                     <v-card-subtitle class="mt-n2 text-subtitle-1">
                         <span>
@@ -74,7 +85,7 @@
                     </v-card-text>
                 </v-window-item>
 
-                <v-window-item :value=2>
+                <v-window-item :value=3>
                     <v-card-title>Enzyme: 4.1.1.31</v-card-title>
                     <v-card-subtitle class="mt-n2 text-subtitle-1">
                         <span>
@@ -109,7 +120,7 @@
                     </v-card-text>
                 </v-window-item>
 
-                <v-window-item :value=3>
+                <v-window-item :value=4>
                     <v-card-title>Reaction: R00345</v-card-title>
                     <v-card-subtitle class="mt-n2 text-subtitle-1">
                         <span>
@@ -138,14 +149,6 @@
                         </p>
                     </v-card-text>
                 </v-window-item>
-
-                <v-window-item :value=4>
-                    <v-card class="tab-content" flat>
-                        <v-card-text class="mb-3">
-                            FIVE
-                        </v-card-text>
-                    </v-card>
-                </v-window-item>
             </v-window>
         </page-tabs>
     </v-dialog>
@@ -158,6 +161,7 @@ import PathwayTable from '../tables/PathwayTable.vue';
 import ResourceLink from '../misc/ResourceLink.vue';
 import ReactionTable from '../tables/ReactionTable.vue';
 import EnzymeTable from '../tables/EnzymeTable.vue';
+import MatchedInputTable from '../tables/MatchedInputTable.vue';
 
 export interface Props {
     modelValue: boolean;
@@ -170,7 +174,7 @@ const emits = defineEmits(['update:model-value']);
 const dialogOpen = ref<boolean>(props.modelValue);
 
 const currentTab = ref<number>(0);
-const tabs = ['Orthology: K01595', 'Orthology: K01086', 'Enzyme: 4.1.1.31', 'Reaction: R00345', 'Extra'];
+const tabs = ['Matched input', 'Orthology: K01595', 'Orthology: K01086', 'Enzyme: 4.1.1.31', 'Reaction: R00345'];
 
 const keggUrl = computed(() => `https://www.genome.jp/entry/K01595`);
 
@@ -190,6 +194,22 @@ const moduleItems = [
     { name: 'map00071', description: 'This is some crap as a string!' },
     { name: 'map00071', description: 'This is some crap as a string!' }
 ];
+
+const MatchedInputItems = [
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001', '3.1.1.31', 'R00345'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
+    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] }
+]
 
 const onClickOutside = () => {
     emits('update:model-value', false);
