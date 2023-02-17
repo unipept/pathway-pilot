@@ -15,16 +15,37 @@ defineProps<Props>();
 
 <style scoped>
 .item {
-    width: fit-content;
     background-color: white;
-    border-radius: 5px;
     padding: 12px;
-    margin-bottom: 4px;
     cursor: default;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.item.first {
+    border-top-left-radius: 4px;
+}
+
+.item.last {
+    border-top-right-radius: 4px;
+    flex-grow: 0;
+    z-index: 2;
+}
+
+.item.second-to-last {
+    box-shadow: 0px -5px 5px -5px gray inset, -5px 0px 5px -5px gray inset;
+}
+
+.item:not(.active):not(.last):not(.second-to-last) {
+    box-shadow: 0px -5px 5px -5px gray inset;
+}
+
+.item:not(.active):not(.last) {
+    background-color: rgb(241, 241, 241);
 }
 
 .item.active {
-    padding-bottom: 24px;
-    margin-bottom: -8px;
+    box-shadow: 0px 0px 5px 0px gray;
+    z-index: 1;
 }
 </style>

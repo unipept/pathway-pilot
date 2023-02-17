@@ -1,31 +1,19 @@
 <template>
-    <peptide-list-form
-        :loading="processing"
-        @submit="onSubmit"
+    <v-btn @click="() => areaModalOpen = true">
+        Click me
+    </v-btn>
+
+    <area-modal
+        :model-value="areaModalOpen"
+        @update:model-value="areaModalOpen = $event"
     />
 </template>
 
 <script setup lang="ts">
-import PeptideListForm from '@/components/forms/PeptideListForm.vue';
-import PeptideListConverter from '@/logic/converters/PeptideListConverter';
+import AreaModal from '@/components/modals/AreaModal.vue';
 import { ref } from 'vue';
 
-const processing = ref<boolean>(false);
-
-const peptideListConverter = new PeptideListConverter({
-    onProgressUpdate: (progress) => {
-        console.log(progress);
-    }
-});
-
-const onSubmit = async (peptides: string[]) => {
-    processing.value = true;
-
-    const result = await peptideListConverter.convert(peptides);
-
-    console.log(result);
-    processing.value = false;
-};
+const areaModalOpen = ref<boolean>(false);
 </script>
 
 <style scoped>
