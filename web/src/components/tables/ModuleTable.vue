@@ -11,7 +11,7 @@
         <v-card-text v-else>
             <div class="error-container text-warning">
                 <v-icon class="me-2 mb-1" size="30">mdi-alert-outline</v-icon>
-                There are no associated pathways to display.
+                There are no associated modules to display.
             </div>
         </v-card-text>
     </v-card>
@@ -20,10 +20,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import PathwayChip from '../chips/PathwayChip.vue';
-import { PathwayTableItem } from './PathwayTableItem';
+import { ModuleTableItem } from './ModuleTableItem';
 
 export interface Props {
-    items: PathwayTableItem[]
+    items: ModuleTableItem[]
 };
 
 const props = defineProps<Props>();

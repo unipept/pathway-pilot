@@ -32,19 +32,19 @@
                         <v-row>
                             <v-col cols=6>
                                 <h2 class="mb-2">Pathways ({{ pathwayItems.length }})</h2>
-                                <pathway-table :items="pathwayItems" />
+                                <pathway-table :items="[]" />
                             </v-col>
                             <v-col cols=6>
                                 <h2 class="mb-2">Modules ({{ moduleItems.length }})</h2>
-                                <pathway-table :items="moduleItems" />
+                                <module-table :items="[]" />
                             </v-col>
                         </v-row>
 
                         <h2 class="mb-2 mt-3">Reactions (1)</h2>
-                        <reaction-table :items="[{ name: 'R00345' }]" />
+                        <reaction-table :items="[]" />
 
                         <h2 class="mb-2 mt-3">Enzymes (1)</h2>
-                        <enzyme-table :items="[{ name: '4.1.1.31' }]" />
+                        <enzyme-table :items="[]" />
 
                         <p class="mt-3">
                             View more information at <resource-link :url="keggUrl">Kegg</resource-link>
@@ -69,7 +69,7 @@
                             </v-col>
                             <v-col cols=6>
                                 <h2 class="mb-2">Modules ({{ moduleItems.length }})</h2>
-                                <pathway-table :items="moduleItems" />
+                                <module-table :items="moduleItems" />
                             </v-col>
                         </v-row>
 
@@ -107,7 +107,7 @@
                             </v-col>
                             <v-col cols=6>
                                 <h2 class="mb-2">Modules ({{ moduleItems.length }})</h2>
-                                <pathway-table :items="moduleItems" />
+                                <module-table :items="moduleItems" />
                             </v-col>
                         </v-row>
 
@@ -137,7 +137,7 @@
                             </v-col>
                             <v-col cols=6>
                                 <h2 class="mb-2">Modules ({{ moduleItems.length }})</h2>
-                                <pathway-table :items="moduleItems" />
+                                <module-table :items="moduleItems" />
                             </v-col>
                         </v-row>
 
@@ -158,6 +158,7 @@
 import { computed, ref, watch } from 'vue';
 import PageTabs from '../tabs/PageTabs.vue';
 import PathwayTable from '../tables/PathwayTable.vue';
+import ModuleTable from '../tables/ModuleTable.vue';
 import ResourceLink from '../misc/ResourceLink.vue';
 import ReactionTable from '../tables/ReactionTable.vue';
 import EnzymeTable from '../tables/EnzymeTable.vue';
