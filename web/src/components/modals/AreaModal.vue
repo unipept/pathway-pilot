@@ -10,144 +10,23 @@
         >
             <v-window v-model="currentTab">
                 <v-window-item :value=0>
-                    <v-card-title>Associated input</v-card-title>
-                    <v-card-subtitle class="mt-n2 text-subtitle-1">
-                        The following entries contain a match against the selected node. The matched annotations are highlighted for each entry in the Annotations column.
-                    </v-card-subtitle>
-
-                    <v-card-text>
-                        <matched-input-table :items="MatchedInputItems" />
-                    </v-card-text>
+                    <matched-input-information-view />
                 </v-window-item>
 
                 <v-window-item :value=1>
-                    <v-card-title>Orthology: K01595</v-card-title>
-                    <v-card-subtitle class="mt-n2 text-subtitle-1">
-                        <span>
-                            phosphoenolpyruvate carboxylase <br>
-                        </span>
-                    </v-card-subtitle>
-
-                    <v-card-text class="mb-3">
-                        <v-row>
-                            <v-col cols=6>
-                                <h2 class="mb-2">Pathways ({{ pathwayItems.length }})</h2>
-                                <pathway-table :items="[]" />
-                            </v-col>
-                            <v-col cols=6>
-                                <h2 class="mb-2">Modules ({{ moduleItems.length }})</h2>
-                                <module-table :items="[]" />
-                            </v-col>
-                        </v-row>
-
-                        <h2 class="mb-2 mt-3">Reactions (1)</h2>
-                        <reaction-table :items="[]" />
-
-                        <h2 class="mb-2 mt-3">Enzymes (1)</h2>
-                        <enzyme-table :items="[]" />
-
-                        <p class="mt-3">
-                            View more information at <resource-link :url="keggUrl">Kegg</resource-link>
-                        </p>
-                    </v-card-text>
+                    <orthology-information-view ko-id="K01595"/>
                 </v-window-item>
 
                 <v-window-item :value=2>
-                    <v-card-title>Orthology: K01086</v-card-title>
-                    <v-card-subtitle class="mt-n2 text-subtitle-1">
-                        <span>
-                            fructose-1,6-bisphosphatase I <br>
-                            sedoheptulose-1,7-bisphosphatase <br>
-                        </span>
-                    </v-card-subtitle>
-
-                    <v-card-text class="mb-3">
-                        <v-row>
-                            <v-col cols=6>
-                                <h2 class="mb-2">Pathways ({{ pathwayItems.length }})</h2>
-                                <pathway-table :items="pathwayItems" />
-                            </v-col>
-                            <v-col cols=6>
-                                <h2 class="mb-2">Modules ({{ moduleItems.length }})</h2>
-                                <module-table :items="moduleItems" />
-                            </v-col>
-                        </v-row>
-
-                        <h2 class="mb-2 mt-3">Reactions (3)</h2>
-                        <reaction-table :items="[{ name: 'R00762' }, { name: 'R01845' }, { name: 'R04780' }]" />
-
-                        <h2 class="mb-2 mt-3">Enzymes (2)</h2>
-                        <enzyme-table :items="[{ name: '3.1.3.11' }, { name: '3.1.3.37' }]" />
-
-                        <p class="mt-3">
-                            View more information at <resource-link :url="keggUrl">Kegg</resource-link>
-                        </p>
-                    </v-card-text>
+                    <orthology-information-view ko-id="K01086"/>
                 </v-window-item>
 
                 <v-window-item :value=3>
-                    <v-card-title>Enzyme: 4.1.1.31</v-card-title>
-                    <v-card-subtitle class="mt-n2 text-subtitle-1">
-                        <span>
-                            phosphoenolpyruvate carboxylase <br>
-                            phosphopyruvate (phosphate) carboxylase <br>
-                            PEP carboxylase <br>
-                            phosphoenolpyruvic carboxylase <br>
-                            PEPC <br>
-                            PEPCase <br>
-                            phosphate:oxaloacetate carboxy-lyase (phosphorylating <br>
-                        </span>
-                    </v-card-subtitle>
-
-                    <v-card-text class="mb-3">
-                        <v-row>
-                            <v-col cols=6>
-                                <h2 class="mb-2">Pathways ({{ pathwayItems.length }})</h2>
-                                <pathway-table :items="pathwayItems" />
-                            </v-col>
-                            <v-col cols=6>
-                                <h2 class="mb-2">Modules ({{ moduleItems.length }})</h2>
-                                <module-table :items="moduleItems" />
-                            </v-col>
-                        </v-row>
-
-                        <h2 class="mb-2 mt-3">Reactions (1)</h2>
-                        <reaction-table :items="[{ name: 'R00345' }]" />
-
-                        <p class="mt-3">
-                            View more information at <resource-link :url="keggUrl">Kegg</resource-link>
-                        </p>
-                    </v-card-text>
+                    <enzyme-information-view ec-number="4.1.1.31" />
                 </v-window-item>
 
                 <v-window-item :value=4>
-                    <v-card-title>Reaction: R00345</v-card-title>
-                    <v-card-subtitle class="mt-n2 text-subtitle-1">
-                        <span>
-                            phosphate:oxaloacetate carboxy-lyase (adding phosphate;phosphoenolpyruvate-forming) <br>
-                            Orthophosphate:oxaloacetate carboxyl-lyase (phosphorylating) <br>
-                        </span>
-                    </v-card-subtitle>
-
-                    <v-card-text class="mb-3">
-                        <v-row>
-                            <v-col cols=6>
-                                <h2 class="mb-2">Pathways ({{ pathwayItems.length }})</h2>
-                                <pathway-table :items="pathwayItems" />
-                            </v-col>
-                            <v-col cols=6>
-                                <h2 class="mb-2">Modules ({{ moduleItems.length }})</h2>
-                                <module-table :items="moduleItems" />
-                            </v-col>
-                        </v-row>
-
-                        <h2 class="mb-2 mt-3">Enzymes (1)</h2>
-                        <enzyme-table :items="[{ name: '4.1.1.31' }]" />
-
-                        <p class="mt-3">
-                            View more information at <resource-link :url="keggUrl">Kegg</resource-link>
-                        </p>
-                    </v-card-text>
+                    <reaction-information-view reaction-id="R00345" />
                 </v-window-item>
             </v-window>
         </page-tabs>
@@ -155,14 +34,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import PageTabs from '../tabs/PageTabs.vue';
-import PathwayTable from '../tables/PathwayTable.vue';
-import ModuleTable from '../tables/ModuleTable.vue';
-import ResourceLink from '../misc/ResourceLink.vue';
-import ReactionTable from '../tables/ReactionTable.vue';
-import EnzymeTable from '../tables/EnzymeTable.vue';
-import MatchedInputTable from '../tables/MatchedInputTable.vue';
+import MatchedInputInformationView from '@/views/information/MatchedInputInformationView.vue';
+import OrthologyInformationView from '@/views/information/OrthologyInformationView.vue';
+import EnzymeInformationView from '@/views/information/EnzymeInformationView.vue';
+import ReactionInformationView from '@/views/information/ReactionInformationView.vue';
 
 export interface Props {
     modelValue: boolean;
@@ -176,41 +53,6 @@ const dialogOpen = ref<boolean>(props.modelValue);
 
 const currentTab = ref<number>(0);
 const tabs = ['Matched input', 'Orthology: K01595', 'Orthology: K01086', 'Enzyme: 4.1.1.31', 'Reaction: R00345'];
-
-const keggUrl = computed(() => `https://www.genome.jp/entry/K01595`);
-
-const pathwayItems = [
-    { name: 'map00071', description: 'This is some crap as a string!' },
-    { name: 'map00071', description: 'This is some crap as a string!' },
-    { name: 'map00071', description: 'This is some crap as a string!' },
-    { name: 'map00071', description: 'This is some crap as a string!' },
-    { name: 'map00071', description: 'This is some crap as a string!' },
-    { name: 'map00071', description: 'This is some crap as a string!' },
-    { name: 'map00071', description: 'This is some crap as a string!' },
-    { name: 'map00071', description: 'This is some crap as a string!' }
-];
-
-const moduleItems = [
-    { name: 'map00071', description: 'This is some crap as a string!' },
-    { name: 'map00071', description: 'This is some crap as a string!' },
-    { name: 'map00071', description: 'This is some crap as a string!' }
-];
-
-const MatchedInputItems = [
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001', '3.1.1.31', 'R00345'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] },
-    { raw_input: "AAALTER", taxon_id: 1, taxon_name: 'root', taxon_rank: 'no rank', node_annotations: ['1.1.1.1', 'K00001'], matched_annotations: ['K00001'] }
-]
 
 const onClickOutside = () => {
     emits('update:model-value', false);
