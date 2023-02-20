@@ -6,18 +6,14 @@ const useKeggStore = defineStore('keggStore', () => {
     const keggCommunicator = new KeggCommunicator();
 
     let koMapping = ref<any>(undefined);
-    let ecMapping: any = undefined;
+    let ecMapping = ref<any>(undefined);
 
     const fetchKoMapping = async () => {
         koMapping.value = await keggCommunicator.fetchKoMapping();
     };
 
     const fetchEcMapping = async () => {
-        if (!ecMapping) {
-            return;
-        }
-
-        ecMapping = await keggCommunicator.fetchEcMapping();
+        ecMapping.value = await keggCommunicator.fetchEcMapping();
     }
 
     return {

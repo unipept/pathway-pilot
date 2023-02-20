@@ -30,11 +30,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import PathwayTable from '@/components/tables/PathwayTable.vue';
 import ModuleTable from '@/components/tables/ModuleTable.vue';
 import ReactionTable from '@/components/tables/ReactionTable.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
+import useKeggStore from '@/stores/KeggStore';
 
 export interface Props {
     ecNumber: string;
@@ -42,23 +43,30 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-// TODO: get this information from the mappingstore
-const ecNames = [
-    'phosphoenolpyruvate carboxylase',
-    'phosphopyruvate (phosphate) carboxylase',
-    'PEP carboxylase',
-    'phosphoenolpyruvic carboxylase',
-    'PEPC',
-    'PEPCase',
-    'phosphate:oxaloacetate carboxy-lyase (phosphorylating)'
-]
+const keggStore = useKeggStore();
 
-// TODO: from mappingstore
-const ecPathways = computed(() => []);
-// TODO: from mappingstore
+const ecEntry = ref<any>(undefined);
+
+// TODO: split in backend (not frontend)
+const ecNames = computed(() => ecEntry.value?.name
+    .split(';').map((n: string) => n.trim()).filter((n: string) => n.length) ?? []
+);
+
+const ecPathways = computed(() =>
+    ecEntry.value?.pathways.map((pathway: string) => ({
+        name: pathway,
+        description: 'TODO'
+    })) ?? []
+);
+
+// TODO: backend
 const ecModules = computed(() => []);
-// TODO: from mappingstore
 const ecReactions = computed(() => []);
 
 const keggUrl = computed(() => `https://www.genome.jp/entry/${props.ecNumber}`);
+
+onMounted(async () => {
+    await keggStore.fetchEcMapping();
+    ecEntry.value = keggStore.ecMapping.get(props.ecNumber) as any;
+});
 </script>

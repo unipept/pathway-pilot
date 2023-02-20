@@ -8,33 +8,15 @@
             @click:close="onClickOutside"
         >
             <template #tabs>
-                <page-tabs-item :value=0>Matched Input</page-tabs-item>
-                <page-tabs-item :value=1>Orthology: K01595</page-tabs-item>
-                <page-tabs-item :value=2>Orthology: K01086</page-tabs-item>
-                <page-tabs-item :value=3>Enzyme: 4.1.1.31</page-tabs-item>
-                <page-tabs-item :value=4>Reaction: R00345</page-tabs-item>
+                <page-tabs-item v-for="(item, i) of tabs" :value=i>
+                    {{ item.name }}
+                </page-tabs-item>
             </template>
 
             <template #content>
                 <v-window v-model="currentTab">
-                    <v-window-item :value=0>
-                        <matched-input-information-view />
-                    </v-window-item>
-
-                    <v-window-item :value=1>
-                        <orthology-information-view ko-id="K01595"/>
-                    </v-window-item>
-
-                    <v-window-item :value=2>
-                        <orthology-information-view ko-id="K01086"/>
-                    </v-window-item>
-
-                    <v-window-item :value=3>
-                        <enzyme-information-view ec-number="4.1.1.31" />
-                    </v-window-item>
-
-                    <v-window-item :value=4>
-                        <reaction-information-view reaction-id="R00345" />
+                    <v-window-item v-for="(item, i) of tabs" :value=i>
+                        <component :is="item.component" v-bind="item.props" />
                     </v-window-item>
                 </v-window>
             </template>
@@ -43,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import PageTabs from '../tabs/PageTabs.vue';
 import PageTabsItem from '../tabs/PageTabsItem.vue';
 import MatchedInputInformationView from '@/views/information/MatchedInputInformationView.vue';
@@ -53,6 +35,7 @@ import ReactionInformationView from '@/views/information/ReactionInformationView
 
 export interface Props {
     modelValue: boolean;
+    area: any;
 }
 
 const props = defineProps<Props>();
@@ -62,6 +45,19 @@ const emits = defineEmits(['update:model-value']);
 const dialogOpen = ref<boolean>(props.modelValue);
 
 const currentTab = ref<number>(0);
+
+const tabs = computed(() => [
+    { name: 'Matched input', component: MatchedInputInformationView, props: {} },
+    ...props.area.info.koNumbers.map((ko: any) => ({
+        name: `Orthology: ${ko.id}`, component: OrthologyInformationView, props: { koId: ko.id }
+    })),
+    ...props.area.info.ecNumbers.map((ec: any) => ({
+        name: `Enzyme: ${ec.id}`, component: EnzymeInformationView, props: { ecNumber: ec.id }
+    })),
+    ...props.area.info.reactions.map((reaction: any) => ({
+        name: `Reaction: ${reaction.id}`, component: ReactionInformationView, props: { reactionId: reaction.id }
+    }))
+]);
 
 const onClickOutside = () => {
     emits('update:model-value', false);

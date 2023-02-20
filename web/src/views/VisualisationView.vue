@@ -23,6 +23,7 @@
 
         <area-modal
             :model-value="areaModalOpen"
+            :area="selectedArea"
             @update:model-value="areaModalOpen = $event"
         />
 
@@ -76,6 +77,7 @@ const imageLoaded = ref<boolean>(false)
 const scale = ref<number>(1)
 
 const areaModalOpen = ref<boolean>(false)
+const selectedArea = ref<any | undefined>(undefined)
 const selectedCompound = ref<Compound | undefined>(undefined)
 
 const computeItems = () => {
@@ -132,7 +134,7 @@ const onBack = (router: Router) => {
 };
 
 const onClickArea = (area: any) => {
-    console.log(area)
+    selectedArea.value = area;
     areaModalOpen.value = true;
 }
 
