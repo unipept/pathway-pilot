@@ -10,7 +10,7 @@ import { KeggMap } from '../models/annotations/KeggMap';
 export type CompoundKey = string;
 
 export type CompoundValue = {
-    name: string;
+    names: string[];
     pathways: KeggMap[];
     ecNumbers: string[];
     reactionIds: string[];
@@ -36,7 +36,11 @@ class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
             const [ compoundId, description ] = line.split('\t');
 
             this.set(compoundId.replace('cpd:', ''), { 
-                name: description.trim(),
+                names: description
+                    .trim()
+                    .split(';')
+                    .map((n: string) => n.trim())
+                    .filter((n: string) => n.length),
                 pathways: [], 
                 ecNumbers: [],
                 reactionIds: []

@@ -50,9 +50,7 @@ const keggStore = useKeggStore();
 
 const compoundEntry = ref<any>(undefined);
 
-const compoundNames = computed(() => compoundEntry.value?.name
-    .split(';').map((n: string) => n.trim()).filter((n: string) => n.length) ?? []
-);
+const compoundNames = computed(() => compoundEntry.value?.names ?? []);
 
 const compoundPathways = computed(() =>
     compoundEntry.value?.pathways.map((pathway: any) => ({

@@ -47,9 +47,7 @@ const keggStore = useKeggStore();
 
 const reactionEntry = ref<any>(undefined);
 
-const reactionNames = computed(() => reactionEntry.value?.name
-    .split(';').map((n: string) => n.trim()).filter((n: string) => n.length) ?? []
-);
+const reactionNames = computed(() => reactionEntry.value?.names ?? []);
 
 const reactionPathways = computed(() =>
     reactionEntry.value?.pathways.map((pathway: any) => ({

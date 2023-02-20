@@ -51,8 +51,7 @@ const keggStore = useKeggStore();
 
 const koEntry = ref<any>(undefined);
 
-// TODO: split in backend
-const koNames = computed(() => [koEntry.value?.name] ?? []);
+const koNames = computed(() => koEntry.value?.names ?? []);
 
 const koPathways = computed(() =>
     koEntry.value?.pathways.map((pathway: any) => ({

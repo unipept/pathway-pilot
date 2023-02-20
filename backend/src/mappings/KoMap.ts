@@ -12,7 +12,7 @@ const descriptionEcRegex: RegExp = /\[EC:([^\]]+)\]$/;
 export type KoKey = string;
 
 export type KoValue = {
-    name: string;
+    names: string[];
     pathways: KeggMap[];
     ecNumbers: string[];
     reactionIds: string[];
@@ -40,7 +40,12 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
             const ecNumbers = description.match(descriptionEcRegex)?.[1]?.split(' ');
 
             this.set(koNumber.replace('ko:', ''), { 
-                name: description.trim(),
+                names: description
+                    .trim()
+                    .split(';')
+                    .slice(1)
+                    .map((n: string) => n.trim().replace(descriptionEcRegex, ''))
+                    .filter((n: string) => n.length),
                 pathways: [], 
                 ecNumbers: ecNumbers ?? [],
                 reactionIds: []

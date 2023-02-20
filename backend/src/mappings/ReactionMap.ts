@@ -10,7 +10,7 @@ import { KeggMap } from '../models/annotations/KeggMap';
 export type ReactionKey = string;
 
 export type ReactionValue = {
-    name: string;
+    names: string[];
     pathways: KeggMap[];
     ecNumbers: string[];
 };
@@ -33,7 +33,11 @@ class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
             const [ reactionId, description ] = line.split('\t');
 
             this.set(reactionId.replace('rn:', ''), { 
-                name: description.trim(),
+                names: description
+                    .trim()
+                    .split(';')
+                    .map((n: string) => n.trim())
+                    .filter((n: string) => n.length),
                 pathways: [], 
                 ecNumbers: []
             });

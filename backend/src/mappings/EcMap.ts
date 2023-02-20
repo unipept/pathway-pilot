@@ -10,7 +10,7 @@ import { KeggMap } from '../models/annotations/KeggMap';
 export type EcKey = string;
 
 export type EcValue = {
-    name: string;
+    names: string[];
     pathways: KeggMap[];
     koNumbers: string[];
     reactionIds: string[];
@@ -36,7 +36,11 @@ class EcMap extends ReaderMap<EcKey, EcValue> {
             const [ ecNumber, description ] = line.split('\t');
 
             this.set(ecNumber.replace('ec:', ''), { 
-                name: description.trim(),
+                names: description
+                    .trim()
+                    .split(';')
+                    .map((n: string) => n.trim())
+                    .filter((n: string) => n.length),
                 pathways: [], 
                 koNumbers: [],
                 reactionIds: []

@@ -48,9 +48,7 @@ const keggStore = useKeggStore();
 const ecEntry = ref<any>(undefined);
 
 // TODO: split in backend (not frontend)
-const ecNames = computed(() => ecEntry.value?.name
-    .split(';').map((n: string) => n.trim()).filter((n: string) => n.length) ?? []
-);
+const ecNames = computed(() => ecEntry.value?.names ?? []);
 
 const ecPathways = computed(() =>
     ecEntry.value?.pathways.map((pathway: any) => ({
