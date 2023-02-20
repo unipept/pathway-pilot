@@ -1,12 +1,17 @@
 <template>
-    <div class="item" :class="{ active: active }">
+    <v-tab
+        class="item"
+        :class="{ first: value === 0 }"
+        color="secondary"
+        :value="value"
+    >
         <slot></slot>
-    </div>
+    </v-tab>
 </template>
 
 <script setup lang="ts">
 export interface Props {
-    active: boolean;
+    value: number;
 }
 
 defineProps<Props>();
@@ -16,36 +21,10 @@ defineProps<Props>();
 <style scoped>
 .item {
     background-color: white;
-    padding: 12px;
-    cursor: default;
     flex-grow: 1;
-    text-align: center;
 }
 
 .item.first {
-    border-top-left-radius: 4px;
-}
-
-.item.last {
-    border-top-right-radius: 4px;
-    flex-grow: 0;
-    z-index: 2;
-}
-
-.item.second-to-last {
-    box-shadow: 0px -5px 5px -5px gray inset, -5px 0px 5px -5px gray inset;
-}
-
-.item:not(.active):not(.last):not(.second-to-last) {
-    box-shadow: 0px -5px 5px -5px gray inset;
-}
-
-.item:not(.active):not(.last) {
-    background-color: rgb(241, 241, 241);
-}
-
-.item.active {
-    box-shadow: 0px 0px 5px 0px gray;
-    z-index: 1;
+    border-top-left-radius: 4px !important;
 }
 </style>

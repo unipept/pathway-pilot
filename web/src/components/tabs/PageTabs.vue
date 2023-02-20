@@ -1,36 +1,26 @@
 <template>
     <div>
-        <div class="d-flex">
-            <page-tabs-item v-for="(tab, i) of tabs"
-                :key="i"
-                :class="{ 'first': i === 0, 'second-to-last': i === tabs.length - 1 }"
-                :active="currentTab === i"
-                @click="() => onClickTab(i)"
-            >
-                {{ tab }}
-            </page-tabs-item>
-            <page-tabs-item 
-                class="d-flex justify-end last" 
-                :active="false"
-                @click="() => onClickClose()"
+        <v-tabs v-model="currentTab" @update:model-value="onUpdateModelValue">
+            <slot name="tabs"></slot>
+            <div 
+                class="close-button"
+                @click="onClickClose"
             >
                 <v-icon>mdi-close</v-icon>
-            </page-tabs-item>
-        </div>
+            </div>
+        </v-tabs>
 
         <v-card class="tab-content" flat>
-            <slot></slot>
+            <slot name="content"></slot>
         </v-card>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import PageTabsItem from './PageTabsItem.vue';
 
 export interface Props {
     modelValue: number;
-    tabs: string[];
 }
 
 const props = defineProps<Props>();
@@ -39,14 +29,13 @@ const emits = defineEmits(['update:model-value', 'click:close']);
 
 const currentTab = ref<number>(props.modelValue);
 
-const onClickTab = (index: number) => {
-    currentTab.value = index;
-    emits('update:model-value', index);
+const onUpdateModelValue = (value: any) => {
+    emits('update:model-value', value);
 };
 
 const onClickClose = () => {
     emits('click:close');
-}
+};
 </script>
 
 <style scoped>
@@ -54,5 +43,15 @@ const onClickClose = () => {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     z-index: 2;
+}
+
+.close-button {
+    display: flex;
+    background-color: white;
+    padding-left: 12px;
+    padding-right: 12px;
+    align-items: center;
+    justify-content: center;
+    border-top-right-radius: 4px;
 }
 </style>
