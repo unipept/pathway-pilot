@@ -11,19 +11,22 @@ export type PathwayValue = {
     name: string;
     ecNumbers: string[];
     koNumbers: string[];
+    reactionIds: string[];
 };
 
 export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
     constructor(
         descriptionFile: string = '../../data/pathway',
         ecLinkFile: string = '../../data/link/ec2pathway',
-        koLinkFile: string = '../../data/link/ko2pathway'
+        koLinkFile: string = '../../data/link/ko2pathway',
+        reactionLinkFile: string = '../../data/link/reaction2pathway'
     ) {
         super();
 
         this.handleDescriptionFile(descriptionFile);
         this.handleEcLinkFile(ecLinkFile);
         this.handleKoLinkFile(koLinkFile);
+        this.handleReactionLinkFile(reactionLinkFile);
     }
 
     private handleDescriptionFile(descriptionFile: string) {
@@ -33,7 +36,8 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
             this.set(pathwayId.replace('path:', ''), { 
                 name: description.trim(),
                 ecNumbers: [],
-                koNumbers: []
+                koNumbers: [],
+                reactionIds: []
             });
         });
     }
@@ -62,6 +66,20 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
             } else {
                 // TODO: add logging or error handling
                 console.log(`Pathway ${pathwayId} not found`);
+            }
+        });
+    }
+
+    private handleReactionLinkFile(reactionLinkFile: string) {
+        this.readlines(reactionLinkFile, (line: string) => {
+            const [ reactionId, pathwayId ] = line.split('\t');
+
+            const pathway = this.get(pathwayId.replace('path:', ''));
+            if (pathway && !pathway.reactionIds.includes(reactionId.replace('rn:', ''))) {
+                pathway.reactionIds.push(reactionId.replace('rn:', ''));
+            } else {
+                 // TODO: add logging or error handling
+                 console.log(`Pathway ${pathwayId} not found`);
             }
         });
     }

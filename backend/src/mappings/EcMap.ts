@@ -11,19 +11,22 @@ export type EcValue = {
     name: string;
     pathways: string[];
     koNumbers: string[];
+    reactionIds: string[];
 };
 
 class EcMap extends ReaderMap<EcKey, EcValue> {
     constructor(
         descriptionFile: string = '../../data/ec',
         pathwayLinkFile: string = '../../data/link/ec2pathway',
-        koLinkFile: string = '../../data/link/ec2ko'
+        koLinkFile: string = '../../data/link/ec2ko',
+        reactionLinkFile: string = '../../data/link/ec2reaction'
     ) {
         super();
 
         this.handleDescriptionFile(descriptionFile);
         this.handlePathwayLinkFile(pathwayLinkFile);
         this.handleKoLinkFile(koLinkFile);
+        this.handleReactionLinkFile(reactionLinkFile);
     }
 
     private handleDescriptionFile(descriptionFile: string) {
@@ -33,7 +36,8 @@ class EcMap extends ReaderMap<EcKey, EcValue> {
             this.set(ecNumber.replace('ec:', ''), { 
                 name: description.trim(),
                 pathways: [], 
-                koNumbers: [] 
+                koNumbers: [],
+                reactionIds: []
             });
         });
     }
@@ -59,6 +63,20 @@ class EcMap extends ReaderMap<EcKey, EcValue> {
             const ec = this.get(ecNumber.replace('ec:', ''));
             if (ec && !ec.koNumbers.includes(koNumber.replace('ko:', ''))) {
                 ec.koNumbers.push(koNumber.replace('ko:', ''));
+            } else {
+                // TODO: add logging or error handling or add without description
+                console.log(`EC number ${ecNumber.replace('ec:', '')} not found`);
+            }
+        });
+    }
+
+    private handleReactionLinkFile(reactionLinkFile: string) {
+        this.readlines(reactionLinkFile, (line: string) => {
+            const [ ecNumber, reactionId ] = line.split('\t');
+
+            const ec = this.get(ecNumber.replace('ec:', ''));
+            if (ec && !ec.reactionIds.includes(reactionId.replace('rn:', ''))) {
+                ec.reactionIds.push(reactionId.replace('rn:', ''));
             } else {
                 // TODO: add logging or error handling or add without description
                 console.log(`EC number ${ecNumber.replace('ec:', '')} not found`);

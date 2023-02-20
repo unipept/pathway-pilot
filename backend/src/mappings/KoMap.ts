@@ -13,19 +13,22 @@ export type KoValue = {
     name: string;
     pathways: string[];
     ecNumbers: string[];
+    reactionIds: string[];
 };
 
 export class KoMap extends ReaderMap<KoKey, KoValue> {
     constructor(
         descriptionFile: string = '../../data/ko', 
         pathwayLinkFile: string = '../../data/link/ko2pathway', 
-        ecLinkFile: string = '../../data/link/ec2ko'
+        ecLinkFile: string = '../../data/link/ec2ko',
+        reactionLinkFile: string = '../../data/link/ko2reaction'
     ) {
         super();
 
         this.handleDescriptionFile(descriptionFile);
         this.handlePathwayLinkFile(pathwayLinkFile);
         this.handleEcLinkFile(ecLinkFile);
+        this.handleReactionLinkFile(reactionLinkFile);
     }
 
     private handleDescriptionFile(descriptionFile: string) {
@@ -37,7 +40,8 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
             this.set(koNumber.replace('ko:', ''), { 
                 name: description.trim(),
                 pathways: [], 
-                ecNumbers: ecNumbers ?? [] 
+                ecNumbers: ecNumbers ?? [],
+                reactionIds: []
             });
         });
     }
@@ -63,6 +67,20 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
             const ko = this.get(koNumber.replace('ko:', ''));
             if (ko && !ko.ecNumbers.includes(ecNumber.replace('ec:', ''))) {
                 ko.ecNumbers.push(ecNumber.replace('ec:', ''));
+            } else {
+                // TODO: add logging or error handling or add without description
+                console.log(`KO number ${koNumber.replace('ko:', '')} not found`);
+            }
+        });
+    }
+
+    private handleReactionLinkFile(reactionLinkFile: string) {
+        this.readlines(reactionLinkFile, (line: string) => {
+            const [ koNumber, reactionId ] = line.split('\t');
+
+            const ko = this.get(koNumber.replace('ko:', ''));
+            if (ko && !ko.reactionIds.includes(reactionId.replace('rn:', ''))) {
+                ko.reactionIds.push(reactionId.replace('rn:', ''));
             } else {
                 // TODO: add logging or error handling or add without description
                 console.log(`KO number ${koNumber.replace('ko:', '')} not found`);
