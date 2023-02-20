@@ -1,14 +1,22 @@
+import KeggCommunicator from "../communicators/KeggCommunicator";
+import UnipeptCommunicator from "../communicators/UnipeptCommunicator";
 import ProgressListener from "./ProgressListener";
 
 export default class PeptideListConverter {
+    private unipeptCommunicator: UnipeptCommunicator;
+    private keggCommunicator: KeggCommunicator;
+
     constructor(
         private readonly progressListener: ProgressListener
-    ) {}
+    ) {
+        this.unipeptCommunicator = new UnipeptCommunicator();
+        this.keggCommunicator = new KeggCommunicator();
+    }
 
     public async convert(peptideList: string[]) {
-        const peptideInfo = await this.fetchUnipeptInfo(peptideList);
+        const peptideInfo = await this.unipeptCommunicator.fetchPeptideInfo(peptideList);
 
-        const ecMapping = await this.fetchKeggMapping();
+        const ecMapping = await this.keggCommunicator.fetchEcMapping();
 
         const peptideInfoLength = peptideInfo.length;
 
@@ -48,26 +56,5 @@ export default class PeptideListConverter {
         }
 
         return Array.from(resultMapping.values());
-    }
-
-    private async fetchUnipeptInfo(peptideList: string[], chunksize=100) {
-        const result: any[] = [];
-        for (let i = 0; i < peptideList.length; i += chunksize) {
-            const chunk = peptideList.slice(i, i + chunksize);
-            const url = "http://api.unipept.ugent.be/api/v2/peptinfo.json?input[]=" + chunk.join("&input[]=");
-            await fetch(url, { method: 'POST', headers: { "content-type": "application/json" } })
-                .then(response => response.json())
-                .then(data => result.push(...data));
-        }
-
-        return result;
-    }
-
-    private async fetchKeggMapping() {
-        const url = "http://localhost:4000/mapping/ec";
-
-        return await fetch(url, { headers: { "content-type": "application/json" } })
-            .then(response => response.json())
-            .then(data => new Map(Object.entries(data)));
     }
 }

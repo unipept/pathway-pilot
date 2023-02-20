@@ -24,12 +24,12 @@
 </template>
 
 <script setup lang="ts">
-import PathwayEntry from '@/logic/entities/PathwayEntry';
+import Pathway from '@/logic/entities/Pathway';
 import { ref, watch, toRaw } from 'vue';
 import { PathwayTableItem } from '../selection/PathwayTableItem';
 
 export interface Props {
-    modelValue: PathwayEntry | undefined;
+    modelValue: Pathway | undefined;
     search: string;
     items: PathwayTableItem[];
 }
@@ -38,7 +38,7 @@ const props = defineProps<Props>();
 
 const emits = defineEmits(["update:model-value"]);
 
-const selected = ref<PathwayEntry | undefined>(undefined);
+const selected = ref<Pathway | undefined>(undefined);
 
 const onRowClicked = (e: any, i: any) => {
     selected.value = i.item.raw.id === selected.value?.id ? undefined : i.item.raw;
@@ -49,7 +49,7 @@ const rowActive = (item: any) => {
     return item.raw.id === selected.value?.id;
 };
 
-const filterPathways = (value: PathwayEntry, search: string, item: PathwayTableItem) => {
+const filterPathways = (value: Pathway, search: string, item: PathwayTableItem) => {
     const pathwayId = toRaw(item).id
 
     if (!pathwayId) {

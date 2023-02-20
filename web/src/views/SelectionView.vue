@@ -60,7 +60,7 @@ import SpeciesTable from '@/components/tables/selection/SpeciesTable.vue';
 import { Router } from 'vue-router';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import Taxon from '@/logic/entities/Taxon';
-import PathwayEntry from '@/logic/entities/PathwayEntry';
+import Pathway from '@/logic/entities/Pathway';
 import useMappingStore from '@/stores/MappingStore';
 
 const mappingStore = useMappingStore();
@@ -69,7 +69,7 @@ const visualisationStore = useVisualisationStore();
 const pathwaySearch = ref<string>("");
 const speciesSearch = ref<string>("");
 
-const pathwaySelected = ref<PathwayEntry | undefined>(undefined);
+const pathwaySelected = ref<Pathway | undefined>(undefined);
 const speciesSelected = ref<Taxon[]>([]);
 
 const speciesItems = computed(() => {
@@ -90,8 +90,8 @@ const speciesItems = computed(() => {
 })
 
 const pathwayItems = [...mappingStore.pathways.values()!]
-    .filter((pathway: PathwayEntry) => pathway.id)
-    .map((pathway: PathwayEntry) => {
+    .filter((pathway: Pathway) => pathway.id)
+    .map((pathway: Pathway) => {
         return {
             id: pathway.id,
             count: mappingStore.pathwaysToPeptideCounts.get(pathway.id)!

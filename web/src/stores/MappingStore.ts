@@ -1,18 +1,18 @@
 import { defineStore } from 'pinia';
 
 import Taxon from "@/logic/entities/Taxon";
-import EcEntry from "@/logic/entities/EcEntry";
-import PathwayEntry from "@/logic/entities/PathwayEntry";
+import EcNumber from "@/logic/entities/EcNumber";
+import Pathway from "@/logic/entities/Pathway";
 
 const useMappingStore = defineStore('mappingStore', () => {
     const taxa = new Map<number, Taxon>();
-    const pathways: Map<string, PathwayEntry> = new Map();
-    const ecs: Map<string, EcEntry> = new Map();
+    const pathways: Map<string, Pathway> = new Map();
+    const ecs: Map<string, EcNumber> = new Map();
 
-    const taxaToPathways: Map<number, Set<PathwayEntry>> = new Map();
-    const taxaToEcs: Map<number, Set<EcEntry>> = new Map();
+    const taxaToPathways: Map<number, Set<Pathway>> = new Map();
+    const taxaToEcs: Map<number, Set<EcNumber>> = new Map();
 
-    const pathwaysToEcs: Map<string, Set<EcEntry>> = new Map();
+    const pathwaysToEcs: Map<string, Set<EcNumber>> = new Map();
     const pathwaysToTaxa: Map<string, Set<Taxon>> = new Map();
 
     const pathwaysToPeptideCounts: Map<string, number> = new Map();
@@ -27,13 +27,13 @@ const useMappingStore = defineStore('mappingStore', () => {
 
             let ec = ecs.get(object.ec);
             if (!ec) {
-                ec = new EcEntry(object.ec);
+                ec = new EcNumber(object.ec);
                 ecs.set(object.ec, ec);
             }
 
             let pathway = pathways.get(object.pathway);
             if (!pathway) {
-                pathway = new PathwayEntry(object.pathway);
+                pathway = new Pathway(object.pathway);
                 pathways.set(object.pathway, pathway);
             }
 
