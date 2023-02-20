@@ -52,9 +52,9 @@ const reactionNames = computed(() => reactionEntry.value?.name
 );
 
 const reactionPathways = computed(() =>
-    reactionEntry.value?.pathways.map((pathway: string) => ({
-        name: pathway,
-        description: 'TODO'
+    reactionEntry.value?.pathways.map((pathway: any) => ({
+        name: pathway.id,
+        description: pathway.name
     })) ?? []
 );
 

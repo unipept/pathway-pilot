@@ -55,9 +55,9 @@ const koEntry = ref<any>(undefined);
 const koNames = computed(() => [koEntry.value?.name] ?? []);
 
 const koPathways = computed(() =>
-    koEntry.value?.pathways.map((pathway: string) => ({
-        name: pathway,
-        description: 'TODO'
+    koEntry.value?.pathways.map((pathway: any) => ({
+        name: pathway.id,
+        description: pathway.name
     })) ?? []
 );
 

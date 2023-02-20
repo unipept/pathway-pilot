@@ -53,9 +53,9 @@ const ecNames = computed(() => ecEntry.value?.name
 );
 
 const ecPathways = computed(() =>
-    ecEntry.value?.pathways.map((pathway: string) => ({
-        name: pathway,
-        description: 'TODO'
+    ecEntry.value?.pathways.map((pathway: any) => ({
+        name: pathway.id,
+        description: pathway.name
     })) ?? []
 );
 

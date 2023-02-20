@@ -1,4 +1,6 @@
 import ReaderMap from './ReaderMap';
+import pathwayMap from './PathwayMap';
+import { KeggMap } from '../models/annotations/KeggMap';
 
 // TODO: Replaces could be done on fetch once a day
 // TODO: Then also throw out path:ko or path:ec from the file
@@ -9,7 +11,7 @@ export type EcKey = string;
 
 export type EcValue = {
     name: string;
-    pathways: string[];
+    pathways: KeggMap[];
     koNumbers: string[];
     reactionIds: string[];
 };
@@ -47,8 +49,10 @@ class EcMap extends ReaderMap<EcKey, EcValue> {
             const [ ecNumber, pathwayId ] = line.split('\t');
 
             const ec = this.get(ecNumber.replace('ec:', ''));
-            if (ec && !ec.pathways.includes(pathwayId.replace('path:', ''))) {
-                ec.pathways.push(pathwayId.replace('path:', ''));
+            const trimmedId = pathwayId.replace('path:', '');
+            if (ec && !ec.pathways.map(p => p.id).includes(trimmedId)) {
+                const pathway = pathwayMap.get(trimmedId);
+                ec.pathways.push({ id: trimmedId, name: pathway?.name ?? '' });
             } else {
                 // TODO: add logging or error handling or add without description
                 console.log(`EC number ${ecNumber.replace('ec:', '')} not found`);
