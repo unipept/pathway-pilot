@@ -28,8 +28,9 @@
         />
 
         <compound-modal
-            :model-value="selectedCompound"
-            @update:model-value="selectedCompound = $event"
+            :model-value="compoundModalOpen"
+            :compoundId="selectedCompound"
+            @update:model-value="compoundModalOpen = $event"
         />
 
         <v-btn class="mt-5" color="primary" @click="() => onBack($router)">
@@ -63,7 +64,7 @@ import HorizontalLegend from '@/components/legends/HorizontalLegend.vue';
 import AreaModal from '@/components/modals/AreaModal.vue';
 import useMappingStore from '@/stores/MappingStore';
 import { toPng } from 'html-to-image';
-import CompoundModal, { Compound } from '@/components/modals/CompoundModal.vue';
+import CompoundModal from '@/components/modals/CompoundModal.vue';
 
 const mappingStore = useMappingStore();
 const visualisationStore = useVisualisationStore();
@@ -77,8 +78,10 @@ const imageLoaded = ref<boolean>(false)
 const scale = ref<number>(1)
 
 const areaModalOpen = ref<boolean>(false)
+const compoundModalOpen = ref<boolean>(false)
+
 const selectedArea = ref<any | undefined>(undefined)
-const selectedCompound = ref<Compound | undefined>(undefined)
+const selectedCompound = ref<string>('')
 
 const computeItems = () => {
     return visualisationStore.highlightedTaxa.map(taxonId => {
@@ -138,8 +141,9 @@ const onClickArea = (area: any) => {
     areaModalOpen.value = true;
 }
 
-const onClickCompound = (compound: Compound) => {
-    selectedCompound.value = compound;
+const onClickCompound = (compound: any) => {
+    selectedCompound.value = compound.info.compounds[0].id;
+    compoundModalOpen.value = true;
 }
 
 const computeTaxonColor = (taxonId: number) => {

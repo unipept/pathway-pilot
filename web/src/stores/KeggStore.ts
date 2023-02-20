@@ -8,6 +8,7 @@ const useKeggStore = defineStore('keggStore', () => {
     let koMapping       = ref<any>(undefined);
     let ecMapping       = ref<any>(undefined);
     let reactionMapping = ref<any>(undefined);
+    let compoundMapping = ref<any>(undefined);
 
     const fetchKoMapping = async () => {
         koMapping.value = await keggCommunicator.fetchKoMapping();
@@ -21,13 +22,19 @@ const useKeggStore = defineStore('keggStore', () => {
         reactionMapping.value = await keggCommunicator.fetchReactionMapping();
     }
 
+    const fetchCompoundMapping = async () => {
+        compoundMapping.value = await keggCommunicator.fetchCompoundMapping();
+    }
+
     return {
         koMapping,
         ecMapping,
         reactionMapping,
+        compoundMapping,
         fetchKoMapping,
         fetchEcMapping,
-        fetchReactionMapping
+        fetchReactionMapping,
+        fetchCompoundMapping
     }
 });
 

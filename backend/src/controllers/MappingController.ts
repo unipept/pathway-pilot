@@ -7,7 +7,9 @@ import {
     findPathwayMapping,
     findPathwayMappings,
     findReactionMapping,
-    findReactionMappings
+    findReactionMappings,
+    findCompoundMapping,
+    findCompoundMappings
 } from "../services/MappingService";
 
 // TODO: Error handling
@@ -130,6 +132,37 @@ export const getReactionMapping = async (req: Request, res: Response) => {
 export const getReactionMappings = async (req: Request, res: Response) => {
     try {
         const mapping = await findReactionMappings();
+        return res.status(200).json(Object.fromEntries(mapping));
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+/**
+ * Get compound information by compound id
+ * 
+ * @param req The request (params: compoundId)
+ * @param res The response
+ * @returns   The resulting compound information
+ */
+export const getCompoundMapping = async (req: Request, res: Response) => {
+    try {
+        return res.status(200).json(await findCompoundMapping(req.params.compoundId))
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+/**
+ * Get the mapping for all compound ids
+ * 
+ * @param req   The request
+ * @param res   The response
+ * @returns     The resulting compound mapping
+ */
+export const getCompoundMappings = async (req: Request, res: Response) => {
+    try {
+        const mapping = await findCompoundMappings();
         return res.status(200).json(Object.fromEntries(mapping));
     } catch (err) {
         console.log(err);

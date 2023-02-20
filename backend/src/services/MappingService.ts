@@ -2,6 +2,7 @@ import pathwayMap from "../mappings/PathwayMap";
 import koMap from "../mappings/KoMap";
 import ecMap from "../mappings/EcMap";
 import reactionMap from "../mappings/ReactionMap";
+import compoundMap from "../mappings/CompoundMap";
 
 // TODO: Better error differentiation
 
@@ -103,4 +104,29 @@ export const findReactionMapping = async (reactionId: string) => {
  */
 export const findReactionMappings = async () => {
     return reactionMap;
+};
+
+/**
+ * Finds the compound mapping for the given compound id
+ * 
+ * @param compoundId    The compound id to find the mapping for
+ * @returns             The mapping for the given compound id
+ * @throws              Error if the compound id is not found
+ */
+export const findCompoundMapping = async (compoundId: string) => {
+    const compound = compoundMap.get(compoundId);
+    if (!compound) {
+        throw new Error("Compound id not found");
+    }
+
+    return compound;
+};
+
+/**
+ * Finds all compound mappings
+ * 
+ * @returns All compound mappings
+ */
+export const findCompoundMappings = async () => {
+    return compoundMap;
 };

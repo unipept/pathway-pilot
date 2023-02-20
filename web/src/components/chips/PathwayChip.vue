@@ -1,7 +1,7 @@
 <template>
     <v-chip
-      :color="color"
-      prepend-icon="mdi-map-outline"
+        :color="color"
+        prepend-icon="mdi-map-outline"
     >
       {{ name }}
     </v-chip>

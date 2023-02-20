@@ -1,6 +1,6 @@
 <template>
     <v-card elevation="5">
-        <v-card-text v-if="hasItems" class="d-flex flex-wrap">
+        <v-card-text v-if="hasItems" class="d-flex flex-wrap scrollable-overflow">
             <reaction-chip v-for="item of items"
                 :key="item.name"
                 class="chip flex-grow-1"
@@ -34,5 +34,10 @@ const hasItems = computed(() => props.items.length > 0);
 <style scoped>
 .chip {
     margin: 2px;
+}
+
+.scrollable-overflow {
+    max-height: 175px;
+    overflow-y: auto;
 }
 </style>

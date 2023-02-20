@@ -18,10 +18,7 @@
 
         <g v-for="area in areas.filter(a => a.shape === 'circle')"
             :transform="`scale(${scale})`"
-            :onclick="() => {
-                l(area);
-                onClickCompound({ id: 'C00074', names: ['Phosphoenolpyruvate', 'Phosphoenolpyruvic acid', 'PEP']});
-            }"
+            :onclick="() => onClickCompound(area)"
         >
             <circle
                 :cx="area.x"

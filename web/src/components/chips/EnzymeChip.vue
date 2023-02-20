@@ -3,7 +3,7 @@
         class="chip"
         :color="color"
     >
-        <ec-icon :color="color" />
+        <ec-icon size="small" :color="color" />
         {{ name }}
     </v-chip>
 </template>
@@ -23,7 +23,6 @@ withDefaults(defineProps<Props>(), {
 
 <style scoped>
 .chip {
-    width: 100px;
     justify-content: center;
 }
 

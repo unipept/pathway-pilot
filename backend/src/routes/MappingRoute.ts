@@ -7,7 +7,9 @@ import {
     getPathwayMapping, 
     getPathwayMappings,
     getReactionMapping,
-    getReactionMappings
+    getReactionMappings,
+    getCompoundMapping,
+    getCompoundMappings
 } from '../controllers/MappingController';
 
 const router = express.Router();
@@ -23,5 +25,8 @@ router.get('/ec/:ecNumber', getEcMapping);
 
 router.get('/reaction', getReactionMappings);
 router.get('/reaction/:reactionId', getReactionMapping);
+
+router.get('/compound', getCompoundMappings);
+router.get('/compound/:compoundId', getCompoundMapping);
 
 export default router;

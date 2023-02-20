@@ -30,7 +30,7 @@ export default class PeptideListConverter {
                 }
 
                 for (const pathway of mapping.pathways) {
-                    const key = `${info.taxon_id}---${ec.ec_number}---${pathway}`;
+                    const key = `${info.taxon_id}---${ec.ec_number}---${pathway.id}`;
 
                     let entry = resultMapping.get(key);
 
@@ -40,7 +40,8 @@ export default class PeptideListConverter {
                             taxon_name: info.taxon_name,
                             taxon_rank: info.taxon_rank,
                             ec: ec.ec_number,
-                            pathway: pathway,
+                            pathway: pathway.id,
+                            pathwayName: pathway.name,
                             count: 0
                         };
                     }
