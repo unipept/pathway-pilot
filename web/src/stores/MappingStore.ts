@@ -5,17 +5,18 @@ import EcNumber from "@/logic/entities/EcNumber";
 import Pathway from "@/logic/entities/Pathway";
 
 const useMappingStore = defineStore('mappingStore', () => {
-    const taxa = new Map<number, Taxon>();
-    const pathways: Map<string, Pathway> = new Map();
-    const ecs: Map<string, EcNumber> = new Map();
+    // Mappings containing all matched entities
+    const taxa     = new Map<number, Taxon>();
+    const pathways = new Map<string, Pathway>();
+    const ecs      = new Map<string, EcNumber>();
 
-    const taxaToPathways: Map<number, Set<Pathway>> = new Map();
-    const taxaToEcs: Map<number, Set<EcNumber>> = new Map();
+    const taxaToPathways = new Map<number, Set<Pathway>>();
+    const taxaToEcs      = new Map<number, Set<EcNumber>>();
 
-    const pathwaysToEcs: Map<string, Set<EcNumber>> = new Map();
-    const pathwaysToTaxa: Map<string, Set<Taxon>> = new Map();
+    const pathwaysToEcs  = new Map<string, Set<EcNumber>>();
+    const pathwaysToTaxa = new Map<string, Set<Taxon>>();
 
-    const pathwaysToPeptideCounts: Map<string, number> = new Map();
+    const pathwaysToPeptideCounts = new Map<string, number>();
 
     const initialize = (infoObjects: any[]) => {
         for (const object of infoObjects) {

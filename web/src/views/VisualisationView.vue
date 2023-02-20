@@ -132,6 +132,7 @@ const onBack = (router: Router) => {
 };
 
 const onClickArea = (area: any) => {
+    console.log(area)
     areaModalOpen.value = true;
 }
 

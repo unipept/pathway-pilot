@@ -33,12 +33,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import PathwayTable from '@/components/tables/PathwayTable.vue';
 import ModuleTable from '@/components/tables/ModuleTable.vue';
 import ReactionTable from '@/components/tables/ReactionTable.vue';
 import EnzymeTable from '@/components/tables/EnzymeTable.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
+import KeggCommunicator from '@/logic/communicators/KeggCommunicator';
 
 export interface Props {
     koId: string;
@@ -46,17 +47,35 @@ export interface Props {
 
 const props = defineProps<Props>();
 
+const keggCommunicator = new KeggCommunicator();
+
 // TODO: get this information from the mappingstore
 const koNames = ['phosphoenolpyruvate carboxylase'];
 
 // TODO: from mappingstore
-const koPathways = computed(() => []);
+const koPathways = ref([]);
 // TODO: from mappingstore
 const koModules = computed(() => []);
 // TODO: from mappingstore
 const koReactions = computed(() => []);
 // TODO: from mappingstore
-const koEnzymes = computed(() => []);
+const koEnzymes = ref([]);
 
 const keggUrl = computed(() => `https://www.genome.jp/entry/${props.koId}`);
+
+onMounted(async () => {
+    // TODO: all kegg mappings in a single store
+    const koMapping = await keggCommunicator.fetchKoMapping();
+
+    const koEntry = koMapping.get(props.koId) as any;
+
+    koPathways.value = koEntry.pathways.map((pathway: string) => ({
+        name: pathway,
+        description: 'TODO'
+    }));
+    
+    koEnzymes.value = koEntry.ecNumbers.map((enzyme: string) => ({
+        name: enzyme
+    }));
+});
 </script>
