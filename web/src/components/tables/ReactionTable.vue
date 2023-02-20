@@ -1,11 +1,15 @@
 <template>
     <v-card elevation="5">
         <v-card-text v-if="hasItems" class="d-flex flex-wrap scrollable-overflow">
-            <reaction-chip v-for="item of items"
+            <reaction-chip v-for="item of items.slice(0, itemsToDisplay)"
                 :key="item.name"
                 class="chip flex-grow-1"
                 :name="item.name" 
                 color="green" 
+            />
+            <show-more-chip v-if="items.length > itemsToDisplay"
+                class="chip flex-grow-1" 
+                @click="onShowMore" 
             />
         </v-card-text>
 
@@ -18,9 +22,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import ReactionChip from '../chips/ReactionChip.vue';
 import { ReactionTableItem } from './ReactionTableItem';
+import ShowMoreChip from '../chips/ShowMoreChip.vue';
 
 export interface Props {
     items: ReactionTableItem[]
@@ -28,7 +33,13 @@ export interface Props {
 
 const props = defineProps<Props>();
 
+const itemsToDisplay = ref<number>(50);
+
 const hasItems = computed(() => props.items.length > 0);
+
+const onShowMore = () => {
+    itemsToDisplay.value += 50;
+}
 </script>
 
 <style scoped>
