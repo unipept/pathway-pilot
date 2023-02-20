@@ -39,7 +39,7 @@ import ModuleTable from '@/components/tables/ModuleTable.vue';
 import ReactionTable from '@/components/tables/ReactionTable.vue';
 import EnzymeTable from '@/components/tables/EnzymeTable.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
-import KeggCommunicator from '@/logic/communicators/KeggCommunicator';
+import useKeggStore from '@/stores/KeggStore';
 
 export interface Props {
     koId: string;
@@ -47,35 +47,34 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const keggCommunicator = new KeggCommunicator();
+const keggStore = useKeggStore();
 
-// TODO: get this information from the mappingstore
-const koNames = ['phosphoenolpyruvate carboxylase'];
+const koEntry = ref<any>(undefined);
 
-// TODO: from mappingstore
-const koPathways = ref([]);
-// TODO: from mappingstore
+// TODO: split in backend
+const koNames = computed(() => [koEntry.value?.name] ?? []);
+
+const koPathways = computed(() =>
+    koEntry.value?.pathways.map((pathway: string) => ({
+        name: pathway,
+        description: 'TODO'
+    })) ?? []
+);
+
+// TODO: backend
 const koModules = computed(() => []);
-// TODO: from mappingstore
 const koReactions = computed(() => []);
-// TODO: from mappingstore
-const koEnzymes = ref([]);
+
+const koEnzymes = computed(() =>
+    koEntry.value?.ecNumbers.map((enzyme: string) => ({
+        name: enzyme
+    })) ?? []
+);
 
 const keggUrl = computed(() => `https://www.genome.jp/entry/${props.koId}`);
 
 onMounted(async () => {
-    // TODO: all kegg mappings in a single store
-    const koMapping = await keggCommunicator.fetchKoMapping();
-
-    const koEntry = koMapping.get(props.koId) as any;
-
-    koPathways.value = koEntry.pathways.map((pathway: string) => ({
-        name: pathway,
-        description: 'TODO'
-    }));
-    
-    koEnzymes.value = koEntry.ecNumbers.map((enzyme: string) => ({
-        name: enzyme
-    }));
+    await keggStore.fetchKoMapping();
+    koEntry.value = keggStore.koMapping.get(props.koId) as any;
 });
 </script>
