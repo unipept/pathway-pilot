@@ -1,6 +1,7 @@
 import pathwayMap from "../mappings/PathwayMap";
 import koMap from "../mappings/KoMap";
 import ecMap from "../mappings/EcMap";
+import reactionMap from "../mappings/ReactionMap";
 
 // TODO: Better error differentiation
 
@@ -37,12 +38,12 @@ export const findPathwayMappings = async () => {
  * @throws          Error if the KO number is not found
  */
 export const findKoMapping = (koNumber: string) => {
-    const pathway = koMap.get(koNumber);
-    if (!pathway) {
+    const ko = koMap.get(koNumber);
+    if (!ko) {
         throw new Error("KO number not found");
     }
 
-    return pathway;
+    return ko;
 };
 
 /**
@@ -62,12 +63,12 @@ export const findKoMappings = () => {
  * @throws          Error if the EC number is not found
  */
 export const findEcMapping = async (ecNumber: string) => {
-    const pathway = ecMap.get(ecNumber);
-    if (!pathway) {
+    const ec = ecMap.get(ecNumber);
+    if (!ec) {
         throw new Error("EC number not found");
     }
 
-    return pathway;
+    return ec;
 };
 
 /**
@@ -77,4 +78,29 @@ export const findEcMapping = async (ecNumber: string) => {
  */
 export const findEcMappings = async () => {
     return ecMap;
+};
+
+/**
+ * Finds the Reaction mapping for the given Reaction id
+ * 
+ * @param reactionId    The Reaction id to find the mapping for
+ * @returns             The mapping for the given Reaction id
+ * @throws              Error if the Reaction id is not found
+ */
+export const findReactionMapping = async (reactionId: string) => {
+    const reaction = reactionMap.get(reactionId);
+    if (!reaction) {
+        throw new Error("Reaction id not found");
+    }
+
+    return reaction;
+};
+
+/**
+ * Finds all Reaction mappings
+ * 
+ * @returns All Reaction mappings
+ */
+export const findReactionMappings = async () => {
+    return reactionMap;
 };

@@ -19,7 +19,7 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
     constructor(
         descriptionFile: string = '../../data/ko', 
         pathwayLinkFile: string = '../../data/link/ko2pathway', 
-        ecLinkFile: string = '../../data/link/ko2ec'
+        ecLinkFile: string = '../../data/link/ec2ko'
     ) {
         super();
 
@@ -58,7 +58,7 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
 
     private handleEcLinkFile(ecLinkFile: string) {
         this.readlines(ecLinkFile, (line: string) => {
-            const [ koNumber, ecNumber ] = line.split('\t');
+            const [ ecNumber, koNumber ] = line.split('\t');
 
             const ko = this.get(koNumber.replace('ko:', ''));
             if (ko && !ko.ecNumbers.includes(ecNumber.replace('ec:', ''))) {

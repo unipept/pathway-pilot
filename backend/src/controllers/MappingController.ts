@@ -5,7 +5,9 @@ import {
     findEcMapping, 
     findEcMappings, 
     findPathwayMapping,
-    findPathwayMappings
+    findPathwayMappings,
+    findReactionMapping,
+    findReactionMappings
 } from "../services/MappingService";
 
 // TODO: Error handling
@@ -97,6 +99,37 @@ export const getEcMapping = async (req: Request, res: Response) => {
 export const getEcMappings = async (req: Request, res: Response) => {
     try {
         const mapping = await findEcMappings();
+        return res.status(200).json(Object.fromEntries(mapping));
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+/**
+ * Get Reaction information by Reaction id
+ * 
+ * @param req The request (params: reactionId)
+ * @param res The response
+ * @returns   The resulting Reaction information
+ */
+export const getReactionMapping = async (req: Request, res: Response) => {
+    try {
+        return res.status(200).json(await findReactionMapping(req.params.reactionId))
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+/**
+ * Get the mapping for all Reaction ids
+ * 
+ * @param req   The request
+ * @param res   The response
+ * @returns     The resulting Reaction mapping
+ */
+export const getReactionMappings = async (req: Request, res: Response) => {
+    try {
+        const mapping = await findReactionMappings();
         return res.status(200).json(Object.fromEntries(mapping));
     } catch (err) {
         console.log(err);

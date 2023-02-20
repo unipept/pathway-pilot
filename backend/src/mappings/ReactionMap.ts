@@ -1,0 +1,70 @@
+import ReaderMap from './ReaderMap';
+
+// TODO: Replaces could be done on fetch once a day
+// TODO: Then also throw out path:ko or path:ec from the file
+// TODO: So much duplicate code, refactor
+// TODO: Put file locations in config file
+
+export type ReactionKey = string;
+
+export type ReactionValue = {
+    name: string;
+    pathways: string[];
+    ecNumbers: string[];
+};
+
+class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
+    constructor(
+        descriptionFile: string = '../../data/reaction',
+        pathwayLinkFile: string = '../../data/link/reaction2pathway',
+        ecLinkFile: string = '../../data/link/ec2reaction'
+    ) {
+        super();
+
+        this.handleDescriptionFile(descriptionFile);
+        this.handlePathwayLinkFile(pathwayLinkFile);
+        this.handleEcLinkFile(ecLinkFile);
+    }
+
+    private handleDescriptionFile(descriptionFile: string) {
+        this.readlines(descriptionFile, (line: string) => {
+            const [ reactionId, description ] = line.split('\t');
+
+            this.set(reactionId.replace('rn:', ''), { 
+                name: description.trim(),
+                pathways: [], 
+                ecNumbers: []
+            });
+        });
+    }
+
+    private handlePathwayLinkFile(pathwayLinkFile: string) {
+        this.readlines(pathwayLinkFile, (line: string) => {
+            const [ reactionId, pathwayId ] = line.split('\t');
+
+            const reaction = this.get(reactionId.replace('rn:', ''));
+            if (reaction && !reaction.pathways.includes(pathwayId.replace('path:', ''))) {
+                reaction.pathways.push(pathwayId.replace('path:', ''));
+            } else {
+                // TODO: add logging or error handling or add without description
+                console.log(`Reaction id ${reactionId.replace('rn:', '')} not found`);
+            }
+        });
+    }
+
+    private handleEcLinkFile(ecLinkFile: string) {
+        this.readlines(ecLinkFile, (line: string) => {
+            const [ ecNumber, reactionId ] = line.split('\t');
+
+            const reaction = this.get(reactionId.replace('rn:', ''));
+            if (reaction && !reaction.ecNumbers.includes(ecNumber.replace('ec:', ''))) {
+                reaction.ecNumbers.push(ecNumber.replace('ec:', ''));
+            } else {
+                // TODO: add logging or error handling or add without description
+                console.log(`Reaction id ${reactionId.replace('rn:', '')} not found`);
+            }
+        });
+    }
+};
+
+export default new ReactionMap();
