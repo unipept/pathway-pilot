@@ -18,4 +18,12 @@ export default class KeggCommunicator {
             .then(response => response.json())
             .then(data => new Map(Object.entries(data)));
     }
+
+    public async fetchReactionMapping() {
+        const url = `${this.baseUrl}/mapping/reaction`;
+
+        return await fetch(url, { headers: { "content-type": "application/json" } })
+            .then(response => response.json())
+            .then(data => new Map(Object.entries(data)));
+    }
 };

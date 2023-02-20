@@ -30,11 +30,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import PathwayTable from '@/components/tables/PathwayTable.vue';
 import ModuleTable from '@/components/tables/ModuleTable.vue';
 import ReactionTable from '@/components/tables/ReactionTable.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
+import useKeggStore from '@/stores/KeggStore';
 
 export interface Props {
     reactionId: string;
@@ -42,18 +43,34 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-// TODO: get this information from the mappingstore
-const reactionNames = [
-    'phosphate:oxaloacetate carboxy-lyase (adding phosphate;phosphoenolpyruvate-forming)',
-    'Orthophosphate:oxaloacetate carboxyl-lyase (phosphorylating)'
-]
+const keggStore = useKeggStore();
 
-// TODO: from mappingstore
-const reactionPathways = computed(() => []);
+const reactionEntry = ref<any>(undefined);
+
+const reactionNames = computed(() => reactionEntry.value?.name
+    .split(';').map((n: string) => n.trim()).filter((n: string) => n.length) ?? []
+);
+
+const reactionPathways = computed(() =>
+    reactionEntry.value?.pathways.map((pathway: string) => ({
+        name: pathway,
+        description: 'TODO'
+    })) ?? []
+);
+
 // TODO: from mappingstore
 const reactionModules = computed(() => []);
-// TODO: from mappingstore
-const reactionEnzymes = computed(() => []);
+
+const reactionEnzymes = computed(() => 
+    reactionEntry.value?.ecNumbers.map((enzyme: string) => ({
+        name: enzyme,
+    })) ?? []
+);
 
 const keggUrl = computed(() => `https://www.genome.jp/entry/${props.reactionId}`);
+
+onMounted(async () => {
+    await keggStore.fetchReactionMapping();
+    reactionEntry.value = keggStore.reactionMapping.get(props.reactionId) as any;
+});
 </script>

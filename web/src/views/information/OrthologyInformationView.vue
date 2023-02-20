@@ -63,7 +63,12 @@ const koPathways = computed(() =>
 
 // TODO: backend
 const koModules = computed(() => []);
-const koReactions = computed(() => []);
+
+const koReactions = computed(() => 
+    koEntry.value?.reactionIds.map((reaction: string) => ({
+        name: reaction
+    })) ?? []
+);
 
 const koEnzymes = computed(() =>
     koEntry.value?.ecNumbers.map((enzyme: string) => ({

@@ -61,7 +61,11 @@ const ecPathways = computed(() =>
 
 // TODO: backend
 const ecModules = computed(() => []);
-const ecReactions = computed(() => []);
+const ecReactions = computed(() => 
+    ecEntry.value?.reactionIds.map((reaction: string) => ({
+        name: reaction
+    })) ?? []
+);
 
 const keggUrl = computed(() => `https://www.genome.jp/entry/${props.ecNumber}`);
 
