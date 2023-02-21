@@ -10,6 +10,12 @@
             </v-virtual-scroll>
         </v-card-text>
 
+        <v-card-text v-else-if="loading">
+            <div class="loading-container">
+                <v-progress-circular indeterminate color="secondary" />
+            </div>
+        </v-card-text>
+
         <v-card-text v-else>
             <div class="error-container text-warning">
                 <v-icon class="me-2 mb-1" size="30">mdi-alert-outline</v-icon>
@@ -27,6 +33,7 @@ import { ModuleTableItem } from './ModuleTableItem';
 
 export interface Props {
     items: ModuleTableItem[]
+    loading: boolean
 };
 
 const props = defineProps<Props>();
@@ -46,6 +53,14 @@ const onClick = (item: string) => window.open(url(item), '_blank');
     justify-content: center;
     align-items: center;
     font-weight: bold;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    height: 150px;
+    justify-content: center;
+    align-items: center;
 }
 
 :deep(.v-virtual-scroll__item):hover {

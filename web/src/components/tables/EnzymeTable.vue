@@ -13,6 +13,12 @@
             />
         </v-card-text>
 
+        <v-card-text v-else-if="loading">
+            <div class="loading-container">
+                <v-progress-circular indeterminate color="secondary" />
+            </div>
+        </v-card-text>
+
         <v-card-text v-else
             class="d-flex justify-center align-center text-warning font-weight-bold"
         >
@@ -29,6 +35,7 @@ import ShowMoreChip from '../chips/ShowMoreChip.vue';
 
 export interface Props {
     items: EnzymeTableItem[]
+    loading: boolean
 };
 
 const props = defineProps<Props>();
@@ -50,5 +57,13 @@ const onShowMore = () => {
 .scrollable-overflow {
     max-height: 175px;
     overflow-y: auto;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
 }
 </style>

@@ -11,16 +11,16 @@
             <v-row>
                 <v-col cols=6>
                     <h2 class="mb-2">Pathways ({{ reactionPathways.length }})</h2>
-                    <pathway-table :items="reactionPathways" />
+                    <pathway-table :items="reactionPathways" :loading="reactionLoading" />
                 </v-col>
                 <v-col cols=6>
                     <h2 class="mb-2">Modules ({{ reactionModules.length }})</h2>
-                    <module-table :items="reactionModules" />
+                    <module-table :items="reactionModules" :loading="reactionLoading" />
                 </v-col>
             </v-row>
 
             <h2 class="mb-2 mt-3">Enzymes ({{ reactionEnzymes.length }})</h2>
-            <enzyme-table :items="reactionEnzymes" />
+            <enzyme-table :items="reactionEnzymes" :loading="reactionLoading" />
 
             <p class="mt-3">
                 View more information at <resource-link :url="keggUrl">Kegg</resource-link>
@@ -48,6 +48,7 @@ const keggStore = useKeggStore();
 const { url } = useKeggEntryLink();
 
 const reactionEntry = ref<any>(undefined);
+const reactionLoading = ref<boolean>(false);
 
 const reactionNames = computed(() => reactionEntry.value?.names ?? []);
 
@@ -74,7 +75,11 @@ const reactionEnzymes = computed(() =>
 const keggUrl = computed(() => url(props.reactionId));
 
 onMounted(async () => {
+    reactionLoading.value = true;
+
     await keggStore.fetchReactionMapping();
     reactionEntry.value = keggStore.reactionMapping.get(props.reactionId) as any;
+
+    reactionLoading.value = false;
 });
 </script>

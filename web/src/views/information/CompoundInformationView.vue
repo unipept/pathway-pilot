@@ -11,19 +11,19 @@
             <v-row>
                 <v-col cols=6>
                     <h2>Pathways ({{ compoundPathways.length }})</h2>
-                    <pathway-table :items="compoundPathways" />
+                    <pathway-table :items="compoundPathways" :loading="compoundLoading" />
                 </v-col>
                 <v-col cols=6>
                     <h2>Modules ({{ compoundModules.length }})</h2>
-                    <pathway-table :items="compoundModules" />
+                    <pathway-table :items="compoundModules" :loading="compoundLoading" />
                 </v-col>
             </v-row>
 
             <h2 class="mt-3">Reactions ({{ compoundReactions.length }})</h2>
-            <reaction-table :items="compoundReactions" />
+            <reaction-table :items="compoundReactions" :loading="compoundLoading" />
 
             <h2 class="mt-3">Enzymes ({{ compoundEnzymes.length }})</h2>
-            <enzyme-table :items="compoundEnzymes" />
+            <enzyme-table :items="compoundEnzymes" :loading="compoundLoading" />
 
             <p class="mt-3">
                 View more information at <resource-link :url="keggUrl">Kegg</resource-link>
@@ -50,6 +50,7 @@ const props = defineProps<Props>();
 const keggStore = useKeggStore();
 const { url } = useKeggEntryLink();
 
+const compoundLoading = ref<boolean>(false);
 const compoundEntry = ref<any>(undefined);
 
 const compoundNames = computed(() => compoundEntry.value?.names ?? []);
@@ -83,7 +84,11 @@ const compoundReactions = computed(() =>
 const keggUrl = computed(() => url(props.compoundId));
 
 onMounted(async () => {
+    compoundLoading.value = true;
+
     await keggStore.fetchCompoundMapping();
     compoundEntry.value = keggStore.compoundMapping.get(props.compoundId) as any;
+
+    compoundLoading.value = false;
 });
 </script>

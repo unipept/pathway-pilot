@@ -11,19 +11,19 @@
             <v-row>
                 <v-col cols=6>
                     <h2 class="mb-2">Pathways ({{ koPathways.length }})</h2>
-                    <pathway-table :items="koPathways" />
+                    <pathway-table :items="koPathways" :loading="koLoading" />
                 </v-col>
                 <v-col cols=6>
                     <h2 class="mb-2">Modules ({{ koModules.length }})</h2>
-                    <module-table :items="koModules" />
+                    <module-table :items="koModules" :loading="koLoading" />
                 </v-col>
             </v-row>
 
             <h2 class="mb-2 mt-3">Reactions ({{ koReactions.length }})</h2>
-            <reaction-table :items="koReactions" />
+            <reaction-table :items="koReactions" :loading="koLoading" />
 
             <h2 class="mb-2 mt-3">Enzymes ({{ koEnzymes.length }})</h2>
-            <enzyme-table :items="koEnzymes" />
+            <enzyme-table :items="koEnzymes" :loading="koLoading" />
 
             <p class="mt-3">
                 View more information at <resource-link :url="keggUrl">Kegg</resource-link>
@@ -52,6 +52,7 @@ const keggStore = useKeggStore();
 const { url } = useKeggEntryLink();
 
 const koEntry = ref<any>(undefined);
+const koLoading = ref<boolean>(false);
 
 const koNames = computed(() => koEntry.value?.names ?? []);
 
@@ -84,7 +85,11 @@ const koEnzymes = computed(() =>
 const keggUrl = computed(() => url(props.koId));
 
 onMounted(async () => {
+    koLoading.value = true;
+
     await keggStore.fetchKoMapping();
     koEntry.value = keggStore.koMapping.get(props.koId) as any;
+
+    koLoading.value = false;
 });
 </script>

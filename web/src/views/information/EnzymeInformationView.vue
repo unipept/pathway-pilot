@@ -11,16 +11,16 @@
             <v-row>
                 <v-col cols=6>
                     <h2 class="mb-2">Pathways ({{ ecPathways.length }})</h2>
-                    <pathway-table :items="ecPathways" />
+                    <pathway-table :items="ecPathways" :loading="ecLoading" />
                 </v-col>
                 <v-col cols=6>
                     <h2 class="mb-2">Modules ({{ ecModules.length }})</h2>
-                    <module-table :items="ecModules" />
+                    <module-table :items="ecModules" :loading="ecLoading" />
                 </v-col>
             </v-row>
 
             <h2 class="mb-2 mt-3">Reactions ({{ ecReactions.length }})</h2>
-            <reaction-table :items="ecReactions" />
+            <reaction-table :items="ecReactions" :loading="ecLoading" />
 
             <p class="mt-3">
                 View more information at <resource-link :url="keggUrl">Kegg</resource-link>
@@ -48,6 +48,7 @@ const keggStore = useKeggStore();
 const { url } = useKeggEntryLink();
 
 const ecEntry = ref<any>(undefined);
+const ecLoading = ref<boolean>(false);
 
 const ecNames = computed(() => ecEntry.value?.names ?? []);
 
@@ -74,7 +75,11 @@ const ecReactions = computed(() =>
 const keggUrl = computed(() => url(props.ecNumber));
 
 onMounted(async () => {
+    ecLoading.value = true;
+
     await keggStore.fetchEcMapping();
     ecEntry.value = keggStore.ecMapping.get(props.ecNumber) as any;
+
+    ecLoading.value = false;
 });
 </script>
