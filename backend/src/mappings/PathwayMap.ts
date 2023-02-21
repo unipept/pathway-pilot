@@ -1,4 +1,5 @@
 import ReaderMap from "./ReaderMap";
+import config from "../config/config";
 
 // TODO: Replaces could be done on fetch once a day
 // TODO: Then also throw out path:ko or path:ec from the file
@@ -16,10 +17,10 @@ export type PathwayValue = {
 
 export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
     constructor(
-        descriptionFile: string = '../../data/pathway',
-        ecLinkFile: string = '../../data/link/ec2pathway',
-        koLinkFile: string = '../../data/link/ko2pathway',
-        reactionLinkFile: string = '../../data/link/reaction2pathway'
+        descriptionFile: string  = config.pathwayDataFile,
+        ecLinkFile: string       = config.ecPathwayLinkFile,
+        koLinkFile: string       = config.koPathwayLinkFile,
+        reactionLinkFile: string = config.reactionPathwayLinkFile
     ) {
         super();
 

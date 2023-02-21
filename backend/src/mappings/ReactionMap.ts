@@ -3,6 +3,7 @@ import pathwayMap from './PathwayMap';
 import moduleMap from './ModuleMap';
 import { KeggMap } from '../models/annotations/KeggMap';
 import { KeggModule } from '../models/annotations/KeggModule';
+import config from '../config/config';
 
 // TODO: Replaces could be done on fetch once a day
 // TODO: Then also throw out path:ko or path:ec from the file
@@ -20,10 +21,10 @@ export type ReactionValue = {
 
 class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
     constructor(
-        descriptionFile: string = '../../data/reaction',
-        pathwayLinkFile: string = '../../data/link/reaction2pathway',
-        moduleLinkFile: string = '../../data/link/reaction2module',
-        ecLinkFile: string = '../../data/link/ec2reaction'
+        descriptionFile: string = config.reactionDataFile,
+        pathwayLinkFile: string = config.reactionPathwayLinkFile,
+        moduleLinkFile: string  = config.reactionModuleLinkFile,
+        ecLinkFile: string      = config.ecReactionLinkFile
     ) {
         super();
 

@@ -3,6 +3,7 @@ import pathwayMap from './PathwayMap';
 import moduleMap from './ModuleMap';
 import { KeggMap } from '../models/annotations/KeggMap';
 import { KeggModule } from '../models/annotations/KeggModule';
+import config from '../config/config';
 
 // TODO: Replaces could be done on fetch once a day
 // TODO: Then also throw out path:ko or path:ec from the file
@@ -21,11 +22,11 @@ export type CompoundValue = {
 
 class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
     constructor(
-        descriptionFile: string = '../../data/compound',
-        pathwayLinkFile: string = '../../data/link/compound2pathway',
-        moduleLinkFile: string = '../../data/link/compound2module',
-        ecLinkFile: string = '../../data/link/ec2compound',
-        reactionLinkFile: string = '../../data/link/reaction2compound'
+        descriptionFile: string  = config.compoundDataFile,
+        pathwayLinkFile: string  = config.compoundPathwayLinkFile,
+        moduleLinkFile: string   = config.compoundModuleLinkFile,
+        ecLinkFile: string       = config.ecCompoundLinkFile,
+        reactionLinkFile: string = config.reactionCompoundLinkFile
     ) {
         super();
 

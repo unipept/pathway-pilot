@@ -3,6 +3,7 @@ import pathwayMap from './PathwayMap';
 import moduleMap from './ModuleMap';
 import { KeggMap } from '../models/annotations/KeggMap';
 import { KeggModule } from '../models/annotations/KeggModule';
+import config from '../config/config';
 
 // TODO: Replaces could be done on fetch once a day
 // TODO: Then also throw out path:ko or path:ec from the file
@@ -23,11 +24,11 @@ export type KoValue = {
 
 export class KoMap extends ReaderMap<KoKey, KoValue> {
     constructor(
-        descriptionFile: string = '../../data/ko', 
-        pathwayLinkFile: string = '../../data/link/ko2pathway',
-        moduleLinkFile: string = '../../data/link/ko2module',
-        ecLinkFile: string = '../../data/link/ec2ko',
-        reactionLinkFile: string = '../../data/link/ko2reaction'
+        descriptionFile: string  = config.koDataFile,
+        pathwayLinkFile: string  = config.koPathwayLinkFile,
+        moduleLinkFile: string   = config.koModuleLinkFile,
+        ecLinkFile: string       = config.ecKoLinkFile,
+        reactionLinkFile: string = config.koReactionLinkFile
     ) {
         super();
 

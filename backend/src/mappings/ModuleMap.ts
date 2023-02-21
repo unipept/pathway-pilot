@@ -1,4 +1,5 @@
 import ReaderMap from "./ReaderMap";
+import config from "../config/config";
 
 // TODO: Replaces could be done on fetch once a day
 // TODO: Then also throw out path:ko or path:ec from the file
@@ -13,7 +14,7 @@ export type ModuleValue = {
 
 export class ModuleMap extends ReaderMap<ModuleKey, ModuleValue> {
     constructor(
-        descriptionFile: string = '../../data/module',
+        descriptionFile: string = config.moduleDataFile,
     ) {
         super();
 
