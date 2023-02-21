@@ -37,6 +37,7 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
         this.handleModuleLinkFile(moduleLinkFile);
         this.handleEcLinkFile(ecLinkFile);
         this.handleReactionLinkFile(reactionLinkFile);
+        console.log(this.get('K01807'));
     }
 
     private handleDescriptionFile(descriptionFile: string) {
@@ -50,7 +51,7 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
                     .trim()
                     .split(';')
                     .slice(1)
-                    .map((n: string) => n.trim())
+                    .map((n: string) => n.trim().replace(descriptionEcRegex, '').trim())
                     .filter((n: string) => n.length),
                 pathways: [],
                 modules: [],
