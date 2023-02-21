@@ -21,7 +21,6 @@ defineProps<Props>();
 <style scoped>
 .item {
     background-color: white;
-    flex-grow: 1;
 }
 
 .item.first {

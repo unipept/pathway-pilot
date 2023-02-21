@@ -1,19 +1,27 @@
 <template>
-    <div>
-        <v-tabs v-model="currentTab" @update:model-value="onUpdateModelValue">
-            <slot name="tabs"></slot>
+    <v-card>
+        <div class="d-flex">
+            <v-tabs 
+                v-model="currentTab" 
+                @update:model-value="onUpdateModelValue"
+                grow
+                center-active
+                show-arrows
+            >
+                <slot name="tabs"></slot>
+            </v-tabs>
             <div 
                 class="close-button"
                 @click="onClickClose"
             >
                 <v-icon>mdi-close</v-icon>
             </div>
-        </v-tabs>
+        </div>
 
-        <v-card class="tab-content" flat>
+        <v-card flat>
             <slot name="content"></slot>
         </v-card>
-    </div>
+    </v-card>
 </template>
 
 <script setup lang="ts">
@@ -39,12 +47,6 @@ const onClickClose = () => {
 </script>
 
 <style scoped>
-.tab-content {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    z-index: 2;
-}
-
 .close-button {
     display: flex;
     background-color: white;
