@@ -20,7 +20,7 @@
             </v-row>
 
             <h2 class="mb-2 mt-3">Enzymes ({{ reactionEnzymes.length }})</h2>
-            <reaction-table :items="reactionEnzymes" />
+            <enzyme-table :items="reactionEnzymes" />
 
             <p class="mt-3">
                 View more information at <resource-link :url="keggUrl">Kegg</resource-link>
@@ -33,7 +33,7 @@
 import { computed, onMounted, ref } from 'vue';
 import PathwayTable from '@/components/tables/PathwayTable.vue';
 import ModuleTable from '@/components/tables/ModuleTable.vue';
-import ReactionTable from '@/components/tables/ReactionTable.vue';
+import EnzymeTable from '@/components/tables/EnzymeTable.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
 import useKeggStore from '@/stores/KeggStore';
 
