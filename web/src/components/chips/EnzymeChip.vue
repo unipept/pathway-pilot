@@ -2,6 +2,7 @@
     <v-chip
         class="chip"
         :color="color"
+        @click="onClick"
     >
         <ec-icon size="small" :color="color" />
         {{ name }}
@@ -9,6 +10,8 @@
 </template>
 
 <script setup lang="ts">
+import { useKeggEntryLink } from '@/composables/useKeggEntryLink';
+import ResourceLink from '../misc/ResourceLink.vue';
 import EcIcon from '../icons/EcIcon.vue';
 
 export interface Props {
@@ -16,9 +19,13 @@ export interface Props {
     color?: string
 };
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     color: 'orange'
 });
+
+const { url } = useKeggEntryLink();
+
+const onClick = () => window.open(url(props.name), '_blank');
 </script>
 
 <style scoped>

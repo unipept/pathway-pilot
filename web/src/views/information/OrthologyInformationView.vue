@@ -40,6 +40,7 @@ import ReactionTable from '@/components/tables/ReactionTable.vue';
 import EnzymeTable from '@/components/tables/EnzymeTable.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
 import useKeggStore from '@/stores/KeggStore';
+import { useKeggEntryLink } from '@/composables/useKeggEntryLink';
 
 export interface Props {
     koId: string;
@@ -48,6 +49,7 @@ export interface Props {
 const props = defineProps<Props>();
 
 const keggStore = useKeggStore();
+const { url } = useKeggEntryLink();
 
 const koEntry = ref<any>(undefined);
 
@@ -79,7 +81,7 @@ const koEnzymes = computed(() =>
     })) ?? []
 );
 
-const keggUrl = computed(() => `https://www.genome.jp/entry/${props.koId}`);
+const keggUrl = computed(() => url(props.koId));
 
 onMounted(async () => {
     await keggStore.fetchKoMapping();

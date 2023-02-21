@@ -3,7 +3,9 @@
         <v-card-text v-if="hasItems">
             <v-virtual-scroll :items="items" height="150">
                 <template v-slot:default="{ item }">
-                    <pathway-chip class="ma-1 chip" :name="item.name" color="blue" /> {{ item.description }}
+                    <div @click="() => onClick(item.name)">
+                        <pathway-chip class="ma-1 chip" :name="item.name" color="blue" /> {{ item.description }}
+                    </div>
                 </template>
             </v-virtual-scroll>
         </v-card-text>
@@ -18,6 +20,7 @@
 </template>
 
 <script setup lang="ts">
+import { useKeggEntryLink } from '@/composables/useKeggEntryLink';
 import { computed } from 'vue';
 import PathwayChip from '../chips/PathwayChip.vue';
 import { ModuleTableItem } from './ModuleTableItem';
@@ -29,6 +32,10 @@ export interface Props {
 const props = defineProps<Props>();
 
 const hasItems = computed(() => props.items.length > 0);
+
+const { url } = useKeggEntryLink();
+
+const onClick = (item: string) => window.open(url(item), '_blank');
 </script>
 
 <style scoped>
