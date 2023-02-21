@@ -44,12 +44,12 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
 
             const ecNumbers = description.match(descriptionEcRegex)?.[1]?.split(' ');
 
-            this.set(koNumber.replace('ko:', ''), { 
+            this.set(koNumber, { 
                 names: description
                     .trim()
                     .split(';')
                     .slice(1)
-                    .map((n: string) => n.trim().replace(descriptionEcRegex, ''))
+                    .map((n: string) => n.trim())
                     .filter((n: string) => n.length),
                 pathways: [],
                 modules: [],
@@ -63,14 +63,13 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
         this.readlines(pathwayLinkFile, (line: string) => {
             const [ koNumber, pathwayId ] = line.split('\t');
 
-            const ko = this.get(koNumber.replace('ko:', ''));
-            const trimmedId = pathwayId.replace('path:', '');
-            if (ko && !ko.pathways.map(p => p.id).includes(trimmedId)) {
-                const pathway = pathwayMap.get(trimmedId);
-                ko.pathways.push({ id: trimmedId, name: pathway?.name ?? '' });
+            const ko = this.get(koNumber);
+            if (ko && !ko.pathways.map(p => p.id).includes(pathwayId)) {
+                const pathway = pathwayMap.get(pathwayId);
+                ko.pathways.push({ id: pathwayId, name: pathway?.name ?? '' });
             } else {
                 // TODO: add logging or error handling or add without description
-                console.log(`KO number ${koNumber.replace('ko:', '')} not found`);
+                console.log(`KO number ${koNumber} not found`);
             }
         });
     }
@@ -79,14 +78,13 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
         this.readlines(moduleLinkFile, (line: string) => {
             const [ koNumber, moduleId ] = line.split('\t');
 
-            const ko = this.get(koNumber.replace('ko:', ''));
-            const trimmedId = moduleId.replace('md:', '');
-            if (ko && !ko.modules.map(m => m.id).includes(trimmedId)) {
-                const module = moduleMap.get(trimmedId);
-                ko.modules.push({ id: trimmedId, name: module?.name ?? '' });
+            const ko = this.get(koNumber);
+            if (ko && !ko.modules.map(m => m.id).includes(moduleId)) {
+                const module = moduleMap.get(moduleId);
+                ko.modules.push({ id: moduleId, name: module?.name ?? '' });
             } else {
                 // TODO: add logging or error handling or add without description
-                console.log(`KO number ${koNumber.replace('ko:', '')} not found`);
+                console.log(`KO number ${koNumber} not found`);
             }
         });
     }
@@ -95,12 +93,12 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
         this.readlines(ecLinkFile, (line: string) => {
             const [ ecNumber, koNumber ] = line.split('\t');
 
-            const ko = this.get(koNumber.replace('ko:', ''));
-            if (ko && !ko.ecNumbers.includes(ecNumber.replace('ec:', ''))) {
-                ko.ecNumbers.push(ecNumber.replace('ec:', ''));
+            const ko = this.get(koNumber);
+            if (ko && !ko.ecNumbers.includes(ecNumber)) {
+                ko.ecNumbers.push(ecNumber);
             } else {
                 // TODO: add logging or error handling or add without description
-                console.log(`KO number ${koNumber.replace('ko:', '')} not found`);
+                console.log(`KO number ${koNumber} not found`);
             }
         });
     }
@@ -109,12 +107,12 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
         this.readlines(reactionLinkFile, (line: string) => {
             const [ koNumber, reactionId ] = line.split('\t');
 
-            const ko = this.get(koNumber.replace('ko:', ''));
-            if (ko && !ko.reactionIds.includes(reactionId.replace('rn:', ''))) {
-                ko.reactionIds.push(reactionId.replace('rn:', ''));
+            const ko = this.get(koNumber);
+            if (ko && !ko.reactionIds.includes(reactionId)) {
+                ko.reactionIds.push(reactionId);
             } else {
                 // TODO: add logging or error handling or add without description
-                console.log(`KO number ${koNumber.replace('ko:', '')} not found`);
+                console.log(`KO number ${koNumber} not found`);
             }
         });
     }

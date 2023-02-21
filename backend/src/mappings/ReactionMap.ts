@@ -37,7 +37,7 @@ class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
         this.readlines(descriptionFile, (line: string) => {
             const [ reactionId, description ] = line.split('\t');
 
-            this.set(reactionId.replace('rn:', ''), { 
+            this.set(reactionId, { 
                 names: description
                     .trim()
                     .split(';')
@@ -54,14 +54,13 @@ class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
         this.readlines(pathwayLinkFile, (line: string) => {
             const [ reactionId, pathwayId ] = line.split('\t');
 
-            const reaction = this.get(reactionId.replace('rn:', ''));
-            const trimmedId = pathwayId.replace('path:', '');
-            if (reaction && !reaction.pathways.map(p => p.id).includes(trimmedId)) {
-                const pathway = pathwayMap.get(trimmedId);
-                reaction.pathways.push({ id: trimmedId, name: pathway?.name ?? '' });
+            const reaction = this.get(reactionId);
+            if (reaction && !reaction.pathways.map(p => p.id).includes(pathwayId)) {
+                const pathway = pathwayMap.get(pathwayId);
+                reaction.pathways.push({ id: pathwayId, name: pathway?.name ?? '' });
             } else {
                 // TODO: add logging or error handling or add without description
-                console.log(`Reaction id ${reactionId.replace('rn:', '')} not found`);
+                console.log(`Reaction id ${reactionId} not found`);
             }
         });
     }
@@ -70,14 +69,13 @@ class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
         this.readlines(moduleLinkFile, (line: string) => {
             const [ reactionId, moduleId ] = line.split('\t');
 
-            const reaction = this.get(reactionId.replace('rn:', ''));
-            const trimmedId = moduleId.replace('md:', '');
-            if (reaction && !reaction.modules.map(m => m.id).includes(trimmedId)) {
-                const module = moduleMap.get(trimmedId);
-                reaction.modules.push({ id: trimmedId, name: module?.name ?? '' });
+            const reaction = this.get(reactionId);
+            if (reaction && !reaction.modules.map(m => m.id).includes(moduleId)) {
+                const module = moduleMap.get(moduleId);
+                reaction.modules.push({ id: moduleId, name: module?.name ?? '' });
             } else {
                 // TODO: add logging or error handling or add without description
-                console.log(`Reaction id ${reactionId.replace('rn:', '')} not found`);
+                console.log(`Reaction id ${reactionId} not found`);
             }
         });
     }
@@ -86,12 +84,12 @@ class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
         this.readlines(ecLinkFile, (line: string) => {
             const [ ecNumber, reactionId ] = line.split('\t');
 
-            const reaction = this.get(reactionId.replace('rn:', ''));
-            if (reaction && !reaction.ecNumbers.includes(ecNumber.replace('ec:', ''))) {
-                reaction.ecNumbers.push(ecNumber.replace('ec:', ''));
+            const reaction = this.get(reactionId);
+            if (reaction && !reaction.ecNumbers.includes(ecNumber)) {
+                reaction.ecNumbers.push(ecNumber);
             } else {
                 // TODO: add logging or error handling or add without description
-                console.log(`Reaction id ${reactionId.replace('rn:', '')} not found`);
+                console.log(`Reaction id ${reactionId} not found`);
             }
         });
     }

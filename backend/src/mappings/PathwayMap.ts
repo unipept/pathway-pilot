@@ -33,7 +33,7 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
         this.readlines(descriptionFile, (line: string) => {
             const [ pathwayId, description ] = line.split('\t');
 
-            this.set(pathwayId.replace('path:', ''), { 
+            this.set(pathwayId, { 
                 name: description.trim(),
                 ecNumbers: [],
                 koNumbers: [],
@@ -46,9 +46,9 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
         this.readlines(ecLinkFile, (line: string) => {
             const [ ecNumber, pathwayId ] = line.split('\t');
 
-            const pathway = this.get(pathwayId.replace('path:', ''));
-            if (pathway && !pathway.ecNumbers.includes(ecNumber.replace('ec:', ''))) {
-                pathway.ecNumbers.push(ecNumber.replace('ec:', ''));
+            const pathway = this.get(pathwayId);
+            if (pathway && !pathway.ecNumbers.includes(ecNumber)) {
+                pathway.ecNumbers.push(ecNumber);
             } else {
                 // TODO: add logging or error handling
                 console.log(`Pathway ${pathwayId} not found`);
@@ -60,9 +60,9 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
         this.readlines(koLinkFile, (line: string) => {
             const [ koNumber, pathwayId ] = line.split('\t');
 
-            const pathway = this.get(pathwayId.replace('path:', ''));
-            if (pathway && !pathway.koNumbers.includes(koNumber.replace('ko:', ''))) {
-                pathway.koNumbers.push(koNumber.replace('ko:', ''));
+            const pathway = this.get(pathwayId);
+            if (pathway && !pathway.koNumbers.includes(koNumber)) {
+                pathway.koNumbers.push(koNumber);
             } else {
                 // TODO: add logging or error handling
                 console.log(`Pathway ${pathwayId} not found`);
@@ -74,9 +74,9 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
         this.readlines(reactionLinkFile, (line: string) => {
             const [ reactionId, pathwayId ] = line.split('\t');
 
-            const pathway = this.get(pathwayId.replace('path:', ''));
-            if (pathway && !pathway.reactionIds.includes(reactionId.replace('rn:', ''))) {
-                pathway.reactionIds.push(reactionId.replace('rn:', ''));
+            const pathway = this.get(pathwayId);
+            if (pathway && !pathway.reactionIds.includes(reactionId)) {
+                pathway.reactionIds.push(reactionId);
             } else {
                  // TODO: add logging or error handling
                  console.log(`Pathway ${pathwayId} not found`);

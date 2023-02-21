@@ -40,7 +40,7 @@ class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
         this.readlines(descriptionFile, (line: string) => {
             const [ compoundId, description ] = line.split('\t');
 
-            this.set(compoundId.replace('cpd:', ''), { 
+            this.set(compoundId, { 
                 names: description
                     .trim()
                     .split(';')
@@ -56,16 +56,15 @@ class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
 
     private handlePathwayLinkFile(pathwayLinkFile: string) {
         this.readlines(pathwayLinkFile, (line: string) => {
-            const [ pathwayId, compoundId ] = line.split('\t');
+            const [ compoundId, pathwayId ] = line.split('\t');
 
-            const compound = this.get(compoundId.replace('cpd:', ''));
-            const trimmedId = pathwayId.replace('path:', '');
-            if (compound && !compound.pathways.map(p => p.id).includes(trimmedId)) {
-                const pathway = pathwayMap.get(trimmedId);
-                compound.pathways.push({ id: trimmedId, name: pathway?.name ?? '' });
+            const compound = this.get(compoundId);
+            if (compound && !compound.pathways.map(p => p.id).includes(pathwayId)) {
+                const pathway = pathwayMap.get(pathwayId);
+                compound.pathways.push({ id: pathwayId, name: pathway?.name ?? '' });
             } else {
                 // TODO: add logging or error handling or add without description
-                console.log(`Compound id ${compoundId.replace('cpd:', '')} not found`);
+                console.log(`Compound id ${compoundId} not found`);
             }
         });
     }
@@ -74,14 +73,13 @@ class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
         this.readlines(moduleLinkFile, (line: string) => {
             const [ compoundId, moduleId ] = line.split('\t');
 
-            const compound = this.get(compoundId.replace('cpd:', ''));
-            const trimmedId = moduleId.replace('md:', '');
-            if (compound && !compound.modules.map(m => m.id).includes(trimmedId)) {
-                const module = moduleMap.get(trimmedId);
-                compound.modules.push({ id: trimmedId, name: module?.name ?? '' });
+            const compound = this.get(compoundId);
+            if (compound && !compound.modules.map(m => m.id).includes(moduleId)) {
+                const module = moduleMap.get(moduleId);
+                compound.modules.push({ id: moduleId, name: module?.name ?? '' });
             } else {
                 // TODO: add logging or error handling or add without description
-                console.log(`Compound id ${compoundId.replace('cpd:', '')} not found`);
+                console.log(`Compound id ${compoundId} not found`);
             }
         });
     }
@@ -90,12 +88,12 @@ class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
         this.readlines(ecLinkFile, (line: string) => {
             const [ ecNumber, compoundId ] = line.split('\t');
 
-            const compound = this.get(compoundId.replace('cpd:', ''));
-            if (compound && !compound.ecNumbers.includes(ecNumber.replace('ec:', ''))) {
-                compound.ecNumbers.push(ecNumber.replace('ec:', ''));
+            const compound = this.get(compoundId);
+            if (compound && !compound.ecNumbers.includes(ecNumber)) {
+                compound.ecNumbers.push(ecNumber);
             } else {
                 // TODO: add logging or error handling or add without description
-                console.log(`Compound id ${compoundId.replace('cpd:', '')} not found`);
+                console.log(`Compound id ${compoundId} not found`);
             }
         });
     }
@@ -104,12 +102,12 @@ class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
         this.readlines(reactionLinkFile, (line: string) => {
             const [ reactionId, compoundId ] = line.split('\t');
 
-            const compound = this.get(compoundId.replace('cpd:', ''));
-            if (compound && !compound.reactionIds.includes(reactionId.replace('rn:', ''))) {
-                compound.reactionIds.push(reactionId.replace('rn:', ''));
+            const compound = this.get(compoundId);
+            if (compound && !compound.reactionIds.includes(reactionId)) {
+                compound.reactionIds.push(reactionId);
             } else {
                 // TODO: add logging or error handling or add without description
-                console.log(`Compound id ${compoundId.replace('cpd:', '')} not found`);
+                console.log(`Compound id ${compoundId} not found`);
             }
         });
     }

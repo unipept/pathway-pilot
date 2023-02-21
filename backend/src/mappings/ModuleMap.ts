@@ -24,7 +24,7 @@ export class ModuleMap extends ReaderMap<ModuleKey, ModuleValue> {
         this.readlines(descriptionFile, (line: string) => {
             const [ ModuleId, description ] = line.split('\t');
 
-            this.set(ModuleId.replace('md:', ''), { 
+            this.set(ModuleId, { 
                 name: description.trim()
             });
         });
