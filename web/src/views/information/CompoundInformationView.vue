@@ -59,7 +59,12 @@ const compoundPathways = computed(() =>
     })) ?? []
 );
 
-const compoundModules = computed(() => []);
+const compoundModules = computed(() => 
+    compoundEntry.value?.modules.map((module: any) => ({
+        name: module.id,
+        description: module.name
+    })) ?? []
+);
 
 const compoundEnzymes = computed(() =>
     compoundEntry.value?.ecNumbers.map((enzyme: any) => ({

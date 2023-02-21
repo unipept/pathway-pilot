@@ -60,8 +60,12 @@ const koPathways = computed(() =>
     })) ?? []
 );
 
-// TODO: backend
-const koModules = computed(() => []);
+const koModules = computed(() => 
+    koEntry.value?.modules.map((module: any) => ({
+        name: module.id,
+        description: module.name
+    })) ?? []
+);
 
 const koReactions = computed(() => 
     koEntry.value?.reactionIds.map((reaction: string) => ({

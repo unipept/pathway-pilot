@@ -1,6 +1,8 @@
 import ReaderMap from './ReaderMap';
 import pathwayMap from './PathwayMap';
+import moduleMap from './ModuleMap';
 import { KeggMap } from '../models/annotations/KeggMap';
+import { KeggModule } from '../models/annotations/KeggModule';
 
 // TODO: Replaces could be done on fetch once a day
 // TODO: Then also throw out path:ko or path:ec from the file
@@ -14,6 +16,7 @@ export type KoKey = string;
 export type KoValue = {
     names: string[];
     pathways: KeggMap[];
+    modules: KeggModule[];
     ecNumbers: string[];
     reactionIds: string[];
 };
@@ -21,7 +24,8 @@ export type KoValue = {
 export class KoMap extends ReaderMap<KoKey, KoValue> {
     constructor(
         descriptionFile: string = '../../data/ko', 
-        pathwayLinkFile: string = '../../data/link/ko2pathway', 
+        pathwayLinkFile: string = '../../data/link/ko2pathway',
+        moduleLinkFile: string = '../../data/link/ko2module',
         ecLinkFile: string = '../../data/link/ec2ko',
         reactionLinkFile: string = '../../data/link/ko2reaction'
     ) {
@@ -29,6 +33,7 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
 
         this.handleDescriptionFile(descriptionFile);
         this.handlePathwayLinkFile(pathwayLinkFile);
+        this.handleModuleLinkFile(moduleLinkFile);
         this.handleEcLinkFile(ecLinkFile);
         this.handleReactionLinkFile(reactionLinkFile);
     }
@@ -46,7 +51,8 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
                     .slice(1)
                     .map((n: string) => n.trim().replace(descriptionEcRegex, ''))
                     .filter((n: string) => n.length),
-                pathways: [], 
+                pathways: [],
+                modules: [],
                 ecNumbers: ecNumbers ?? [],
                 reactionIds: []
             });
@@ -62,6 +68,22 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
             if (ko && !ko.pathways.map(p => p.id).includes(trimmedId)) {
                 const pathway = pathwayMap.get(trimmedId);
                 ko.pathways.push({ id: trimmedId, name: pathway?.name ?? '' });
+            } else {
+                // TODO: add logging or error handling or add without description
+                console.log(`KO number ${koNumber.replace('ko:', '')} not found`);
+            }
+        });
+    }
+
+    private handleModuleLinkFile(moduleLinkFile: string) {
+        this.readlines(moduleLinkFile, (line: string) => {
+            const [ koNumber, moduleId ] = line.split('\t');
+
+            const ko = this.get(koNumber.replace('ko:', ''));
+            const trimmedId = moduleId.replace('md:', '');
+            if (ko && !ko.modules.map(m => m.id).includes(trimmedId)) {
+                const module = moduleMap.get(trimmedId);
+                ko.modules.push({ id: trimmedId, name: module?.name ?? '' });
             } else {
                 // TODO: add logging or error handling or add without description
                 console.log(`KO number ${koNumber.replace('ko:', '')} not found`);

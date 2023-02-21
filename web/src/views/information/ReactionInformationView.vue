@@ -56,8 +56,12 @@ const reactionPathways = computed(() =>
     })) ?? []
 );
 
-// TODO: from mappingstore
-const reactionModules = computed(() => []);
+const reactionModules = computed(() => 
+    reactionEntry.value?.modules.map((module: any) => ({
+        name: module.id,
+        description: module.name
+    })) ?? []
+);
 
 const reactionEnzymes = computed(() => 
     reactionEntry.value?.ecNumbers.map((enzyme: string) => ({
