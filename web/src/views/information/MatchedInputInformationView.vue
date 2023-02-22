@@ -14,7 +14,39 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import MatchedInputTable from '@/components/tables/MatchedInputTable.vue';
+import useMappingStore from '@/stores/MappingStore';
+import Taxon from '@/logic/entities/Taxon';
+import EcNumber from '@/logic/entities/EcNumber';
+import useVisualisationStore from '@/stores/VisualisationStore';
 
-// TODO: from mappingstore and other stores
-const MatchedInputItems = computed(() => []);
+export interface Props {
+    annotations: string[]
+}
+
+const props = defineProps<Props>();
+
+const mappingStore = useMappingStore();
+const visualisationStore = useVisualisationStore();
+
+const pathwayTaxa = computed(() => {
+    return [...mappingStore.pathwaysToTaxa.get(visualisationStore.pathwayId!) ?? []]
+        .filter((taxon: Taxon) => taxon.id !== 1);
+});
+
+const MatchedInputItems = computed(() => {
+    return pathwayTaxa.value.map((taxon: Taxon) => {
+        return {
+            taxon_id: taxon.id,
+            taxon_name: taxon.name,
+            taxon_rank: taxon.rank,
+            node_annotations: props.annotations,
+            matched_annotations: getMatchedAnnotations(taxon)
+        };
+    });
+});
+
+const getMatchedAnnotations = (taxon: Taxon) => {
+    const ecNumbers = [...mappingStore.taxaToEcs.get(taxon.id) ?? []].map((ec: EcNumber) => ec.id);
+    return props.annotations.filter(a => ecNumbers.includes(a))
+}
 </script>

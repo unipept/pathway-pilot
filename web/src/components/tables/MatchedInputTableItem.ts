@@ -1,5 +1,4 @@
 export interface MatchedInputTableItem {
-    raw_input: string,
     taxon_id: number,
     taxon_name: string,
     taxon_rank: string,

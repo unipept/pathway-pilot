@@ -47,15 +47,14 @@
         </v-btn>
     </div>
 
-    <v-row v-else>
+    <div v-else class="loading-container">
         <v-progress-circular
-            class="progress-loader"
             size="50"
             width="5"
             color="secondary"
             indeterminate
         ></v-progress-circular>
-    </v-row>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -190,6 +189,14 @@ onMounted(async () => {
     outline-style: solid;
     outline-width: 10px;
     outline-offset: -5px;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 100px);
 }
 
 .legend {

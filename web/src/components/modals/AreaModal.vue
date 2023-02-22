@@ -46,8 +46,14 @@ const dialogOpen = ref<boolean>(props.modelValue);
 
 const currentTab = ref<number>(0);
 
+const annotations = computed(() => [
+    ...props.area.info.koNumbers.map((ko: any) => ko.id),
+    ...props.area.info.ecNumbers.map((ec: any) => ec.id),
+    ...props.area.info.reactions.map((reaction: any) => reaction.id)
+]);
+
 const tabs = computed(() => [
-    { name: 'Matched input', component: MatchedInputInformationView, props: {} },
+    { name: 'Matched input', component: MatchedInputInformationView, props: { annotations: annotations.value } },
     ...props.area.info.koNumbers.map((ko: any) => ({
         name: `Orthology: ${ko.id}`, component: OrthologyInformationView, props: { koId: ko.id }
     })),

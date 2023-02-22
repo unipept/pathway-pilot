@@ -5,12 +5,6 @@
         item-value="raw_input"
         density="compact"
     >
-        <template #item.raw_input="{ item }">
-            <div class="px-4">
-                {{ item.raw.raw_input }}
-            </div>
-        </template>
-
         <template #item.taxon_id="{ item }">
             <div class="px-4">
                 {{ item.raw.taxon_id }}
@@ -68,11 +62,6 @@ const hasItems = computed(() => props.items.length > 0);
 const l = console.log;
 
 const headers = [
-    {
-        title: "Peptide",
-        align: "start",
-        key: "raw_input"
-    },
     {
         title: "Taxon id",
         align: "start",

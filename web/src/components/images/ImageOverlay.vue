@@ -2,7 +2,7 @@
     <svg width="100%" height="100%" version="1.1">
         <rect class="border" width="100%" height="100%" fill="none" />
 
-        <g v-for="area in areas.filter(a => a.shape === 'rect')"
+        <g v-for="area in areas.filter(a => a.shape === 'rect' && isSelectable(a))"
             class="group"
             :transform="`scale(${scale})`"
             :onclick="() => onClick(area)"
@@ -56,6 +56,14 @@ export interface Props {
 };
 
 defineProps<Props>();
+
+const isSelectable = (area: any) => {
+    return area.info.ecNumbers.length 
+         + area.info.koNumbers.length
+         + area.info.compounds.length 
+         + area.info.reactions.length
+         > 0;
+}
 
 const splitRectangle = (rectangle: any, parts: number) => {
     if (parts === 0) {
