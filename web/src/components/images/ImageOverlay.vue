@@ -3,29 +3,34 @@
         <rect class="border" width="100%" height="100%" fill="none" />
 
         <g v-for="area in areas.filter(a => a.shape === 'rect')"
+            class="group"
             :transform="`scale(${scale})`"
             :onclick="() => onClick(area)"
         >
             <rect v-for="rect in splitRectangle(area, area.colors.length)"
+                class="group-item"
+                :class="{ 'group-item-trans': rect.color === 'transparent' }"
                 :x="rect.x1"
                 :y="rect.y1"
                 :width="(rect.x2 - rect.x1)"
                 :height="(rect.y2 - rect.y1)"
                 :fill="rect.color"
-                fill-opacity="0.5"
+                :fill-opacity="0.5"
             />
         </g>
 
         <g v-for="area in areas.filter(a => a.shape === 'circle')"
+            class="group"
             :transform="`scale(${scale})`"
             :onclick="() => onClickCompound(area)"
         >
             <circle
+                class="group-item group-item-trans"
                 :cx="area.x"
                 :cy="area.y"
                 :r="area.r"
-                fill="white"
-                fill-opacity="0"
+                fill="transparent"
+                fill-opacity="0.5"
             />
         </g>
 
@@ -52,8 +57,6 @@ export interface Props {
 
 defineProps<Props>();
 
-const l = console.log;
-
 const splitRectangle = (rectangle: any, parts: number) => {
     if (parts === 0) {
         rectangle.color = "transparent";
@@ -72,7 +75,7 @@ const splitRectangle = (rectangle: any, parts: number) => {
             x2: rectangle.x1 + widthDelta * (i + 1),
             y2: rectangle.y2,
             shape: "rect",
-            color: rectangle.colors[i],
+            color: rectangle.colors[i]
         });
     }
 
@@ -86,5 +89,13 @@ const splitRectangle = (rectangle: any, parts: number) => {
     outline-style: solid;
     outline-width: 6px;
     outline-offset: -3px;
+}
+
+.group:hover .group-item {
+    filter: brightness(0.9);
+}
+
+.group:hover .group-item-trans {
+    fill: rgb(226, 226, 226);
 }
 </style>
