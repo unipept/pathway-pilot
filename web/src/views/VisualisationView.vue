@@ -1,24 +1,29 @@
 <template>
     <div v-if="pngUrl">
         <div ref="image">
-            <horizontal-legend v-if="imageLoaded"
-                class="legend"
-                :items="computeItems()"
-            />
-
-            <reactive-image
-                class="image-container"
-                :src="pngUrl" 
-                alt="Pathway"
-                @resize="onResize"
-            >
-                <image-overlay v-if="imageLoaded"
-                    :areas="areas"
-                    :scale="scale"
-                    :onClick="onClickArea"
-                    :onClickCompound="onClickCompound"
+            <!-- TODO: height has to be responsive here I guess -->
+            <v-card elevation="5" max-height="700px" style="position: relative;">
+                <taxon-legend v-if="imageLoaded"
+                    class="legend"
+                    :items="computeItems()"
                 />
-            </reactive-image>
+
+                <interactive-image>
+                    <reactive-image
+                        class="image-container"
+                        :src="pngUrl" 
+                        alt="Pathway"
+                        @resize="onResize"
+                    >
+                        <image-overlay v-if="imageLoaded"
+                            :areas="areas"
+                            :scale="scale"
+                            :onClick="onClickArea"
+                            :onClickCompound="onClickCompound"
+                        />
+                    </reactive-image>
+                </interactive-image>
+            </v-card>
         </div>
 
         <area-modal
@@ -60,11 +65,12 @@ import useVisualisationStore from '@/stores/VisualisationStore';
 import { onMounted, ref } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
 import { Router } from 'vue-router';
-import HorizontalLegend from '@/components/legends/HorizontalLegend.vue';
+import TaxonLegend from '@/components/legends/TaxonLegend.vue';
 import AreaModal from '@/components/modals/AreaModal.vue';
 import useMappingStore from '@/stores/MappingStore';
 import { toPng } from 'html-to-image';
 import CompoundModal from '@/components/modals/CompoundModal.vue';
+import InteractiveImage from '@/components/images/InteractiveImage.vue';
 
 const mappingStore = useMappingStore();
 const visualisationStore = useVisualisationStore();
@@ -179,12 +185,19 @@ onMounted(async () => {
 
 <style scoped>
 .image-container {
-  position: relative;
+    position: relative;
+    outline-color: white;
+    outline-style: solid;
+    outline-width: 10px;
+    outline-offset: -5px;
 }
 
 .legend {
-    margin-bottom: 12px;
+    position: absolute;
+    right: 0;
+    margin: 12px;
     font-size: 90%;
     background-color: white;
+    z-index: 1;
 }
 </style>

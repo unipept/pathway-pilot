@@ -26,7 +26,6 @@ const empty = computed(() => props.items.length === 0);
 <style scoped>
 .legend-container {
     width: fit-content;
-    border: 1px solid #000000;
-    padding: 12px;
+    padding: 8px;
 }
 </style>

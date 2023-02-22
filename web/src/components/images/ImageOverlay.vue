@@ -1,6 +1,6 @@
 <template>
-    <svg width="100%" height="100%">
-        <rect width="100%" height="100%" fill="none" stroke="white" stroke-width="5"/>
+    <svg width="100%" height="100%" version="1.1">
+        <rect class="border" width="100%" height="100%" fill="none" />
 
         <g v-for="area in areas.filter(a => a.shape === 'rect')"
             :transform="`scale(${scale})`"
@@ -79,3 +79,12 @@ const splitRectangle = (rectangle: any, parts: number) => {
     return rectangles;
 }
 </script>
+
+<style scoped>
+.border {
+    outline-color: white;
+    outline-style: solid;
+    outline-width: 6px;
+    outline-offset: -3px;
+}
+</style>
