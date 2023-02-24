@@ -34,7 +34,7 @@
         </v-btn>
 
         <v-btn class="ms-3" color="primary" @click="onSubmit" :disabled="!hasFile && !hasList">
-            Continue
+            Upload
         </v-btn>
     </div>
 
