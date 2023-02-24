@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import Taxon from "@/logic/entities/Taxon";
 import EcNumber from "@/logic/entities/EcNumber";
 import Pathway from "@/logic/entities/Pathway";
+import { ref } from 'vue';
 
 const useMappingStore = defineStore('mappingStore', () => {
     // Mappings containing all matched entities
@@ -18,7 +19,13 @@ const useMappingStore = defineStore('mappingStore', () => {
 
     const pathwaysToPeptideCounts = new Map<string, number>();
 
+    const initialized = ref<boolean>(false);
+
     const initialize = (infoObjects: any[]) => {
+        if (initialized.value) {
+            return;
+        }
+
         for (const object of infoObjects) {
             let taxon = taxa.get(object.taxon_id);
             if (!taxon) {
@@ -64,6 +71,8 @@ const useMappingStore = defineStore('mappingStore', () => {
             pathwaysToPeptideCounts.set(object.pathway, pathwaysToPeptideCounts.get(object.pathway)! + object.count);
         }
 
+        initialized.value = true;
+
         console.log("MappingStore initialized");
     }
 
@@ -76,6 +85,8 @@ const useMappingStore = defineStore('mappingStore', () => {
         pathwaysToEcs,
         pathwaysToTaxa,
         pathwaysToPeptideCounts,
+
+        initialized,
 
         initialize
     };

@@ -19,6 +19,7 @@
         </v-timeline-item>
         <v-timeline-item
             dot-color="primary"
+            width="100%"
         >
             <template v-slot:icon>3</template>
             <visualisation-view />

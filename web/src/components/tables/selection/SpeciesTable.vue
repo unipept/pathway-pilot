@@ -48,7 +48,7 @@ const onRowClicked = (e: any, i: any) => {
     if (selected.value.map((taxon: Taxon) => taxon.id).includes(i.item.raw.id)) {
         selected.value = selected.value.filter((v) => v.id !== i.item.raw.id);
     } else if (selected.value.length < props.max) {
-        selected.value.push(i.item.raw);
+        selected.value = [...selected.value, i.item.raw];
     }
 
     emits("update:model-value", selected.value);
