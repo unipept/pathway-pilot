@@ -61,6 +61,8 @@ onMounted(() => {
     const legend_radius = 10;
     const line_size = 20;
 
+    let maxNoPathways = 4;
+    let selectedPathways = Array();
 
     let fillColor = {};
     const noColor = groupArray.length -1 ;
@@ -185,8 +187,40 @@ onMounted(() => {
         d3.select("#selectedBackground").remove();
         d3.select('#legend_'+d.group)
           .attr('r',legend_radius);
-          // .attr('stroke', d3.rgb(fillColor(d.group)).darker());
       })
+  };
+
+  function toggleBorder(event, d) {
+    // console.log(d);
+    if (! selectedPathways.includes(d.id) ){
+      if (selectedPathways.length < maxNoPathways){
+        d3.select(this)
+        .each(function(d){
+          
+          d3.select(this)
+            .attr("stroke", fillColor[d.group].brighter(-1.5))
+            .attr('stroke-width', 2.5);
+        }
+        )
+        selectedPathways.push(d.id);
+        
+      }  else {
+        // notification that says only 4 pathways are allowed
+
+      }
+    } else {
+      
+        d3.select(this)
+        .each(function(d){
+          d3.select(this)
+            .attr("stroke", "none");
+        })
+        const index = selectedPathways.indexOf(d.id);
+        selectedPathways.splice(index, 1);
+        
+      }
+      // console.log(selectedPathways);
+
   };
   
   let simulation = d3.forceSimulation()
@@ -209,7 +243,8 @@ onMounted(() => {
       // .attr('stroke', function (d) { return d3.rgb(fillColor[d.group]).darker(); })
       // .attr('stroke-width', 2)
       .on('mouseover', showDetail)
-      .on('mouseout', hideDetail);
+      .on('mouseout', hideDetail)
+      .on('click', toggleBorder);
 
     // @v4 Merge the original empty selection and the enter selection
   bubbles = bubbles.merge(bubblesE);
