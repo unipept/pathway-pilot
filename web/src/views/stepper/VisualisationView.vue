@@ -174,7 +174,9 @@ const onDownload = async () => {
     link.click();
 }
 
-watch(pathwayId, async (id: string | undefined) => {   
+watch(pathwayId, async (id: string | undefined) => {
+    pngUrl.value = undefined;
+    
     // Fetch data from the store when loaded
     const data = await visualisationStore.getPathwayData();
 
