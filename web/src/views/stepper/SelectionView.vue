@@ -8,11 +8,11 @@
 
         <v-row class="mt-5">
             <v-col cols=12>
-                <h3>Select a pathway</h3>
+                <h3>Select your pathway</h3>
                 <v-text-field 
                     class="mt-3"
                     v-model="pathwaySearch"
-                    label="Search a pathway"
+                    label="Search for an identifier or name"
                     prepend-inner-icon="mdi-magnify"
                     variant="solo"
                 />
@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import PathwayTable from '@/components/tables/selection/PathwayTable.vue';
 import SpeciesTable from '@/components/tables/selection/SpeciesTable.vue';
 import Pathway from '@/logic/entities/Pathway';
@@ -58,11 +58,14 @@ import Taxon from '@/logic/entities/Taxon';
 import useMappingStore from '@/stores/MappingStore';
 import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
+import useKeggStore from '@/stores/KeggStore';
 
 const mappingStore = useMappingStore();
+const keggStore = useKeggStore();
 const visualisationStore = useVisualisationStore(); // TODO: use v-model instead of store
 
 const { initialized } = storeToRefs(mappingStore);
+const { pathwayMapping } = storeToRefs(keggStore);
 
 const pathwaySearch = ref<string>("");
 const speciesSearch = ref<string>("");
@@ -74,6 +77,7 @@ const pathwayItems = computed(() => [...mappingStore.pathways.values()!]
     .filter((pathway: Pathway) => pathway.id)
     .map((pathway: Pathway) => ({
             id: pathway.id,
+            name: pathwayMapping.value.get(pathway.id)?.name ?? "",
             count: mappingStore.pathwaysToPeptideCounts.get(pathway.id)!
         })
     )
@@ -101,5 +105,9 @@ watch(pathwaySelected, (pathway: Pathway | undefined) => {
 
 watch(speciesSelected, (taxa: Taxon[]) => {
     visualisationStore.setHighlightedTaxa(speciesSelected.value.map((s: Taxon) => s.id));
+});
+
+onMounted(async () => {
+    await keggStore.fetchPathwayMapping();
 });
 </script>

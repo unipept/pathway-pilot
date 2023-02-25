@@ -3,6 +3,10 @@ export default class KeggCommunicator {
         private readonly baseUrl: string = "http://localhost:4000"
     ) {}
 
+    public async fetchPathwayMapping() {
+        return await this.fetchMapping(`${this.baseUrl}/mapping/pathway`);
+    }
+
     public async fetchEcMapping() {
         return await this.fetchMapping(`${this.baseUrl}/mapping/ec`);
     }

@@ -1,10 +1,12 @@
 <template>
-    <v-data-table-virtual
+    <v-data-table
         :headers="headers"
         :items="items"
         :search="search"
-        :custom-filter="filterPathways"
-        height="300"
+        :filter-keys="['id', 'name']"
+        :sort-by="[{ key: 'count', order: 'desc' }]"
+        :must-sort=true
+        items-per-page="5"
         item-value="pathway"
         density="compact"
         @click:row="onRowClicked"
@@ -15,12 +17,18 @@
             </div>
         </template>
 
+        <template #item.name="{ item }">
+            <div :class="rowActive(item) ? 'active' : ''">
+                {{ item.raw.name }}
+            </div>
+        </template>
+
         <template #item.count="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
                 {{ item.raw.count }}
             </div>
         </template>
-    </v-data-table-virtual>
+    </v-data-table>
 </template>
 
 <script setup lang="ts">
@@ -49,21 +57,16 @@ const rowActive = (item: any) => {
     return item.raw.id === selected.value?.id;
 };
 
-const filterPathways = (value: Pathway, search: string, item: PathwayTableItem) => {
-    const pathwayId = toRaw(item).id
-
-    if (!pathwayId) {
-        return false;
-    }
-
-    return pathwayId.toLowerCase().indexOf(search.toLowerCase()) !== -1;
-}
-
 const headers = [
     {
         title: "Pathway",
         align: "start",
         key: "id"
+    },
+    {
+        title: "Name",
+        align: "start",
+        key: "name"
     },
     {
         title: "Count",
