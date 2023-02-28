@@ -2,13 +2,27 @@
     <h2>Create your selection</h2>
 
     <div v-if="initialized">
-        <p>
-            TODO
-        </p>
+        <v-row>
+            <v-col cols=6>
+                <p>
+                    TODO: Introduction (What is this selection phase)
+                </p>
+            </v-col>
+
+            <v-col cols=6>
+                <p style="height: 250px; background-color: lightblue;">
+                    Bubbleplot
+                </p>
+            </v-col>
+        </v-row>
 
         <v-row class="mt-5">
             <v-col cols=12>
                 <h3>Select your pathway</h3>
+                <p class="subtitle">
+                    The table below list all the pathways that have at least one node in common with your input data. You can either 
+                    scroll through the table or use the search bar to find the specific pathway you wish to visualise.
+                </p>
                 <v-text-field 
                     class="mt-3 mb-n3"
                     v-model="pathwaySearch"
@@ -26,6 +40,10 @@
 
             <v-col v-if="pathwaySelected">
                 <h3>Select multiple taxa <span style="font-size: x-small; color: #7a7a7a;">OPTIONAL</span></h3>
+                <p class="subtitle">
+                    By default we will highlight all nodes with a match between the selected pathway and your input data. By selecting <b>a maximum of 4</b> taxa, we can narrow 
+                    this down to only highlight nodes that are associated with the selected pathway and taxa.
+                </p>
                 <div class="d-flex">
                     <v-text-field 
                         class="mt-3 mb-n3"
@@ -119,3 +137,9 @@ onMounted(async () => {
     await keggStore.fetchPathwayMapping();
 });
 </script>
+
+<style scoped>
+.subtitle {
+    color: #454545;
+}
+</style>

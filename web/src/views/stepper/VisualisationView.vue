@@ -2,7 +2,12 @@
     <h2>Analyse your pathway</h2>
 
     <div v-if="pngUrl">
-        <div ref="image">
+        <warning-alert v-if="highlightedTaxa.length === 0" class="mt-3">
+            You selected no taxa during the previous step. Therefore <b>all nodes with at least one match</b> are shown in the same color. You can always update your selection 
+            in the previous step.
+        </warning-alert>
+
+        <div ref="image" class="mt-3">
             <!-- TODO: height has to be responsive here I guess -->
             <v-card elevation="5" max-height="700px" style="position: relative;">
                 <taxon-legend v-if="imageLoaded"
@@ -74,6 +79,7 @@ import useMappingStore from '@/stores/MappingStore';
 import { toPng } from 'html-to-image';
 import CompoundModal from '@/components/modals/CompoundModal.vue';
 import InteractiveImage from '@/components/images/InteractiveImage.vue';
+import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 
 const mappingStore = useMappingStore();
