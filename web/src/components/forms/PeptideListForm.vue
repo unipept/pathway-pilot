@@ -18,7 +18,7 @@
         <v-col>
             <v-textarea
                 v-model="peptides"
-                label="Peptide list"
+                label="Paste your peptide list here"
                 rows=7
                 :counter-value="() => peptidesList.length"
                 :loading="processing"

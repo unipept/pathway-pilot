@@ -23,7 +23,7 @@
                 />
             </v-col>
 
-            <v-col>
+            <v-col v-if="pathwaySelected">
                 <h3>Select multiple taxa <span style="font-size: x-small; color: #7a7a7a;">OPTIONAL</span></h3>
                 <v-text-field 
                     class="mt-3 mb-n3"
@@ -101,6 +101,8 @@ const speciesItems = computed(() => {
 
 watch(pathwaySelected, (pathway: Pathway | undefined) => {
     visualisationStore.setPathwayId(pathway?.id);
+    visualisationStore.setHighlightedTaxa([]);
+    speciesSelected.value = [];
 });
 
 watch(speciesSelected, (taxa: Taxon[]) => {

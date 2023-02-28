@@ -16,7 +16,7 @@
                     mdi-tray-arrow-up
                 </v-icon>
                 <p>
-                    Drop your file here, or click anywhere to select it.
+                    Drop your file here, or click to select a single file.
                 </p>
                 <p v-if="file" class="text-green mt-3">
                     {{ file.name }} ({{ file.size }} bytes)
