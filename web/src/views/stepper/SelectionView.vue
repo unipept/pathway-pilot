@@ -15,6 +15,7 @@
                     label="Search for an identifier or name"
                     prepend-inner-icon="mdi-magnify"
                     variant="solo"
+                    density="comfortable"
                 />
                 <pathway-table
                     v-model="pathwaySelected"
@@ -25,13 +26,18 @@
 
             <v-col v-if="pathwaySelected">
                 <h3>Select multiple taxa <span style="font-size: x-small; color: #7a7a7a;">OPTIONAL</span></h3>
-                <v-text-field 
-                    class="mt-3 mb-n3"
-                    v-model="speciesSearch"
-                    label="Search for a taxon or rank" 
-                    prepend-inner-icon="mdi-magnify"
-                    variant="solo"
-                />
+                <div class="d-flex">
+                    <v-text-field 
+                        class="mt-3 mb-n3"
+                        v-model="speciesSearch"
+                        label="Search for a taxon or rank" 
+                        prepend-inner-icon="mdi-magnify"
+                        variant="solo"
+                        density="comfortable"
+                    />
+                    <v-label v-if="speciesSelected.length === 0" class="px-5">No taxa selected</v-label>
+                    <v-label v-else class="px-5">{{ speciesSelected.length }} out of 4 taxa selected</v-label>
+                </div>
                 <species-table
                     v-model="speciesSelected"
                     :items="speciesItems"

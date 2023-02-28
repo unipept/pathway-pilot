@@ -3,17 +3,21 @@
         :headers="headers"
         :items="items"
         :search="search"
+        :page="page"
         :filter-keys="['name', 'rank']"
         items-per-page="5"
         density="compact"
         @click:row="onRowClicked"
+        @update:options="pageOptions = $event"
     >
         <template #item.checkbox="{ item }">
             <div v-if="rowActive(item)" class="active">
                 <v-icon>mdi-checkbox-outline</v-icon>
             </div>
             <div v-else>
-                <v-icon>mdi-checkbox-blank-outline</v-icon>
+                <v-icon :color="selected.length === max ? 'grey' : 'black'">
+                    mdi-checkbox-blank-outline
+                </v-icon>
             </div>
         </template>
 
@@ -28,12 +32,21 @@
                 {{ item.raw.rank }}
             </div>
         </template>
+
+        <template #bottom>
+            <v-pagination
+                v-model="page"
+                :length="pageOptions.pageCount"
+                :total-visible="7"
+                density="comfortable"
+            ></v-pagination>
+        </template>
     </v-data-table>
 </template>
 
 <script setup lang="ts">
 import Taxon from '@/logic/entities/Taxon';
-import { ref, toRaw, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { SpeciesTableItem } from './SpeciesTableItem';
 
 export interface Props {
@@ -48,6 +61,11 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emits = defineEmits(["update:model-value"]);
+
+const page = ref(1);
+const pageOptions = ref({
+    pageCount: 1
+});
 
 const selected = ref<Taxon[]>([]);
 
@@ -64,16 +82,6 @@ const onRowClicked = (e: any, i: any) => {
 const rowActive = (item: any) => {
     return selected.value.map((taxon: Taxon) => taxon.id).includes(item.raw.id);
 };
-
-const filterSpecies = (value: Taxon, search: string, item: SpeciesTableItem) => {
-    const speciesName = toRaw(item).name
-
-    if (!speciesName) {
-        return false;
-    }
-    
-    return speciesName.toLowerCase().indexOf(search.toLowerCase()) !== -1;
-}
 
 const headers = [
     {
