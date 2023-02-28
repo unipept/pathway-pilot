@@ -86,16 +86,18 @@ watch(() => props.modelValue, (value) => {
 }
 
 :deep(td) > :not(.active) {
+    display: flex;
     padding-left: 16px;
     padding-right: 16px;
+    align-items: center;
 }
 
 :deep(td) > .active {
+    display: flex;
     background-color: #eee;
-    width: inherit;
-    height: inherit;
+    height: 100%;
     padding-left: 16px;
     padding-right: 16px;
-    padding-top: 6px;
+    align-items: center;
 }
 </style>

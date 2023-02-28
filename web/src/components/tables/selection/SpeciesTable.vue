@@ -1,13 +1,22 @@
 <template>
-    <v-data-table-virtual
+    <v-data-table
         :headers="headers"
         :items="items"
         :search="search"
-        :custom-filter="filterSpecies"
-        height="300"
+        :filter-keys="['name', 'rank']"
+        items-per-page="5"
         density="compact"
         @click:row="onRowClicked"
     >
+        <template #item.checkbox="{ item }">
+            <div v-if="rowActive(item)" class="active">
+                <v-icon>mdi-checkbox-outline</v-icon>
+            </div>
+            <div v-else>
+                <v-icon>mdi-checkbox-blank-outline</v-icon>
+            </div>
+        </template>
+
         <template #item.name="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
                 {{ item.raw.name }}
@@ -19,7 +28,7 @@
                 {{ item.raw.rank }}
             </div>
         </template>
-    </v-data-table-virtual>
+    </v-data-table>
 </template>
 
 <script setup lang="ts">
@@ -37,8 +46,6 @@ export interface Props {
 const props = withDefaults(defineProps<Props>(), {
     max: 2
 });
-
-const l = console.log
 
 const emits = defineEmits(["update:model-value"]);
 
@@ -70,7 +77,13 @@ const filterSpecies = (value: Taxon, search: string, item: SpeciesTableItem) => 
 
 const headers = [
     {
-        title: "Species",
+        title: "",
+        align: "start",
+        key: "checkbox",
+        width: "60px"
+    },
+    {
+        title: "Taxon",
         align: "start",
         key: "name"
     },
@@ -92,16 +105,18 @@ watch(() => props.modelValue, (value) => {
 }
 
 :deep(td) > :not(.active) {
+    display: flex;
     padding-left: 16px;
     padding-right: 16px;
+    align-items: center;
 }
 
 :deep(td) > .active {
+    display: flex;
     background-color: #eee;
-    width: inherit;
-    height: inherit;
+    height: 100%;
     padding-left: 16px;
     padding-right: 16px;
-    padding-top: 6px;
+    align-items: center;
 }
 </style>

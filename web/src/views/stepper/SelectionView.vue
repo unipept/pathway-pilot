@@ -10,7 +10,7 @@
             <v-col cols=12>
                 <h3>Select your pathway</h3>
                 <v-text-field 
-                    class="mt-3"
+                    class="mt-3 mb-n3"
                     v-model="pathwaySearch"
                     label="Search for an identifier or name"
                     prepend-inner-icon="mdi-magnify"
@@ -24,11 +24,11 @@
             </v-col>
 
             <v-col>
-                <h3>Select multiple species <span style="font-size: x-small; color: #7a7a7a;">OPTIONAL</span></h3>
+                <h3>Select multiple taxa <span style="font-size: x-small; color: #7a7a7a;">OPTIONAL</span></h3>
                 <v-text-field 
-                    class="mt-3"
+                    class="mt-3 mb-n3"
                     v-model="speciesSearch"
-                    label="Search for a species" 
+                    label="Search for a taxon or rank" 
                     prepend-inner-icon="mdi-magnify"
                     variant="solo"
                 />
