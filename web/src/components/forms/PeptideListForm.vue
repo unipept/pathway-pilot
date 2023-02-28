@@ -2,30 +2,39 @@
     <h1 class="mb-3">Upload your peptide list</h1>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
-    <v-row class="mt-5">
-        <v-col>
+    <v-row class="mt-5 input-container">
+        <v-col :class="{ 'loading': processing }">
             <file-input
                 v-model="peptideFile"
-                :disabled="hasList" 
+                :disabled="hasList"
                 @upload="onUpload" 
             />
         </v-col>
 
-        <span class="d-flex flex-grow-0 align-center pb-5">
+        <span 
+            :class="{ 'loading': processing }"
+            class="d-flex flex-grow-0 align-center pb-5"
+        >
             OR
         </span>
 
-        <v-col>
+        <v-col :class="{ 'loading': processing }">
             <v-textarea
                 v-model="peptides"
                 label="Paste your peptide list here"
                 rows=7
                 :counter-value="() => peptidesList.length"
-                :loading="processing"
-                :disabled="hasFile"
                 no-resize
             />
         </v-col>
+
+        <v-progress-circular v-if="processing"
+            class="loading-spinner"
+            size="50"
+            width="5"
+            color="secondary"
+            indeterminate
+        />
     </v-row>
 
     <div class="d-flex justify-end mt-1">
@@ -111,3 +120,21 @@ const onSubmit = async () => {
     processing.value = false;
 };
 </script>
+
+<style scoped>
+.input-container {
+    position: relative;
+}
+
+.loading {
+    opacity: 0.2;
+    cursor: default;
+}
+
+.loading-spinner {
+    position: absolute;
+    top: calc(50% - 10px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+</style>

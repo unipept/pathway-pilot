@@ -66,7 +66,7 @@
         </v-row>
     </div>
 
-    <v-card v-else>
+    <v-card v-else class="mt-5">
         <v-card-text class="d-flex justify-center align-center text-warning font-weight-bold">
             <v-icon class="me-2">mdi-alert-outline</v-icon> In order to create your selection, you need to upload the data first.
         </v-card-text>

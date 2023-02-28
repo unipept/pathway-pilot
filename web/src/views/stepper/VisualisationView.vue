@@ -50,7 +50,7 @@
         </v-btn>
     </div>
 
-    <v-card v-else-if="!pathwayId">
+    <v-card v-else-if="!pathwayId" class="mt-5">
         <v-card-text class="d-flex justify-center align-center text-warning font-weight-bold">
             <v-icon class="me-2">mdi-alert-outline</v-icon> No pathway selected. Please select a pathway first.
         </v-card-text>
