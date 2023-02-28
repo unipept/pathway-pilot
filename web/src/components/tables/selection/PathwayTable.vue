@@ -8,11 +8,10 @@
         :sort-by="[{ key: 'count', order: 'desc' }]"
         :must-sort=true
         items-per-page="5"
-        item-value="pathway"
         density="compact"
-        hide-default-footer
         @click:row="onRowClicked"
         @update:options="pageOptions = $event"
+        @update:page=""
     >
         <template #item.checkbox="{ item }">
             <div v-if="rowActive(item)" class="active">
@@ -109,10 +108,6 @@ const headers = [
 
 watch(() => props.modelValue, (value) => {
     selected.value = value;
-});
-
-watch(pageOptions, (value) => {
-    console.log(pageOptions.value)
 });
 </script>
 
