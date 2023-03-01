@@ -1,11 +1,24 @@
 <template>
     <h2>Create your selection</h2>
 
-    <div v-if="initialized">
+    <div v-if="initialized" class="mt-5">
         <v-row>
             <v-col cols=6>
-                <p>
-                    TODO: Introduction (What is this selection phase)
+                <p class="subtitle">
+                    Please select a pathway you wish to visualise. You can either use the table below or utilise the bubbleplot visualisation 
+                    on the right. In case of a large amount of pathways, you can always look for the pathway using the ID or name.
+                </p>
+
+                <p class="mt-3 subtitle">
+                    Depending on the amount of matches and the Unipept results for your chosen pathway, it might be possible to select 
+                    multiple taxa. This will allow you to visualise the pathway with a more specific coloring.
+                </p>
+
+                <p v-if="pathwayItems.length <= 0" class="mt-3 subtitle">
+                    Unfortunately, we were not able to visualise your input data on any pathway.
+                </p>
+                <p v-else class="mt-3 subtitle">
+                    We were able to visualise your input data on <b>{{ pathwayItems.length }}</b> unique pathways.
                 </p>
             </v-col>
 
