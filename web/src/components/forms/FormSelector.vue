@@ -10,17 +10,15 @@
             <v-tab value=1>Proteins</v-tab>
         </v-tabs>
 
-        <v-card-text>
-            <v-window v-model="currentTab">
-                <v-window-item value=0>
-                    <peptide-list-form @submit="onSubmit" />
-                </v-window-item>
+        <v-window v-model="currentTab">
+            <v-window-item value=0>
+                <peptide-list-form @submit="onSubmit" />
+            </v-window-item>
 
-                <v-window-item value=1>
-                    <div></div>
-                </v-window-item>
-            </v-window>
-        </v-card-text>
+            <v-window-item value=1>
+                <div></div>
+            </v-window-item>
+        </v-window>
     </v-card>
 </template>
 

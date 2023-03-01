@@ -31,10 +31,12 @@ import { ref, watch } from 'vue';
 
 export interface Props {
     modelValue: File | undefined;
-    disabled: boolean;
+    disabled?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    disabled: false
+});
 
 const emits = defineEmits(["upload"]);
 

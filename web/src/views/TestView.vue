@@ -8,14 +8,14 @@
             dot-color="primary"
         >
             <template v-slot:icon>1</template>
-            <upload-view />
+            <upload-view @submit="() => resetSelection = !resetSelection"/>
         </v-timeline-item>
         <v-timeline-item
             dot-color="primary"
             width="100%"
         >
             <template v-slot:icon>2</template>
-            <selection-view />
+            <selection-view :do-reset="resetSelection"/>
         </v-timeline-item>
         <v-timeline-item
             dot-color="primary"
@@ -31,6 +31,10 @@
 import UploadView from './stepper/UploadView.vue';
 import SelectionView from './stepper/SelectionView.vue';
 import VisualisationView from './stepper/VisualisationView.vue';
+import { ref } from 'vue';
+import useVisualisationStore from '@/stores/VisualisationStore';
+
+const resetSelection = ref<boolean>(false);
 </script>
 
 <style scoped>

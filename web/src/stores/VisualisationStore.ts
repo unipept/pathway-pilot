@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
-import {ref} from "vue";
+import {ref, reactive} from "vue";
 
 const useVisualisationStore = defineStore('visualisationStore', () => {
     // Keep track of already fetched pathways
-    const pathwayData = new Map<string, Promise<any>>();
+    const pathwayData = reactive<Map<string, Promise<any>>>(new Map());
 
     // Currently selected pathway and taxa
     const pathwayId = ref<string | undefined>(undefined);
@@ -27,12 +27,19 @@ const useVisualisationStore = defineStore('visualisationStore', () => {
         highlightedTaxa.value = taxa;
     }
 
+    const reset = () => {
+        pathwayId.value = undefined;
+        highlightedTaxa.value = [];
+        pathwayData.clear();
+    }
+
     return {
         pathwayId,
         highlightedTaxa,
         setPathwayId,
         setHighlightedTaxa,
-        getPathwayData
+        getPathwayData,
+        reset
     };
 });
 
