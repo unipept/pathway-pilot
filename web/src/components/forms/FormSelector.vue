@@ -3,7 +3,6 @@
         <v-tabs
             v-model="currentTab"
             bg-color="secondary"
-            color="white"
             centered
         >
             <v-tab value=0>Peptides</v-tab>

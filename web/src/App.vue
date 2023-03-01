@@ -2,7 +2,7 @@
     <v-app>
         <v-toolbar
             app
-            color="secondary"
+            color="primary"
             dark
             hide-on-scroll
             class="px-lg-16"

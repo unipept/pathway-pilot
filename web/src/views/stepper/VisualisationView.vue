@@ -60,7 +60,7 @@
         <v-progress-circular
             size="50"
             width="5"
-            color="secondary"
+            color="primary"
             indeterminate
         ></v-progress-circular>
     </div>
