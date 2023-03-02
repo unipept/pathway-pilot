@@ -27,6 +27,8 @@
 </template>
 
 <script setup lang="ts">
+import example from "./PeptideListExample";
+
 export interface Props {
     disabled?: boolean
 };
@@ -36,13 +38,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emits = defineEmits(["try-out"]);
-
-const example = [
-    "AIESPIYHIAANAGIEGSVIINK",
-    "IIIGDDEHGWDDEGVFNFEGGCYAK",
-    "MEVAVGDKVIYSK",
-    "TEGNYVVVNYSAEPATSDELDR"
-];
 
 const exampleString = example.join("\n");
 
