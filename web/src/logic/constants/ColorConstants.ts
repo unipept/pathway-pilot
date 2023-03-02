@@ -5,4 +5,4 @@ export default class ColorConstants {
         "#EFB043",
         "#A6D3A0"
     ];
-}
+};

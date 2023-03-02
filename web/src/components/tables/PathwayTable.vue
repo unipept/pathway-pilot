@@ -1,98 +1,74 @@
 <template>
-    <v-data-table-virtual
-        :headers="headers"
-        :items="items"
-        :search="search"
-        :custom-filter="filterPathways"
-        height="300"
-        item-value="pathway"
-        density="compact"
-        @click:row="onRowClicked"
-    >
-        <template #item.id="{ item }">
-            <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.raw.id }}
-            </div>
-        </template>
+    <v-card elevation="5">
+        <v-card-text v-if="hasItems">
+            <v-virtual-scroll :items="items" height="150">
+                <template v-slot:default="{ item }">
+                    <div @click="() => onClick(item.name)">
+                        <pathway-chip class="ma-1 chip" :name="item.name" color="blue" /> {{ item.description }}
+                    </div>
+                </template>
+            </v-virtual-scroll>
+        </v-card-text>
 
-        <template #item.count="{ item }">
-            <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.raw.count }}
+        <v-card-text v-else-if="loading">
+            <div class="loading-container">
+                <v-progress-circular indeterminate color="secondary" />
             </div>
-        </template>
-    </v-data-table-virtual>
+        </v-card-text>
+
+        <v-card-text v-else>
+            <div class="error-container text-warning">
+                <v-icon class="me-2 mb-1" size="30">mdi-alert-outline</v-icon>
+                There are no associated pathways to display.
+            </div>
+        </v-card-text>
+    </v-card>
 </template>
 
 <script setup lang="ts">
-import PathwayEntry from '@/logic/entities/PathwayEntry';
-import { ref, watch, toRaw } from 'vue';
+import { useKeggEntryLink } from '@/composables/useKeggEntryLink';
+import { computed } from 'vue';
+import PathwayChip from '../chips/PathwayChip.vue';
 import { PathwayTableItem } from './PathwayTableItem';
 
 export interface Props {
-    modelValue: PathwayEntry | undefined;
-    search: string;
-    items: PathwayTableItem[];
-}
+    items: PathwayTableItem[]
+    loading: boolean
+};
 
 const props = defineProps<Props>();
 
-const emits = defineEmits(["update:model-value"]);
+const hasItems = computed(() => props.items.length > 0);
 
-const selected = ref<PathwayEntry | undefined>(undefined);
+const { url } = useKeggEntryLink();
 
-const onRowClicked = (e: any, i: any) => {
-    selected.value = i.item.raw.id === selected.value?.id ? undefined : i.item.raw;
-    emits("update:model-value", selected.value);
-};
-
-const rowActive = (item: any) => {
-    return item.raw.id === selected.value?.id;
-};
-
-const filterPathways = (value: PathwayEntry, search: string, item: PathwayTableItem) => {
-    const pathwayId = toRaw(item).id
-
-    if (!pathwayId) {
-        return false;
-    }
-
-    return pathwayId.toLowerCase().indexOf(search.toLowerCase()) !== -1;
-}
-
-const headers = [
-    {
-        title: "Pathway",
-        align: "start",
-        key: "id"
-    },
-    {
-        title: "Count",
-        align: "start",
-        key: "count"
-    }
-];
-
-watch(() => props.modelValue, (value) => {
-    selected.value = value;
-});
+const onClick = (item: string) => window.open(url(item), '_blank');
 </script>
 
 <style scoped>
-:deep(td) {
-    padding: 0px !important;
+.error-container {
+    display: flex;
+    flex-direction: column;
+    height: 150px;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
 }
 
-:deep(td) > :not(.active) {
-    padding-left: 16px;
-    padding-right: 16px;
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    height: 150px;
+    justify-content: center;
+    align-items: center;
 }
 
-:deep(td) > .active {
-    background-color: #eee;
-    width: inherit;
-    height: inherit;
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-top: 6px;
+:deep(.v-virtual-scroll__item):hover {
+    background-color: #f4f4f4;
+}
+
+:deep(.v-virtual-scroll__item):hover .chip {
+    background-color: #afcdeb;
+    color: #337cbb !important;
 }
 </style>

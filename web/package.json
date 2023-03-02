@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix --ignore-path .gitignore"
@@ -12,6 +12,7 @@
     "@mdi/font": "7.0.96",
     "core-js": "^3.8.3",
     "d3": "^7.8.2",
+    "html-to-image": "^1.11.11",
     "pinia": "^2.0.29",
     "roboto-fontface": "*",
     "vue": "^3.2.13",

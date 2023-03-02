@@ -4,4 +4,4 @@ export default class Taxon {
         public readonly name: string,
         public readonly rank: string
     ) {}
-}
+};
