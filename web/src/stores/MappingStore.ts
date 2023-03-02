@@ -3,22 +3,29 @@ import { defineStore } from 'pinia';
 import Taxon from "@/logic/entities/Taxon";
 import EcNumber from "@/logic/entities/EcNumber";
 import Pathway from "@/logic/entities/Pathway";
+import { reactive, ref } from 'vue';
 
 const useMappingStore = defineStore('mappingStore', () => {
     // Mappings containing all matched entities
     const taxa     = new Map<number, Taxon>();
-    const pathways = new Map<string, Pathway>();
+    const pathways = reactive<Map<string, Pathway>>(new Map());
     const ecs      = new Map<string, EcNumber>();
 
     const taxaToPathways = new Map<number, Set<Pathway>>();
     const taxaToEcs      = new Map<number, Set<EcNumber>>();
 
     const pathwaysToEcs  = new Map<string, Set<EcNumber>>();
-    const pathwaysToTaxa = new Map<string, Set<Taxon>>();
+    const pathwaysToTaxa = reactive<Map<string, Set<Taxon>>>(new Map());
 
     const pathwaysToPeptideCounts = new Map<string, number>();
 
+    const initialized = ref<boolean>(false);
+
     const initialize = (infoObjects: any[]) => {
+        if (initialized.value) {
+            return;
+        }
+
         for (const object of infoObjects) {
             let taxon = taxa.get(object.taxon_id);
             if (!taxon) {
@@ -64,7 +71,27 @@ const useMappingStore = defineStore('mappingStore', () => {
             pathwaysToPeptideCounts.set(object.pathway, pathwaysToPeptideCounts.get(object.pathway)! + object.count);
         }
 
+        initialized.value = true;
+
         console.log("MappingStore initialized");
+    }
+
+    const reset = () => {
+        initialized.value = false;
+
+        taxa.clear();
+
+        console.log(taxa);
+        pathways.clear();
+        ecs.clear();
+
+        taxaToPathways.clear();
+        taxaToEcs.clear();
+
+        pathwaysToEcs.clear();
+        pathwaysToTaxa.clear();
+
+        pathwaysToPeptideCounts.clear();
     }
 
     return {
@@ -77,7 +104,10 @@ const useMappingStore = defineStore('mappingStore', () => {
         pathwaysToTaxa,
         pathwaysToPeptideCounts,
 
-        initialize
+        initialized,
+
+        initialize,
+        reset
     };
 });
 

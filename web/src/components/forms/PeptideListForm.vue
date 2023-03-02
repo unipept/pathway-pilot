@@ -1,44 +1,72 @@
 <template>
-    <h1 class="mb-3">Upload your peptide list</h1>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <v-card flat>
+        <v-card-text>
+            <h1 class="mb-3">Upload a list of peptides</h1>
+            <p class="subtitle">
+                Provide a list of tryptic peptides by either pasting your sequences on the right or selecting a single <span>.txt</span> 
+                file. Each line of input will be interpreted as a single sequence and can't contain any special characters. Have a look 
+                at the example below to get a feel about the input format.
+            </p>
 
-    <v-row class="mt-5">
-        <v-col>
-            <file-input
-                v-model="peptideFile"
-                :disabled="hasList" 
-                @upload="onUpload" 
-            />
-        </v-col>
+            <p class="subtitle mt-3">
+                Two processing steps will happen whenever you upload your data:
+                <ol class="ms-5">
+                    <li class="ms-5">
+                        Each input line will be analyzed with <resource-link url="https://unipept.ugent.be/">Unipept</resource-link>. 
+                        this results is list of functional annotations and taxa per sequence.  <b>Note: Unipept works with peptides of 
+                        length 5 - 50. Shorter and longer peptides will be ignored</b>.
+                    </li>
+                    <li class="ms-5">
+                        Each functional annotation gets mapped onto zero or more <resource-link url="https://www.genome.jp/kegg/pathway.html">Kegg pathways</resource-link>.
+                    </li>
+                </ol>
+            </p>
 
-        <span class="d-flex flex-grow-0 align-center pb-5">
-            OR
-        </span>
+            <v-row class="mt-5 input-container">
+                <v-col :class="{ 'loading': processing }">
+                    <file-input v-model="peptideFile" @upload="onUpload" />
+                </v-col>
 
-        <v-col>
-            <v-textarea
-                v-model="peptides"
-                label="Peptide list"
-                rows=7
-                :counter-value="() => peptidesList.length"
-                :loading="processing"
-                :disabled="hasFile"
-                no-resize
-            />
-        </v-col>
-    </v-row>
+                <span 
+                    :class="{ 'loading': processing }"
+                    class="d-flex flex-grow-0 align-center pb-5"
+                >
+                    OR
+                </span>
 
-    <div class="d-flex justify-end mt-1">
-        <v-btn color="error" @click="onClear" :disabled="!hasFile && !hasList">
-            <v-icon class="me-2">mdi-delete-outline</v-icon> Clear input
-        </v-btn>
+                <v-col :class="{ 'loading': processing }">
+                    <v-textarea
+                        v-model="peptides"
+                        label="Paste your peptide list here"
+                        rows=7
+                        no-resize
+                        persistent-counter
+                        :counter-value="() => peptidesList.length"
+                    />
+                </v-col>
 
-        <v-btn class="ms-3" color="primary" @click="onSubmit" :disabled="!hasFile && !hasList">
-            Continue
-        </v-btn>
-    </div>
+                <v-progress-circular v-if="processing"
+                    class="loading-spinner"
+                    size="50"
+                    width="5"
+                    color="primary"
+                    indeterminate
+                />
+            </v-row>
 
-    <peptide-list-example class="mt-5" />
+            <div class="d-flex justify-end mt-3">
+                <v-btn color="error" @click="onClear" :disabled="!hasList || processing">
+                    <v-icon class="me-2">mdi-delete-outline</v-icon> Clear input
+                </v-btn>
+
+                <v-btn class="ms-3" color="primary" :disabled="!hasList || processing" @click="onSubmit">
+                    Upload
+                </v-btn>
+            </div>
+        </v-card-text>
+    </v-card>
+
+    <peptide-list-example @try-out="onTryOut" :disabled="processing" />
 </template>
 
 <script lang="ts" setup>
@@ -48,11 +76,11 @@ import FileInput from '../inputs/FileInput.vue';
 import PeptideListExample from './examples/PeptideListExample.vue';
 import { useFileReader } from '@/composables/useFileReader';
 import useMappingStore from '@/stores/MappingStore';
+import ResourceLink from '../misc/ResourceLink.vue';
 
 const emits = defineEmits(["submit"]);
 
-const  { initialize } = useMappingStore();
-
+const { initialize, reset }   = useMappingStore();
 const { readTextFile } = useFileReader();
 
 const peptideFile = ref<File | undefined>(undefined);
@@ -63,33 +91,27 @@ const peptidesList = computed(() => {
     return peptides.value.split("\n").filter((peptide) => peptide.length > 0);
 });
 
-const hasFile = computed(() => {
-    return peptideFile.value !== undefined;
-});
+const hasList = computed(() => peptidesList.value.length > 0);
 
-const hasList = computed(() => {
-    return peptidesList.value.length > 0;
-});
-
-const submitList = async (peptides: string[]) => {
-    const converter = new PeptideListConverter({
-        onProgressUpdate: (progress) => {
-            // TODO: show progress
-            //console.log(progress);
-        }
-    });
-
-    return await converter.convert(peptides);
+const submitPeptideList = async (peptides: string[]) => {
+    return await new PeptideListConverter({ 
+        onProgressUpdate: (progress) => {} 
+    }).convert(peptides);
 };
 
-const submitFile = async () => {
-    const text = await readTextFile(peptideFile.value!);
+const onSubmit = async () => {    
+    processing.value = true;
 
-    return await submitList(text.trimEnd().split("\n"));
+    reset();
+    initialize(await submitPeptideList(peptidesList.value))
+    emits("submit", true);
+
+    processing.value = false;
 };
 
-const onUpload = (file: File) => {
+const onUpload = async (file: File) => {
     peptideFile.value = file;
+    peptides.value = await readTextFile(file);
 };
 
 const onClear = () => {
@@ -97,17 +119,32 @@ const onClear = () => {
     peptides.value = "";
 };
 
-const onSubmit = async () => {
-    processing.value = true;
-
-    if (hasList.value) {
-        initialize(await submitList(peptidesList.value));
-    } else if (hasFile.value) {
-        initialize(await submitFile());
-    }
-
-    emits("submit", true);
-
-    processing.value = false;
+const onTryOut = (examplePeptides: string[]) => {
+    onClear();
+    peptides.value = examplePeptides.join("\n");
+    onSubmit();
 };
 </script>
+
+<style scoped>
+.input-container {
+    position: relative;
+}
+
+.loading {
+    opacity: 0.2;
+    cursor: default;
+}
+
+.loading-spinner {
+    position: absolute;
+    top: calc(50% - 10px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.subtitle {
+    font-size: 16px;
+    color: #454545;
+}
+</style>

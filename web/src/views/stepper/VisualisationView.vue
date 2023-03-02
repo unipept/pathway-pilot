@@ -1,22 +1,29 @@
 <template>
+    <h2>Analyse your pathway</h2>
+
     <div v-if="pngUrl">
-        <div ref="image">
+        <warning-alert v-if="highlightedTaxa.length === 0" class="mt-3">
+            You selected no taxa during the previous step. Therefore <b>all nodes with at least one match</b> are shown in the same color. You can always update your selection 
+            in the previous step.
+        </warning-alert>
+
+        <div ref="image" class="mt-3">
             <!-- TODO: height has to be responsive here I guess -->
             <v-card elevation="5" max-height="700px" style="position: relative;">
                 <taxon-legend v-if="imageLoaded"
                     class="legend"
-                    :items="computeItems()"
+                    :items="legendItems"
                 />
 
                 <interactive-image>
                     <reactive-image
                         class="image-container"
-                        :src="pngUrl" 
+                        :src="pngUrl"
                         alt="Pathway"
                         @resize="onResize"
                     >
                         <image-overlay v-if="imageLoaded"
-                            :areas="areas"
+                            :areas="coloredAreas"
                             :scale="scale"
                             :onClick="onClickArea"
                             :onClickCompound="onClickCompound"
@@ -38,20 +45,20 @@
             @update:model-value="compoundModalOpen = $event"
         />
 
-        <v-btn class="mt-5" color="primary" @click="() => onBack($router)">
-            Back
-        </v-btn>
-
         <v-btn class="mt-5 float-right" color="primary" @click="onDownload">
             Download
         </v-btn>
     </div>
 
+    <warning-alert v-else-if="!pathwayId" class="mt-5">
+        No pathway selected. Please select a pathway first.
+    </warning-alert>
+
     <div v-else class="loading-container">
         <v-progress-circular
             size="50"
             width="5"
-            color="secondary"
+            color="primary"
             indeterminate
         ></v-progress-circular>
     </div>
@@ -61,7 +68,7 @@
 import ReactiveImage from '@/components/images/ReactiveImage.vue';
 import ImageOverlay from '@/components/images/ImageOverlay.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
 import { Router } from 'vue-router';
 import TaxonLegend from '@/components/legends/TaxonLegend.vue';
@@ -70,6 +77,8 @@ import useMappingStore from '@/stores/MappingStore';
 import { toPng } from 'html-to-image';
 import CompoundModal from '@/components/modals/CompoundModal.vue';
 import InteractiveImage from '@/components/images/InteractiveImage.vue';
+import WarningAlert from '@/components/alerts/WarningAlert.vue';
+import { storeToRefs } from 'pinia';
 
 const mappingStore = useMappingStore();
 const visualisationStore = useVisualisationStore();
@@ -88,15 +97,23 @@ const compoundModalOpen = ref<boolean>(false)
 const selectedArea = ref<any | undefined>(undefined)
 const selectedCompound = ref<string>('')
 
-const computeItems = () => {
-    return visualisationStore.highlightedTaxa.map(taxonId => {
-        return {
-            label: mappingStore.taxa.get(taxonId)?.name ?? "Unknown",
-            color: computeTaxonColor(taxonId)
-        };
-    });
-};
+const { pathwayId, highlightedTaxa } = storeToRefs(visualisationStore);
 
+const legendItems = computed(() => highlightedTaxa.value.map(taxonId => ({
+        label: mappingStore.taxa.get(taxonId)?.name ?? "Unknown",
+        color: computeTaxonColor(taxonId)
+    }))
+);
+
+const coloredAreas = computed(() => {
+    if (highlightedTaxa.value.length === 0) {
+        return colorAll(areas.value);
+    } else {
+        return colorHighlighted(areas.value);
+    }
+});
+
+// TODO: move coloring to a different file
 const colorAll = (areas: any[]) => {
     return areas.map(area => {
         area.colors = [];
@@ -137,10 +154,6 @@ const onResize = (event: any) => {
     }
 }
 
-const onBack = (router: Router) => {
-    router.push("/selection");
-};
-
 const onClickArea = (area: any) => {
     selectedArea.value = area;
     areaModalOpen.value = true;
@@ -168,17 +181,14 @@ const onDownload = async () => {
     link.click();
 }
 
-onMounted(async () => {
-    const response = await fetch(`http://localhost:4000/pathway/${visualisationStore.pathwayId!.replace("path:ec", "map")}`);
-    const data     = await response.json();
+watch(pathwayId, async (id: string | undefined) => {
+    pngUrl.value = undefined;
+    
+    // Fetch data from the store when loaded
+    const data = await visualisationStore.getPathwayData();
 
-    pngUrl.value = data.image;
-
-    if (visualisationStore.highlightedTaxa.length === 0) {
-        areas.value = colorAll(data.nodes);
-    } else {
-        areas.value = colorHighlighted(data.nodes);
-    }
+    pngUrl.value = data?.image;
+    areas.value  = data?.nodes ?? [];
 });
 </script>
 
@@ -208,3 +218,4 @@ onMounted(async () => {
     z-index: 1;
 }
 </style>
+

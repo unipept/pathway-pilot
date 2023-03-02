@@ -5,10 +5,15 @@ import { ref } from "vue";
 const useKeggStore = defineStore('keggStore', () => {
     const keggCommunicator = new KeggCommunicator();
 
+    const pathwayMapping  = ref<any>(undefined);
     const koMapping       = ref<any>(undefined);
     const ecMapping       = ref<any>(undefined);
     const reactionMapping = ref<any>(undefined);
     const compoundMapping = ref<any>(undefined);
+
+    const fetchPathwayMapping = async () => {
+        pathwayMapping.value = await keggCommunicator.fetchPathwayMapping();
+    };
 
     const fetchKoMapping = async () => {
         koMapping.value = await keggCommunicator.fetchKoMapping();
@@ -27,10 +32,12 @@ const useKeggStore = defineStore('keggStore', () => {
     }
 
     return {
+        pathwayMapping,
         koMapping,
         ecMapping,
         reactionMapping,
         compoundMapping,
+        fetchPathwayMapping,
         fetchKoMapping,
         fetchEcMapping,
         fetchReactionMapping,

@@ -101,6 +101,7 @@ const splitRectangle = (rectangle: any, parts: number) => {
 
 .group:hover .group-item {
     filter: brightness(0.9);
+    cursor: pointer;
 }
 
 .group:hover .group-item-trans {

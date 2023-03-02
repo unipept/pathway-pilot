@@ -1,13 +1,26 @@
 <template>
-    <v-data-table-virtual
+    <v-data-table
         :headers="headers"
         :items="items"
         :search="search"
-        :custom-filter="filterSpecies"
-        height="300"
+        :page="page"
+        :filter-keys="['name', 'rank']"
+        items-per-page="5"
         density="compact"
         @click:row="onRowClicked"
+        @update:options="pageOptions = $event"
     >
+        <template #item.checkbox="{ item }">
+            <div v-if="rowActive(item)" class="active">
+                <v-icon>mdi-checkbox-outline</v-icon>
+            </div>
+            <div v-else>
+                <v-icon :color="selected.length === max ? 'grey' : 'black'">
+                    mdi-checkbox-blank-outline
+                </v-icon>
+            </div>
+        </template>
+
         <template #item.name="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
                 {{ item.raw.name }}
@@ -19,12 +32,21 @@
                 {{ item.raw.rank }}
             </div>
         </template>
-    </v-data-table-virtual>
+
+        <template #bottom>
+            <v-pagination
+                v-model="page"
+                :length="pageOptions.pageCount"
+                :total-visible="7"
+                density="comfortable"
+            ></v-pagination>
+        </template>
+    </v-data-table>
 </template>
 
 <script setup lang="ts">
 import Taxon from '@/logic/entities/Taxon';
-import { ref, toRaw, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { SpeciesTableItem } from './SpeciesTableItem';
 
 export interface Props {
@@ -38,9 +60,12 @@ const props = withDefaults(defineProps<Props>(), {
     max: 2
 });
 
-const l = console.log
-
 const emits = defineEmits(["update:model-value"]);
+
+const page = ref(1);
+const pageOptions = ref({
+    pageCount: 1
+});
 
 const selected = ref<Taxon[]>([]);
 
@@ -48,7 +73,7 @@ const onRowClicked = (e: any, i: any) => {
     if (selected.value.map((taxon: Taxon) => taxon.id).includes(i.item.raw.id)) {
         selected.value = selected.value.filter((v) => v.id !== i.item.raw.id);
     } else if (selected.value.length < props.max) {
-        selected.value.push(i.item.raw);
+        selected.value = [...selected.value, i.item.raw];
     }
 
     emits("update:model-value", selected.value);
@@ -58,19 +83,15 @@ const rowActive = (item: any) => {
     return selected.value.map((taxon: Taxon) => taxon.id).includes(item.raw.id);
 };
 
-const filterSpecies = (value: Taxon, search: string, item: SpeciesTableItem) => {
-    const speciesName = toRaw(item).name
-
-    if (!speciesName) {
-        return false;
-    }
-    
-    return speciesName.toLowerCase().indexOf(search.toLowerCase()) !== -1;
-}
-
 const headers = [
     {
-        title: "Species",
+        title: "",
+        align: "start",
+        key: "checkbox",
+        width: "60px"
+    },
+    {
+        title: "Taxon",
         align: "start",
         key: "name"
     },
@@ -92,16 +113,18 @@ watch(() => props.modelValue, (value) => {
 }
 
 :deep(td) > :not(.active) {
+    display: flex;
     padding-left: 16px;
     padding-right: 16px;
+    align-items: center;
 }
 
 :deep(td) > .active {
+    display: flex;
     background-color: #eee;
-    width: inherit;
-    height: inherit;
+    height: 100%;
     padding-left: 16px;
     padding-right: 16px;
-    padding-top: 6px;
+    align-items: center;
 }
 </style>

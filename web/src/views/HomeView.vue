@@ -1,19 +1,37 @@
 <template>
-    <v-container>
-        <h1>Welcome</h1>
-        <p class="mb-5 text-justify">
-            Van 't pathje is a taxonomy assignment and pathway visualisation tool for metaproteomics data. It combines <a href="https://unipept.ugent.be">UniPept</a> and <a href="https://www.kegg.jp">KEGG</a> to provide pathway visualisations showing which pathways are represented in which species. It works both with peptide and protein input.
-        </p>
-
-        <FormSelector @submit="() => onSubmit($router)"/>
-    </v-container>
+    <v-timeline
+        density="compact"
+        side="end"
+        align="start"
+    >
+        <v-timeline-item
+            dot-color="primary"
+        >
+            <template v-slot:icon>1</template>
+            <upload-view @submit="() => resetSelection = !resetSelection"/>
+        </v-timeline-item>
+        <v-timeline-item
+            dot-color="primary"
+            width="100%"
+        >
+            <template v-slot:icon>2</template>
+            <selection-view :do-reset="resetSelection"/>
+        </v-timeline-item>
+        <v-timeline-item
+            dot-color="primary"
+            width="100%"
+        >
+            <template v-slot:icon>3</template>
+            <visualisation-view />
+        </v-timeline-item>
+    </v-timeline>
 </template>
 
-<script lang="ts" setup>
-import FormSelector from '@/components/forms/FormSelector.vue';
-import { Router } from 'vue-router';
+<script setup lang="ts">
+import UploadView from './stepper/UploadView.vue';
+import SelectionView from './stepper/SelectionView.vue';
+import VisualisationView from './stepper/VisualisationView.vue';
+import { ref } from 'vue';
 
-const onSubmit = async (router: Router) => {
-    router.push('/selection');
-};
+const resetSelection = ref<boolean>(false);
 </script>

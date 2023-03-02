@@ -16,7 +16,7 @@
                     mdi-tray-arrow-up
                 </v-icon>
                 <p>
-                    Drop your file here, or click anywhere to select it.
+                    Drop your file here, or click to select a single file.
                 </p>
                 <p v-if="file" class="text-green mt-3">
                     {{ file.name }} ({{ file.size }} bytes)
@@ -31,10 +31,12 @@ import { ref, watch } from 'vue';
 
 export interface Props {
     modelValue: File | undefined;
-    disabled: boolean;
+    disabled?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    disabled: false
+});
 
 const emits = defineEmits(["upload"]);
 

@@ -1,17 +1,36 @@
 <template>
-    <v-data-table-virtual
+    <v-data-table
         :headers="headers"
         :items="items"
         :search="search"
-        :custom-filter="filterPathways"
-        height="300"
-        item-value="pathway"
+        :page="page"
+        :filter-keys="['id', 'name']"
+        :sort-by="[{ key: 'count', order: 'desc' }]"
+        :must-sort=true
+        items-per-page="5"
         density="compact"
         @click:row="onRowClicked"
+        @update:options="pageOptions = $event"
+        @update:page=""
     >
+        <template #item.checkbox="{ item }">
+            <div v-if="rowActive(item)" class="active">
+                <v-icon>mdi-checkbox-outline</v-icon>
+            </div>
+            <div v-else>
+                <v-icon>mdi-checkbox-blank-outline</v-icon>
+            </div>
+        </template>
+
         <template #item.id="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
                 {{ item.raw.id }}
+            </div>
+        </template>
+
+        <template #item.name="{ item }">
+            <div :class="rowActive(item) ? 'active' : ''">
+                {{ item.raw.name }}
             </div>
         </template>
 
@@ -20,12 +39,21 @@
                 {{ item.raw.count }}
             </div>
         </template>
-    </v-data-table-virtual>
+
+        <template #bottom>
+            <v-pagination
+                v-model="page"
+                :length="pageOptions.pageCount"
+                :total-visible="7"
+                density="comfortable"
+            ></v-pagination>
+        </template>
+    </v-data-table>
 </template>
 
 <script setup lang="ts">
 import Pathway from '@/logic/entities/Pathway';
-import { ref, watch, toRaw } from 'vue';
+import { ref, watch } from 'vue';
 import { PathwayTableItem } from '../selection/PathwayTableItem';
 
 export interface Props {
@@ -38,6 +66,11 @@ const props = defineProps<Props>();
 
 const emits = defineEmits(["update:model-value"]);
 
+const page = ref(1);
+const pageOptions = ref({
+    pageCount: 1
+});
+
 const selected = ref<Pathway | undefined>(undefined);
 
 const onRowClicked = (e: any, i: any) => {
@@ -49,21 +82,22 @@ const rowActive = (item: any) => {
     return item.raw.id === selected.value?.id;
 };
 
-const filterPathways = (value: Pathway, search: string, item: PathwayTableItem) => {
-    const pathwayId = toRaw(item).id
-
-    if (!pathwayId) {
-        return false;
-    }
-
-    return pathwayId.toLowerCase().indexOf(search.toLowerCase()) !== -1;
-}
-
 const headers = [
+    {
+        title: "",
+        align: "start",
+        key: "checkbox",
+        width: "60px"
+    },
     {
         title: "Pathway",
         align: "start",
         key: "id"
+    },
+    {
+        title: "Name",
+        align: "start",
+        key: "name"
     },
     {
         title: "Count",
@@ -83,16 +117,18 @@ watch(() => props.modelValue, (value) => {
 }
 
 :deep(td) > :not(.active) {
+    display: flex;
     padding-left: 16px;
     padding-right: 16px;
+    align-items: center;
 }
 
 :deep(td) > .active {
+    display: flex;
     background-color: #eee;
-    width: inherit;
-    height: inherit;
+    height: 100%;
     padding-left: 16px;
     padding-right: 16px;
-    padding-top: 6px;
+    align-items: center;
 }
 </style>
