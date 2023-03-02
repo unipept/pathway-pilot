@@ -2,7 +2,25 @@
     <v-card flat>
         <v-card-text>
             <h1 class="mb-3">Upload a list of peptides</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <p class="subtitle">
+                Provide a list of tryptic peptides by either pasting your sequences on the right or selecting a single <span>.txt</span> 
+                file. Each line of input will be interpreted as a single sequence and can't contain any special characters. Have a look 
+                at the example below to get a feel about the input format.
+            </p>
+
+            <p class="subtitle mt-3">
+                Two processing steps will happen whenever you upload your data:
+                <ol class="ms-5">
+                    <li class="ms-5">
+                        Each input line will be analyzed with <resource-link url="https://unipept.ugent.be/">Unipept</resource-link>. 
+                        this results is list of functional annotations and taxa per sequence.  <b>Note: Unipept works with peptides of 
+                        length 5 - 50. Shorter and longer peptides will be ignored</b>.
+                    </li>
+                    <li class="ms-5">
+                        Each functional annotation gets mapped onto zero or more <resource-link url="https://www.genome.jp/kegg/pathway.html">Kegg pathways</resource-link>.
+                    </li>
+                </ol>
+            </p>
 
             <v-row class="mt-5 input-container">
                 <v-col :class="{ 'loading': processing }">
@@ -58,6 +76,7 @@ import FileInput from '../inputs/FileInput.vue';
 import PeptideListExample from './examples/PeptideListExample.vue';
 import { useFileReader } from '@/composables/useFileReader';
 import useMappingStore from '@/stores/MappingStore';
+import ResourceLink from '../misc/ResourceLink.vue';
 
 const emits = defineEmits(["submit"]);
 
@@ -122,5 +141,10 @@ const onTryOut = (examplePeptides: string[]) => {
     top: calc(50% - 10px);
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.subtitle {
+    font-size: 16px;
+    color: #454545;
 }
 </style>
