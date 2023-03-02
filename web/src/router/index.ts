@@ -2,32 +2,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
-  {
-    path: '/',
-    //component: () => import('@/views/HomeView.vue'),
-    children: [
-      {
-        path: '',
+    {
+        path: '/',
         name: 'Home',
-        component: () => import('@/views/HomeView.vue'),
-      },
-      {
-        path: 'selection',
-        name: 'selection',
-        component: () => import('@/views/SelectionView.vue'),
-      },
-      {
-        path: 'visualisation',
-        name: 'visualisation',
-        component: () => import('@/views/VisualisationView.vue'),
-      },
-      {
-        path: 'test',
-        name: 'test',
-        component: () => import('@/views/TestView.vue'),
-      }
-    ]
-  },
+        component: () => import('@/views/HomeView.vue')
+    }
 ]
 
 const router = createRouter({
