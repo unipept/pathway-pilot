@@ -63,6 +63,8 @@
                     Upload
                 </v-btn>
             </div>
+
+            <error-modal v-model="errors" />
         </v-card-text>
     </v-card>
 
@@ -77,15 +79,20 @@ import PeptideListExample from './examples/PeptideListExample.vue';
 import { useFileReader } from '@/composables/useFileReader';
 import useMappingStore from '@/stores/MappingStore';
 import ResourceLink from '../misc/ResourceLink.vue';
+import PeptideListVerifier from '@/logic/verifiers/PeptideListVerifier';
+import ErrorModal from '../modals/ErrorModal.vue';
+import VerifierError from '@/logic/verifiers/VerifierError';
 
 const emits = defineEmits(["submit"]);
 
-const { initialize, reset }   = useMappingStore();
+const { initialize, reset: resetMappingStore }   = useMappingStore();
 const { readTextFile } = useFileReader();
 
 const peptideFile = ref<File | undefined>(undefined);
 const peptides = ref<string>("");
 const processing = ref<boolean>(false);
+
+const errors = ref<VerifierError[]>([]);
 
 const peptidesList = computed(() => {
     return peptides.value.split("\n").filter((peptide) => peptide.length > 0);
@@ -102,9 +109,14 @@ const submitPeptideList = async (peptides: string[]) => {
 const onSubmit = async () => {    
     processing.value = true;
 
-    reset();
-    initialize(await submitPeptideList(peptidesList.value))
-    emits("submit", true);
+    resetMappingStore();
+
+    errors.value = new PeptideListVerifier().verify(peptidesList.value);
+
+    if (errors.value.length === 0) {
+        initialize(await submitPeptideList(peptidesList.value))
+        emits("submit", true);
+    }
 
     processing.value = false;
 };

@@ -1,0 +1,9 @@
+<template>
+    <v-alert
+        color="error"
+        icon="mdi-alert-outline"
+        variant="outlined"
+    >
+        <slot></slot>
+    </v-alert>
+</template>
