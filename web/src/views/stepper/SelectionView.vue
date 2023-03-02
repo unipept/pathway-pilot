@@ -3,7 +3,7 @@
 
     <div v-if="initialized" class="mt-5">
         <v-row>
-            <v-col cols=6>
+            <v-col cols=5>
                 <p class="subtitle">
                     Please select a pathway you wish to visualise. You can either use the table below or utilise the bubbleplot visualisation 
                     on the right. In case of a large amount of pathways, you can always look for the pathway using the ID or name.
@@ -22,10 +22,9 @@
                 </p>
             </v-col>
 
-            <v-col cols=6>
-                <p style="height: 250px; background-color: lightblue;">
-                    Bubbleplot
-                </p>
+            <v-col cols=7>
+                <bubble :pathway_counts="mappingStore.pathwaysToPeptideCounts" />
+                <!--<bubble-plot :pathway-to-counts="mappingStore.pathwaysToPeptideCounts" />-->
             </v-col>
         </v-row>
 
@@ -102,6 +101,8 @@ import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
+import Bubble from '@/components/Bubble.vue';
+import BubblePlot from '@/components/visualisations/BubblePlot.vue';
 
 export interface Props {
     doReset: boolean

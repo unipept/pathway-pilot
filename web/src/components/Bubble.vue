@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 import * as d3 from "d3";
 // import { pathway_counts } from "../dummyData";
 import { pathway2count,pathwayID2cat, pathwayID2name} from "../currentData";
@@ -17,15 +18,15 @@ export interface Props {
 const props = defineProps<Props>();
 // console.log(props.pathway_counts);
 
-onMounted(() => {
-    const width = 1000;
-    
+onMounted(() => {    
     const height = 380;
     const svg = d3
         .select("#svgcontainer")
         .append("svg")
-        .attr("width", width)
+        .attr("width", '100%')
         .attr("height", height);
+
+    const width = parseInt(svg.style('width').replace('px',''));
 
     let inputData = [];
     const groupArray = [
@@ -91,11 +92,10 @@ onMounted(() => {
         .attr("fill", "#515151");;
     });
     
-    
     let bubbles = null;
     let nodes = [];
     let forceStrength = 0.03;
-    let center = { x: (width+300) / 2, y: height / 2 };
+    let center = { x: (300 + width) / 2, y: height / 2 };
 
     // return fillColor;
     function createNodes(rawData) {
@@ -129,7 +129,7 @@ onMounted(() => {
     myNodes.sort(function (a, b) { return a.value - b.value; });
 
     return myNodes;
-  }
+    }
 
   function charge(d) {
     return -Math.pow(d.radius, 2.05) * forceStrength;

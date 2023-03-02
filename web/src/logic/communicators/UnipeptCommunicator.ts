@@ -1,6 +1,6 @@
 export default class UnipeptCommunicator {
     constructor(
-        private readonly baseUrl: string = "http://api.unipept.ugent.be/api/v2"
+        private readonly baseUrl: string = "https://api.unipept.ugent.be/api/v2"
     ) {}
 
     public async fetchPeptideInfo(peptideList: string[], chunksize=100) {
