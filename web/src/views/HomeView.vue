@@ -15,7 +15,7 @@
             width="100%"
         >
             <template v-slot:icon>2</template>
-            <selection-view :do-reset="resetSelection"/>
+            <pathway-selection-view :do-reset="resetSelection"/>
         </v-timeline-item>
         <v-timeline-item
             dot-color="primary"
@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import UploadView from './stepper/UploadView.vue';
-import SelectionView from './stepper/SelectionView.vue';
+import PathwaySelectionView from './stepper/PathwaySelectionView.vue';
 import VisualisationView from './stepper/VisualisationView.vue';
 import { ref } from 'vue';
 
