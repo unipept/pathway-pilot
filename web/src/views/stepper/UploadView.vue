@@ -15,7 +15,7 @@
 import FormSelector from '@/components/forms/FormSelector.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
 
-defineEmits(['submit']);
+const emits = defineEmits(['submit']);
 </script>
 
 <style scoped>

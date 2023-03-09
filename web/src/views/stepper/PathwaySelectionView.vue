@@ -44,42 +44,12 @@
                     density="comfortable"
                 />
                 <pathway-table v-if="pathwayItems.length > 0"
-                    v-model="pathwaySelected"
+                    v-model="selectedPathway"
                     :items="pathwayItems"
                     :search="pathwaySearch"
                 />
                 <warning-alert v-else class="mt-3">
                     We were unable to match your input data with any pathways. You can always try to analyse a different input sample.
-                </warning-alert>
-            </v-col>
-
-            <v-col v-if="pathwaySelected">
-                <h3>Select multiple taxa <span style="font-size: x-small; color: #7a7a7a;">OPTIONAL</span></h3>
-                <p class="subtitle">
-                    By default we will highlight all nodes with a match between the selected pathway and your input data. By selecting <b>a maximum of 4</b> taxa, we can narrow 
-                    this down to only highlight nodes that are associated with the selected pathway and taxa.
-                </p>
-                <div class="d-flex" v-if="speciesItems.length > 0">
-                    <v-text-field 
-                        class="mt-3 mb-n3"
-                        v-model="speciesSearch"
-                        label="Search for a taxon or rank" 
-                        prepend-inner-icon="mdi-magnify"
-                        variant="solo"
-                        density="comfortable"
-                    />
-                    <v-label v-if="speciesSelected.length === 0" class="px-5">No taxa selected</v-label>
-                    <v-label v-else class="px-5">{{ speciesSelected.length }} out of 4 taxa selected</v-label>
-                </div>
-                <species-table v-if="speciesItems.length > 0"
-                    v-model="speciesSelected"
-                    :items="speciesItems"
-                    :search="speciesSearch"
-                    :max=4
-                />
-                <warning-alert v-else class="mt-3">
-                    It seems like all matches for this pathway point back to the taxonomic root. As a result, you will not be able 
-                    to visualise more specific highlights for this pathway.
                 </warning-alert>
             </v-col>
         </v-row>
@@ -93,35 +63,23 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import PathwayTable from '@/components/tables/selection/PathwayTable.vue';
-import SpeciesTable from '@/components/tables/selection/SpeciesTable.vue';
 import Pathway from '@/logic/entities/Pathway';
-import Taxon from '@/logic/entities/Taxon';
 import useMappingStore from '@/stores/MappingStore';
 import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import Bubble from '@/components/Bubble.vue';
-import BubblePlot from '@/components/visualisations/BubblePlot.vue';
-
-export interface Props {
-    doReset: boolean
-};
-
-const props = defineProps<Props>();
 
 const mappingStore = useMappingStore();
 const keggStore = useKeggStore();
 const visualisationStore = useVisualisationStore(); // TODO: use v-model instead of store
 
-const { initialized, pathways, pathwaysToTaxa } = storeToRefs(mappingStore);
+const { initialized, pathways } = storeToRefs(mappingStore);
+const { pathway: selectedPathway } = storeToRefs(visualisationStore);
 const { pathwayMapping } = storeToRefs(keggStore);
 
 const pathwaySearch = ref<string>("");
-const speciesSearch = ref<string>("");
-
-const pathwaySelected = ref<Pathway | undefined>(undefined);
-const speciesSelected = ref<Taxon[]>([]);
 
 const pathwayItems = computed(() => [...pathways.value.values()!]
     .filter((pathway: Pathway) => pathway.id)
@@ -133,40 +91,10 @@ const pathwayItems = computed(() => [...pathways.value.values()!]
     )
 );
 
-const speciesItems = computed(() => {
-    if (!pathwaySelected.value) {
-        return [];
-    }
-
-    return [...pathwaysToTaxa.value.get(pathwaySelected.value?.id) ?? []]
-        .filter((taxon: Taxon) => taxon.id !== 1)
-        .map((taxon: Taxon) => ({
-                id: taxon.id,
-                name: taxon.name,
-                rank: taxon.rank,
-                count: 0
-            })
-        );
-});
-
-watch(pathwaySelected, (pathway: Pathway | undefined) => {
-    visualisationStore.setPathwayId(pathway?.id);
-    visualisationStore.setHighlightedTaxa([]);
-    speciesSelected.value = [];
-});
-
-watch(speciesSelected, (taxa: Taxon[]) => {
-    visualisationStore.setHighlightedTaxa(speciesSelected.value.map((s: Taxon) => s.id));
-});
-
-watch(() => props.doReset, () => {
+watch(selectedPathway, (pathway: Pathway | undefined) => {
     pathwaySearch.value = "";
-    speciesSearch.value = "";
-
-    pathwaySelected.value = undefined;
-    speciesSelected.value = [];
-
-    visualisationStore.reset();
+    visualisationStore.setPathway(pathway);
+    visualisationStore.setHighlightedTaxa([]);
 });
 
 onMounted(async () => {

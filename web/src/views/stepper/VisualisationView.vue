@@ -50,7 +50,7 @@
         </v-btn>
     </div>
 
-    <warning-alert v-else-if="!pathwayId" class="mt-5">
+    <warning-alert v-else-if="!pathway" class="mt-5">
         No pathway selected. Please select a pathway first.
     </warning-alert>
 
@@ -70,7 +70,6 @@ import ImageOverlay from '@/components/images/ImageOverlay.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import { computed, onMounted, ref, watch } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
-import { Router } from 'vue-router';
 import TaxonLegend from '@/components/legends/TaxonLegend.vue';
 import AreaModal from '@/components/modals/AreaModal.vue';
 import useMappingStore from '@/stores/MappingStore';
@@ -79,6 +78,8 @@ import CompoundModal from '@/components/modals/CompoundModal.vue';
 import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
+import Pathway from '@/logic/entities/Pathway';
+import Taxon from '@/logic/entities/Taxon';
 
 const mappingStore = useMappingStore();
 const visualisationStore = useVisualisationStore();
@@ -97,11 +98,11 @@ const compoundModalOpen = ref<boolean>(false)
 const selectedArea = ref<any | undefined>(undefined)
 const selectedCompound = ref<string>('')
 
-const { pathwayId, highlightedTaxa } = storeToRefs(visualisationStore);
+const { pathway, highlightedTaxa } = storeToRefs(visualisationStore);
 
-const legendItems = computed(() => highlightedTaxa.value.map(taxonId => ({
-        label: mappingStore.taxa.get(taxonId)?.name ?? "Unknown",
-        color: computeTaxonColor(taxonId)
+const legendItems = computed(() => highlightedTaxa.value.map(taxon => ({
+        label: mappingStore.taxa.get(taxon.id)?.name ?? "Unknown",
+        color: computeTaxonColor(taxon.id)
     }))
 );
 
@@ -132,12 +133,12 @@ const colorHighlighted = (areas: any[]) => {
     return areas.map(area => {
         area.colors = [];
 
-        for (const taxonId of visualisationStore.highlightedTaxa) {
-            const taxonEcs = [...mappingStore.taxaToEcs.get(taxonId) ?? []].map(e => e.id);
+        for (const taxon of highlightedTaxa.value) {
+            const taxonEcs = [...mappingStore.taxaToEcs.get(taxon.id) ?? []].map(e => e.id);
 
             for (const ecNumber of area.info.ecNumbers) {
                 if (taxonEcs.includes(ecNumber.id)) {
-                    area.colors.push(computeTaxonColor(taxonId));
+                    area.colors.push(computeTaxonColor(taxon.id));
                     break;
                 }
             }
@@ -165,7 +166,7 @@ const onClickCompound = (compound: any) => {
 }
 
 const computeTaxonColor = (taxonId: number) => {
-    return ColorConstants.LEGEND[visualisationStore.highlightedTaxa.indexOf(taxonId)];
+    return ColorConstants.LEGEND[visualisationStore.highlightedTaxa.map(t => t.id).indexOf(taxonId)];
 }
 
 const onDownload = async () => {
@@ -181,7 +182,7 @@ const onDownload = async () => {
     link.click();
 }
 
-watch(pathwayId, async (id: string | undefined) => {
+watch(pathway, async (pathway: Pathway | undefined) => {
     pngUrl.value = undefined;
     
     // Fetch data from the store when loaded
