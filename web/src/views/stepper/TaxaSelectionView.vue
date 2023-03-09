@@ -1,6 +1,4 @@
 <template>
-    <h2>Select your taxa <span style="font-size: small; color: #7a7a7a;">OPTIONAL</span></h2>
-
     <div v-if="selectedPathway" class="mt-5">
         <v-row class="mt-5">
             <v-col v-if="selectedTaxa">

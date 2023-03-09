@@ -114,8 +114,8 @@ const onSubmit = async () => {
     errors.value = new PeptideListVerifier().verify(peptidesList.value);
 
     if (errors.value.length === 0) {
-        initialize(await submitPeptideList(peptidesList.value))
         emits("submit", true);
+        initialize(await submitPeptideList(peptidesList.value))
     }
 
     processing.value = false;

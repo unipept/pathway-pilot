@@ -1,6 +1,4 @@
 <template>
-    <h2>Select your pathway</h2>
-
     <div v-if="initialized" class="mt-5">
         <v-row>
             <v-col cols=5>

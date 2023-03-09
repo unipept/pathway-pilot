@@ -1,6 +1,4 @@
 <template>
-    <h2>Analyse your pathway</h2>
-
     <div v-if="pngUrl">
         <warning-alert v-if="highlightedTaxa.length === 0" class="mt-3">
             You selected no taxa during the previous step. Therefore <b>all nodes with at least one match</b> are shown in the same color. You can always update your selection 
@@ -68,7 +66,7 @@
 import ReactiveImage from '@/components/images/ReactiveImage.vue';
 import ImageOverlay from '@/components/images/ImageOverlay.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
 import TaxonLegend from '@/components/legends/TaxonLegend.vue';
 import AreaModal from '@/components/modals/AreaModal.vue';
@@ -79,7 +77,6 @@ import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import Pathway from '@/logic/entities/Pathway';
-import Taxon from '@/logic/entities/Taxon';
 
 const mappingStore = useMappingStore();
 const visualisationStore = useVisualisationStore();
