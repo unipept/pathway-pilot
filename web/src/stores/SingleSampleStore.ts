@@ -5,7 +5,7 @@ import EcNumber from "@/logic/entities/EcNumber";
 import Pathway from "@/logic/entities/Pathway";
 import { reactive, ref } from 'vue';
 
-const useMappingStore = defineStore('mappingStore', () => {
+const useSingleSampleStore = defineStore('singleSampleStore', () => {
     // Mappings containing all matched entities
     const taxa     = new Map<number, Taxon>();
     const pathways = reactive<Map<string, Pathway>>(new Map());
@@ -111,4 +111,4 @@ const useMappingStore = defineStore('mappingStore', () => {
     };
 });
 
-export default useMappingStore;
+export default useSingleSampleStore;

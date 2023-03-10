@@ -42,10 +42,10 @@
 </template>
 
 <script setup lang="ts">
-import UploadView from './stepper/UploadView.vue';
-import PathwaySelectionView from './stepper/PathwaySelectionView.vue';
-import TaxaSelectionView from './stepper/TaxaSelectionView.vue';
-import VisualisationView from './stepper/VisualisationView.vue';
+import UploadView from './single-sample-stepper/UploadView.vue';
+import PathwaySelectionView from './single-sample-stepper/PathwaySelectionView.vue';
+import TaxaSelectionView from './single-sample-stepper/TaxaSelectionView.vue';
+import VisualisationView from './single-sample-stepper/VisualisationView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
 
 const { reset } = useVisualisationStore();

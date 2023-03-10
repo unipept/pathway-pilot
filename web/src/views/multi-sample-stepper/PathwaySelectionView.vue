@@ -62,14 +62,14 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import PathwayTable from '@/components/tables/selection/PathwayTable.vue';
 import Pathway from '@/logic/entities/Pathway';
-import useMappingStore from '@/stores/MappingStore';
+import useSingleSampleStore from '@/stores/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import Bubble from '@/components/Bubble.vue';
 
-const mappingStore = useMappingStore();
+const mappingStore = useSingleSampleStore();
 const keggStore = useKeggStore();
 const visualisationStore = useVisualisationStore(); // TODO: use v-model instead of store
 

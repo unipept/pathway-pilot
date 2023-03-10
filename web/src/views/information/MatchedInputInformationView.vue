@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import MatchedInputTable from '@/components/tables/MatchedInputTable.vue';
-import useMappingStore from '@/stores/MappingStore';
+import useSingleSampleStore from '@/stores/SingleSampleStore';
 import Taxon from '@/logic/entities/Taxon';
 import EcNumber from '@/logic/entities/EcNumber';
 import useVisualisationStore from '@/stores/VisualisationStore';
@@ -25,11 +25,11 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const mappingStore = useMappingStore();
+const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
 const pathwayTaxa = computed(() => {
-    return [...mappingStore.pathwaysToTaxa.get(visualisationStore.pathwayId!) ?? []]
+    return [...mappingStore.pathwaysToTaxa.get(visualisationStore.pathway?.id!) ?? []]
         .filter((taxon: Taxon) => taxon.id !== 1);
 });
 

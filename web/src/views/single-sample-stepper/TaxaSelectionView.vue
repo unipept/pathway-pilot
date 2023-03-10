@@ -38,12 +38,12 @@
 import { computed, ref, watch } from 'vue';
 import SpeciesTable from '@/components/tables/selection/SpeciesTable.vue';
 import Taxon from '@/logic/entities/Taxon';
-import useMappingStore from '@/stores/MappingStore';
+import useSingleSampleStore from '@/stores/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 
-const mappingStore = useMappingStore();
+const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
 const { pathwaysToTaxa } = storeToRefs(mappingStore);

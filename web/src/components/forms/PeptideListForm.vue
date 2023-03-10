@@ -77,7 +77,7 @@ import { computed, ref } from 'vue';
 import FileInput from '../inputs/FileInput.vue';
 import PeptideListExample from './examples/PeptideListExample.vue';
 import { useFileReader } from '@/composables/useFileReader';
-import useMappingStore from '@/stores/MappingStore';
+import useSingleSampleStore from '@/stores/SingleSampleStore';
 import ResourceLink from '../misc/ResourceLink.vue';
 import PeptideListVerifier from '@/logic/verifiers/PeptideListVerifier';
 import ErrorModal from '../modals/ErrorModal.vue';
@@ -85,7 +85,7 @@ import VerifierError from '@/logic/verifiers/VerifierError';
 
 const emits = defineEmits(["submit"]);
 
-const { initialize, reset: resetMappingStore }   = useMappingStore();
+const { initialize, reset: resetMappingStore }   = useSingleSampleStore();
 const { readTextFile } = useFileReader();
 
 const peptideFile = ref<File | undefined>(undefined);

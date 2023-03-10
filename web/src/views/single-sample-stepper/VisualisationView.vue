@@ -70,7 +70,7 @@ import { computed, ref, watch } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
 import TaxonLegend from '@/components/legends/TaxonLegend.vue';
 import AreaModal from '@/components/modals/AreaModal.vue';
-import useMappingStore from '@/stores/MappingStore';
+import useSingleSampleStore from '@/stores/SingleSampleStore';
 import { toPng } from 'html-to-image';
 import CompoundModal from '@/components/modals/CompoundModal.vue';
 import InteractiveImage from '@/components/images/InteractiveImage.vue';
@@ -78,7 +78,7 @@ import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import Pathway from '@/logic/entities/Pathway';
 
-const mappingStore = useMappingStore();
+const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
 const image = ref<HTMLElement | null>(null);
