@@ -43,7 +43,7 @@ import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 
-const mappingStore = useSingleSampleStore();
+const mappingStore = useSingleSampleStore('single-sample');
 const visualisationStore = useVisualisationStore();
 
 const { pathwaysToTaxa } = storeToRefs(mappingStore);

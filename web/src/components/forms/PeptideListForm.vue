@@ -23,18 +23,18 @@
             </p>
 
             <v-row class="mt-5 input-container">
-                <v-col :class="{ 'loading': processing }">
+                <v-col :class="{ 'loading': loading }">
                     <file-input v-model="peptideFile" @upload="onUpload" />
                 </v-col>
 
                 <span 
-                    :class="{ 'loading': processing }"
+                    :class="{ 'loading': loading }"
                     class="d-flex flex-grow-0 align-center pb-5"
                 >
                     OR
                 </span>
 
-                <v-col :class="{ 'loading': processing }">
+                <v-col :class="{ 'loading': loading }">
                     <v-textarea
                         v-model="peptides"
                         label="Paste your peptide list here"
@@ -45,7 +45,7 @@
                     />
                 </v-col>
 
-                <v-progress-circular v-if="processing"
+                <v-progress-circular v-if="loading"
                     class="loading-spinner"
                     size="50"
                     width="5"
@@ -55,44 +55,41 @@
             </v-row>
 
             <div class="d-flex justify-end mt-3">
-                <v-btn color="error" @click="onClear" :disabled="!hasList || processing">
+                <v-btn color="error" @click="onClear" :disabled="!hasList || loading">
                     <v-icon class="me-2">mdi-delete-outline</v-icon> Clear input
                 </v-btn>
 
-                <v-btn class="ms-3" color="primary" :disabled="!hasList || processing" @click="onSubmit">
+                <v-btn class="ms-3" color="primary" :disabled="!hasList || loading" @click="onSubmit">
                     Upload
                 </v-btn>
             </div>
-
-            <error-modal v-model="errors" />
         </v-card-text>
     </v-card>
 
-    <peptide-list-example @try-out="onTryOut" :disabled="processing" />
+    <peptide-list-example @try-out="onTryOut" :disabled="loading" />
 </template>
 
 <script lang="ts" setup>
-import PeptideListConverter from '@/logic/converters/PeptideListConverter';
 import { computed, ref } from 'vue';
 import FileInput from '../inputs/FileInput.vue';
 import PeptideListExample from './examples/PeptideListExample.vue';
 import { useFileReader } from '@/composables/useFileReader';
-import useSingleSampleStore from '@/stores/SingleSampleStore';
 import ResourceLink from '../misc/ResourceLink.vue';
-import PeptideListVerifier from '@/logic/verifiers/PeptideListVerifier';
-import ErrorModal from '../modals/ErrorModal.vue';
-import VerifierError from '@/logic/verifiers/VerifierError';
 
-const emits = defineEmits(["submit"]);
+export interface Props {
+    loading: boolean;
+}
 
-const { initialize, reset: resetMappingStore }   = useSingleSampleStore();
+withDefaults(defineProps<Props>(), {
+    loading: false
+});
+
+const emits = defineEmits(["submit", "reset"]);
+
 const { readTextFile } = useFileReader();
 
-const peptideFile = ref<File | undefined>(undefined);
 const peptides = ref<string>("");
-const processing = ref<boolean>(false);
-
-const errors = ref<VerifierError[]>([]);
+const peptideFile = ref<File | undefined>(undefined);
 
 const peptidesList = computed(() => {
     return peptides.value.split("\n").filter((peptide) => peptide.length > 0);
@@ -100,25 +97,19 @@ const peptidesList = computed(() => {
 
 const hasList = computed(() => peptidesList.value.length > 0);
 
-const submitPeptideList = async (peptides: string[]) => {
-    return await new PeptideListConverter({ 
-        onProgressUpdate: (progress) => {} 
-    }).convert(peptides);
+const onSubmit = async () => {
+    onReset();
+    emits("submit", peptidesList.value);
 };
 
-const onSubmit = async () => {    
-    processing.value = true;
+const onReset = () => {
+    emits("reset");
+};
 
-    resetMappingStore();
-
-    errors.value = new PeptideListVerifier().verify(peptidesList.value);
-
-    if (errors.value.length === 0) {
-        emits("submit", true);
-        initialize(await submitPeptideList(peptidesList.value))
-    }
-
-    processing.value = false;
+const onClear = () => {
+    peptides.value = "";
+    peptideFile.value = undefined;
+    onReset();
 };
 
 const onUpload = async (file: File) => {
@@ -126,13 +117,8 @@ const onUpload = async (file: File) => {
     peptides.value = await readTextFile(file);
 };
 
-const onClear = () => {
-    peptideFile.value = undefined;
-    peptides.value = "";
-};
-
 const onTryOut = (examplePeptides: string[]) => {
-    onClear();
+    onReset();
     peptides.value = examplePeptides.join("\n");
     onSubmit();
 };

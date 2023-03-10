@@ -78,7 +78,7 @@ import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import Pathway from '@/logic/entities/Pathway';
 
-const mappingStore = useSingleSampleStore();
+const mappingStore = useSingleSampleStore('single-sample');
 const visualisationStore = useVisualisationStore();
 
 const image = ref<HTMLElement | null>(null);

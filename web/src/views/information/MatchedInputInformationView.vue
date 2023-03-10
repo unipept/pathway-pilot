@@ -25,7 +25,7 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const mappingStore = useSingleSampleStore();
+const mappingStore = useSingleSampleStore('single-sample');
 const visualisationStore = useVisualisationStore();
 
 const pathwayTaxa = computed(() => {

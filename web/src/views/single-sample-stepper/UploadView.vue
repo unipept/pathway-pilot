@@ -1,20 +1,61 @@
 <template>
     <div class="mt-5">
-        <p class="subtitle mb-3">
-            First, we need to know the data you want to visualise. Van 't pathje offers multiple ways to upload your data. You can 
-            either upload a <ResourceLink url="#">list of peptides</ResourceLink>  or a <ResourceLink url="#">list of proteins</ResourceLink>. 
-            If you require more information about any of the input formats, we recommend you to look at the individual information tabs below.
-        </p>
+        <v-card>
+            <v-tabs
+                v-model="currentTab"
+                bg-color="secondary"
+                centered
+            >
+                <v-tab value=0>Peptides</v-tab>
+            </v-tabs>
 
-        <FormSelector @submit="$emit('submit')" />
+            <v-window v-model="currentTab">
+                <v-window-item value=0>
+                    <peptide-list-form :loading="processing" @submit="onSubmit" @reset="onReset" />
+                </v-window-item>
+            </v-window>
+        </v-card>
+
+        <error-modal v-model="errors" />
     </div>
 </template>
 
 <script lang="ts" setup>
-import FormSelector from '@/components/forms/FormSelector.vue';
-import ResourceLink from '@/components/misc/ResourceLink.vue';
+import { ref } from 'vue';
+import PeptideListForm from '@/components/forms/PeptideListForm.vue';
+import useSingleSampleStore from '@/stores/SingleSampleStore';
+import VerifierError from '@/logic/verifiers/VerifierError';
+import PeptideListVerifier from '@/logic/verifiers/PeptideListVerifier';
+import PeptideListConverter from '@/logic/converters/PeptideListConverter';
+import ErrorModal from '@/components/modals/ErrorModal.vue';
 
 defineEmits(['submit']);
+
+const { initialize, reset } = useSingleSampleStore('single-sample');
+
+const currentTab = ref<number>(0);
+const processing = ref<boolean>(false);
+
+const errors = ref<VerifierError[]>([]);
+
+const onSubmit = async (peptideList: string[]) => {
+    processing.value = true;
+
+    errors.value = new PeptideListVerifier().verify(peptideList);
+
+    if (errors.value.length <= 0) {
+        initialize(await new PeptideListConverter({
+            onProgressUpdate: () => { },
+        }).convert(peptideList));
+    }
+
+    processing.value = false;
+};
+
+const onReset = () => {
+    reset();
+    errors.value = [];
+};
 </script>
 
 <style scoped>

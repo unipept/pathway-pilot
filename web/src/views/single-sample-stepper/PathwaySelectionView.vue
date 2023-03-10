@@ -69,7 +69,7 @@ import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import Bubble from '@/components/Bubble.vue';
 
-const mappingStore = useSingleSampleStore();
+const mappingStore = useSingleSampleStore('single-sample');
 const keggStore = useKeggStore();
 const visualisationStore = useVisualisationStore(); // TODO: use v-model instead of store
 
