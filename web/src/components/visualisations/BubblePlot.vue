@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts">
+// TODO: Tooltips should be allowed outside the borders
 import Pathway from "@/logic/entities/Pathway";
 import * as d3 from "d3";
 import { onMounted, ref, watch } from 'vue';
@@ -28,9 +29,9 @@ const lineSize = 20;
 const forceStrength = 0.03;
 
 const groupColors = pathwayGroups.map((group, i) => {
-    return d3.hsl(1.9 + i * 360 / pathwayGroups.length, 0.721, 0.747).toString();
+    return d3.hsl(1.9 + i * 360 / pathwayGroups.length, 0.721, 0.747);
 });
-groupColors[groupColors.length - 1] = d3.hsl(0, 0, 0.5).toString();
+groupColors[groupColors.length - 1] = d3.hsl(0, 0, 0.5);
 
 const data: DataItem[] = [];
 for (const [pathway, count] of props.pathwayToCounts) {
@@ -68,7 +69,7 @@ const createNodes = (rawData: any) => {
 const addHighlight = (id: string | undefined) => {
     d3.selectAll('.bubble')
         .filter((d: any) => d.id === id)
-        .attr("stroke", "black")
+        .attr("stroke", (d: any) => groupColors[d.group].brighter(-1.5).toString())
         .attr('stroke-width', 2.5)
         .raise();
 
@@ -97,6 +98,65 @@ const toggleBubble = (d: any) => {
     });
 };
 
+const showDetail = (d: any) => {
+    d3.select(d.target)
+        .each((d: any, i: any, elements: any) => {
+            // Enlarge the selected bubble
+            d3.select(elements[i])
+                .attr("r", d.radius * 1.3)
+                .raise()
+
+            // Append a tooltip box to the parent
+            d3.select(elements[i].parentNode)
+                .append('rect')
+                    .attr("id", "selectedBackground")
+                    .attr("width", (d.name.length + 12) * 8.2)
+                    .attr("height", 30)
+                    .attr("x", d.x - (d.name.length + 12) * 4.1)
+                    .attr("y", d.y - 20)
+                    .attr("rx", 4)
+                    .attr("stroke", groupColors[d.group].toString())
+                    .attr('stroke-width', 1.5)
+                    .attr("fill", "white")
+                    .attr("anchor", "middle")
+                    .attr("style", "pointer-events: none;")
+                    .attr("position", "absolute")
+
+            // Append a text to the tooltip box
+            d3.select(elements[i].parentNode)
+                .append('text')
+                    .attr("id", "selectedText")
+                    .attr("x", d.x)
+                    .attr("y", d.y)
+                    .attr("font-family", "sans-serif")
+                    .attr("text-anchor", "middle")
+                    .attr("style", "pointer-events: none;")
+                    .attr("fill", "#515151")
+                    .text(`${d.id} ${d.name}`)
+        
+            // Highlight the legend
+            d3.select(`#legend_${d.group}`)
+                .attr('r', legendRadius * 1.3)
+        });
+};
+
+const hideDetail = (d: any) => {
+    d3.select(d.target)
+        .each((d: any, i: any, elements: any) => {
+            // Reset the selected bubble
+            d3.select(elements[i])
+                .attr("r", d.radius)
+
+            // Remove tooltip
+            d3.select("#selectedText").remove(); 
+            d3.select("#selectedBackground").remove();
+
+            // Reset the legend
+            d3.select(`#legend_${d.group}`)
+                .attr('r',legendRadius);
+        });
+};
+
 watch(() => props.modelValue, (newVal) => {
     removeHighlight();
     addHighlight(newVal?.id);
@@ -122,7 +182,7 @@ onMounted(() => {
             .attr('cx', lineSize)
             .attr('cy', lineSize + lineSize * 1.3 * i)
             .attr('r', legendRadius)
-            .attr('fill', groupColors[i]);
+            .attr('fill', groupColors[i].toString());
 
         legend.append('text')
             .attr('x', lineSize * 2)
@@ -134,65 +194,6 @@ onMounted(() => {
                 .attr("fill", "#515151");
     });
 
-    const showDetail = (d: any) => {
-        d3.select(d.target)
-            .each((d: any, i: any, elements: any) => {
-                // Enlarge the selected bubble
-                d3.select(elements[i])
-                    .attr("r", d.radius * 1.3)
-                    .raise()
-
-                // Append a tooltip box to the parent
-                d3.select(elements[i].parentNode)
-                    .append('rect')
-                        .attr("id", "selectedBackground")
-                        .attr("width", (d.name.length + 12) * 8.2)
-                        .attr("height", 30)
-                        .attr("x", d.x - (d.name.length + 12) * 4.1)
-                        .attr("y", d.y - 20)
-                        .attr("rx", 4)
-                        .attr("stroke", groupColors[d.group])
-                        .attr('stroke-width', 1.5)
-                        .attr("fill", "white")
-                        .attr("anchor", "middle")
-                        .attr("style", "pointer-events: none;")
-                        .attr("position", "absolute")
-
-                // Append a text to the tooltip box
-                d3.select(elements[i].parentNode)
-                    .append('text')
-                        .attr("id", "selectedText")
-                        .attr("x", d.x)
-                        .attr("y", d.y)
-                        .attr("font-family", "sans-serif")
-                        .attr("text-anchor", "middle")
-                        .attr("style", "pointer-events: none;")
-                        .attr("fill", "#515151")
-                        .text(`${d.id} ${d.name}`)
-            
-                // Highlight the legend
-                d3.select(`#legend_${d.group}`)
-                    .attr('r', legendRadius * 1.3)
-            });
-    };
-
-    const hideDetail = (d: any) => {
-        d3.select(d.target)
-            .each((d: any, i: any, elements: any) => {
-                // Reset the selected bubble
-                d3.select(elements[i])
-                    .attr("r", d.radius)
-
-                // Remove tooltip
-                d3.select("#selectedText").remove(); 
-                d3.select("#selectedBackground").remove();
-
-                // Reset the legend
-                d3.select(`#legend_${d.group}`)
-                    .attr('r',legendRadius);
-            });
-    };
-
     const nodes = createNodes(data);
 
     // Create bubbles
@@ -202,7 +203,7 @@ onMounted(() => {
         .append('circle')
             .classed('bubble', true)
             .attr('r', "0")
-            .attr('fill', (d: any) => groupColors[d.group])
+            .attr('fill', (d: any) => groupColors[d.group].toString())
             .on('mouseover', showDetail)
             .on('mouseout', hideDetail)
             .on('click', e => toggleBubble(e.target));
@@ -226,10 +227,3 @@ onMounted(() => {
         .nodes(nodes);
 });
 </script>
-
-<style scoped>
-.selected {
-    stroke: black;
-    stroke-width: 2.5;
-}
-</style>
