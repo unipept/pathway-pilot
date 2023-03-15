@@ -5,6 +5,23 @@ export type DataItem = {
     value: number 
 };
 
+export const pathwayGroups = [
+    "Global and overview maps",
+    "Carbohydrate metabolism",
+    "Energy metabolism",
+    "Lipid metabolism",
+    "Nucleotide metabolism",
+    "Amino acid metabolism",
+    "Metabolism of other amino acids",
+    "Glycan biosynthesis and metabolism",
+    "Metabolism of cofactors and vitamins",
+    "Metabolism of terpenoids and polyketides",
+    "Biosynthesis of other secondary metabolites",
+    "Xenobiotics biodegradation and metabolism",
+    "Chemical structure transformation maps",
+    "Others"
+];
+
 export const pathwayToCategory = new Map(Object.entries({
     map01100: "Global and overview maps",
     map01110: "Global and overview maps",

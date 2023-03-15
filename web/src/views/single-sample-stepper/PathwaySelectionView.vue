@@ -21,8 +21,11 @@
             </v-col>
 
             <v-col cols=7>
-                <bubble :pathway_counts="mappingStore.pathwaysToPeptideCounts" />
-                <!--<bubble-plot :pathway-to-counts="mappingStore.pathwaysToPeptideCounts" />-->
+                <bubble-plot 
+                    v-model="selectedPathway" 
+                    :pathway-to-counts="mappingStore.pathwaysToPeptideCounts" 
+                    @update:model-value="onBubblePlotClick"    
+                />
             </v-col>
         </v-row>
 
@@ -67,7 +70,7 @@ import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
-import Bubble from '@/components/Bubble.vue';
+import BubblePlot from '@/components/visualisations/BubblePlot.vue';
 
 const mappingStore = useSingleSampleStore('single-sample');
 const keggStore = useKeggStore();
@@ -88,6 +91,11 @@ const pathwayItems = computed(() => [...pathways.value.values()!]
         })
     )
 );
+
+const onBubblePlotClick = (pathway: Pathway) => {
+    visualisationStore.setPathway(pathway);
+    visualisationStore.setHighlightedTaxa([]);
+};
 
 watch(selectedPathway, (pathway: Pathway | undefined) => {
     pathwaySearch.value = "";
