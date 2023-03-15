@@ -168,7 +168,8 @@ onMounted(() => {
         .select("#svgcontainer")
         .append("svg")
         .attr("width",  "100%")
-        .attr("height", height);
+        .attr("height", height)
+        .attr("overflow", "visible");
 
     const width = parseInt(svg.style('width').replace('px',''));
 
