@@ -12,6 +12,7 @@ import { DataItem, pathwayToCategory, pathwayGroups } from "./BubblePlotInfo";
 export interface Props {
     modelValue: Pathway | undefined;
     pathwayToCounts: Map<string, number>
+    pathwayToName: Map<string, any>
 }
 
 const props = defineProps<Props>();
@@ -36,7 +37,7 @@ for (const [pathway, count] of props.pathwayToCounts) {
     const category = pathwayToCategory.get(pathway) ?? "Others";
     data.push({
         'id': pathway,
-        'name': 'TODO: forward map as prop',
+        'name': props.pathwayToName.get(pathway)?.name ?? "",
         'group': pathwayGroups.indexOf(category),
         'value': count
     });

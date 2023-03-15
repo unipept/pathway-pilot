@@ -23,7 +23,8 @@
             <v-col cols=7>
                 <bubble-plot 
                     v-model="selectedPathway" 
-                    :pathway-to-counts="mappingStore.pathwaysToPeptideCounts" 
+                    :pathway-to-counts="mappingStore.pathwaysToPeptideCounts"
+                    :pathway-to-name="pathwayMapping"
                     @update:model-value="onBubblePlotClick"    
                 />
             </v-col>
