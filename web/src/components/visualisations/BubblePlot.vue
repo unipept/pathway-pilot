@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-// TODO: Tooltips should be allowed outside the borders
 import Pathway from "@/logic/entities/Pathway";
 import * as d3 from "d3";
 import { onMounted, ref, watch } from 'vue';

@@ -2,10 +2,12 @@
     <svg width="100%" height="100%" version="1.1">
         <rect class="border" width="100%" height="100%" fill="none" />
 
-        <g v-for="area in areas.filter(a => a.shape === 'rect' && isSelectable(a))"
+        <g v-for="area, i in areas.filter(a => a.shape === 'rect' && isSelectable(a))"
             class="group"
             :transform="`scale(${scale})`"
             :onclick="() => onClick(area)"
+            :onmouseenter="() => onMouseEnter(i)"
+            :onmouseleave="onMouseLeave"
         >
             <rect v-for="rect in splitRectangle(area, area.colors.length)"
                 class="group-item"
@@ -19,10 +21,12 @@
             />
         </g>
 
-        <g v-for="area in areas.filter(a => a.shape === 'circle')"
+        <g v-for="area, i in areas.filter(a => a.shape === 'circle')"
             class="group"
             :transform="`scale(${scale})`"
             :onclick="() => onClickCompound(area)"
+            :onmouseenter="() => onMouseEnter(i + 123456)"
+            :onmouseleave="onMouseLeave"
         >
             <circle
                 class="group-item group-item-trans"
@@ -32,6 +36,32 @@
                 fill="transparent"
                 fill-opacity="0.5"
             />
+        </g>
+
+        <g v-for="tt, i in areas.filter(a => a.shape === 'rect' && isSelectable(a)).map(a => tooltip(a))"
+            :transform="`scale(${scale})`"
+        >
+            <rect v-if="areaHover === i"
+                :x="tt.boundingX"
+                :y="tt.boundingY"
+                :width="tt.boundingWidth"
+                :height="tt.boundingHeight"
+                fill="white"
+                stroke="black"
+            />
+
+            <text v-if="areaHover === i"
+                :x="tt.boundingX"
+                :y="tt.boundingY"
+                font-size="26"
+                font-family="monospace"
+                dominant-baseline="hanging"
+            >
+                <tspan v-for="t, j in tt.text"
+                    :x="tt.textX"
+                    :y="tt.textY + tt.textOffset * j"
+                > {{ t }} </tspan>
+            </text>
         </g>
 
         <g v-for="area in areas.filter(a => a.shape === 'poly')"
@@ -47,6 +77,9 @@
 </template>
 
 <script setup lang="ts">
+import useKeggStore from '@/stores/KeggStore';
+import { onBeforeMount, ref } from 'vue';
+
 export interface Props {
     areas: any[];
     scale: number;
@@ -56,6 +89,41 @@ export interface Props {
 };
 
 defineProps<Props>();
+
+const keggStore = useKeggStore();
+
+const tooltip = (area: any): any => {
+    // In order to show the tooltip, we need to have the EC mapping
+    if (!keggStore.ecMapping) {
+        return {};
+    }
+
+    const textOffset = 40;
+
+    const text = area.info.ecNumbers.map((ec: any) => `${ec.id}: ${keggStore.ecMapping?.get(ec.id)?.names[0] ?? "Unknown"}`);
+
+    const boundingWidth = text.reduce((a: number, b: string) => Math.max(a, b.length), 0) * 16.5;
+    const boundingHeight = area.info.ecNumbers.length * 40;
+
+    const boundingX = area.x1 - boundingWidth / 2 + (area.x2 - area.x1) / 2;
+    const boundingY = area.y1 - boundingHeight - 25;
+
+    const textX = boundingX + 10;
+    const textY = boundingY + 10;
+
+    return {
+        boundingX: boundingX,
+        boundingY: boundingY,
+        boundingWidth: boundingWidth,
+        boundingHeight: boundingHeight,
+        textX: textX,
+        textY: textY,
+        textOffset: textOffset,
+        text: text,
+    }
+}
+
+const areaHover = ref<number | undefined>(undefined);
 
 const isSelectable = (area: any) => {
     return area.info.ecNumbers.length 
@@ -89,6 +157,18 @@ const splitRectangle = (rectangle: any, parts: number) => {
 
     return rectangles;
 }
+
+const onMouseEnter = (areaId: number) => {
+    areaHover.value = areaId;
+}
+
+const onMouseLeave = (e: MouseEvent) => {
+    areaHover.value = undefined;
+}
+
+onBeforeMount(async () => {
+    await keggStore.fetchEcMapping();
+});
 </script>
 
 <style scoped>
