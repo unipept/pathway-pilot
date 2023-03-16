@@ -55,8 +55,12 @@
             </v-row>
 
             <div class="d-flex justify-end mt-3">
-                <v-btn color="error" @click="onClear" :disabled="!hasList || loading">
+                <v-btn color="error" @click="onClear" variant="outlined" :disabled="!hasList || loading">
                     <v-icon class="me-2">mdi-delete-outline</v-icon> Clear input
+                </v-btn>
+
+                <v-btn class="ms-3" color="primary" variant="outlined" :disabled="loading" @click="onLoadExample">
+                    Load example
                 </v-btn>
 
                 <v-btn class="ms-3" color="primary" :disabled="!hasList || loading" @click="onSubmit">
@@ -65,16 +69,15 @@
             </div>
         </v-card-text>
     </v-card>
-
-    <peptide-list-example @try-out="onTryOut" :disabled="loading" />
 </template>
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import FileInput from '../inputs/FileInput.vue';
-import PeptideListExample from './examples/PeptideListExample.vue';
 import { useFileReader } from '@/composables/useFileReader';
 import ResourceLink from '../misc/ResourceLink.vue';
+
+import example from "./examples/PeptideListExample";
 
 export interface Props {
     loading: boolean;
@@ -117,10 +120,9 @@ const onUpload = async (file: File) => {
     peptides.value = await readTextFile(file);
 };
 
-const onTryOut = (examplePeptides: string[]) => {
-    onReset();
-    peptides.value = examplePeptides.join("\n");
-    onSubmit();
+const onLoadExample = () => {
+    peptideFile.value = undefined;
+    peptides.value = example.join("\n");
 };
 </script>
 
