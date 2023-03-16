@@ -21,8 +21,7 @@
             </v-col>
 
             <v-col cols=7>
-                <!--<bubble :pathway_counts="mappingStore.pathwaysToPeptideCounts" />-->
-                <!--<bubble-plot :pathway-to-counts="mappingStore.pathwaysToPeptideCounts" />-->
+
             </v-col>
         </v-row>
 

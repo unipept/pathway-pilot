@@ -1,52 +1,36 @@
 <template>
-    <v-timeline
-        density="compact"
-        side="end"
-        align="start"
-    >
-        <v-timeline-item
-            dot-color="primary"
-        >
-            <template v-slot:icon>1</template>
-            <h2>Upload your data</h2>
-            <upload-view @submit="reset"/>
-        </v-timeline-item>
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </p>
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </p>
 
-        <v-timeline-item
-            dot-color="primary"
-            width="100%"
-        >
-            <template v-slot:icon>2</template>
-            <h2>Select your pathway</h2>
-            <pathway-selection-view />
-        </v-timeline-item>
+    <v-row class="mt-3">
+        <v-col cols="6">
+            <v-card height="300" color="primary" to="/single" variant="outlined">
+                <v-card-text class="center-card">
+                    Compare multiple organisms
+                </v-card-text>
+            </v-card>
+        </v-col>
 
-        <v-timeline-item
-            dot-color="primary"
-            width="100%"
-        >
-            <template v-slot:icon>3</template>
-            <h2>Select your taxa <span style="font-size: small; color: #7a7a7a;">OPTIONAL</span></h2>
-            <taxa-selection-view />
-        </v-timeline-item>
-
-        <v-timeline-item
-            dot-color="primary"
-            width="100%"
-        >
-            <template v-slot:icon>4</template>
-            <h2>Analyse your pathway</h2>
-            <visualisation-view />
-        </v-timeline-item>
-    </v-timeline>
+        <v-col cols="6">
+            <v-card height="300" color="primary" to="/multi" variant="outlined">
+                <v-card-text class="center-card">
+                    Compare multiple samples
+                </v-card-text>
+            </v-card>
+        </v-col>
+    </v-row>
 </template>
 
-<script setup lang="ts">
-import UploadView from './single-sample-stepper/UploadView.vue';
-import PathwaySelectionView from './single-sample-stepper/PathwaySelectionView.vue';
-import TaxaSelectionView from './single-sample-stepper/TaxaSelectionView.vue';
-import VisualisationView from './single-sample-stepper/VisualisationView.vue';
-import useVisualisationStore from '@/stores/VisualisationStore';
-
-const { reset } = useVisualisationStore();
-</script>
+<style scoped>
+.center-card {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: x-large;
+}
+</style>

@@ -4,13 +4,16 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
     {
         path: '/',
-        name: 'Home',
-        component: () => import('@/views/HomeView.vue')
+        children: [
+            { path: '', component: () => import('@/views/HomeView.vue') },
+            { path: 'single', component: () => import('@/views/OrganismComparisonView.vue') },
+            { path: 'multi', component: () => import('@/views/SampleComparisonView.vue') }
+        ]
     },
     {
-      path: '/test',
-      name: 'Test',
-      component: () => import('@/views/SampleComparisonView.vue')
+        path: '/test',
+        name: 'Test',
+        component: () => import('@/views/SampleComparisonView.vue')
     }
 ]
 

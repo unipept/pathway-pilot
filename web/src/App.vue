@@ -1,32 +1,48 @@
 <template>
     <v-app>
-        <v-toolbar
+        <v-app-bar
             app
-            color="primary"
             dark
+            color="primary"
             hide-on-scroll
-            class="px-lg-16"
         >
-            <v-container>
-                <router-link to="/" class="homepage-title">
-                    <h1>Van 't pathje</h1>
+            <v-container class="d-flex">
+                <h2 class="mr-5">
+                    <router-link to="/" class="homepage-title">
+                        Van 't pathje
+                    </router-link>
+                </h2>
+
+                <router-link class="app-bar-item" to="/single" v-slot="{ href, navigate }">
+                    <v-btn @click="navigate" :href="href">
+                        Compare organisms
+                    </v-btn>
                 </router-link>
 
-                <v-spacer />
+                <router-link class="app-bar-item" to="/multi" v-slot="{ href, navigate }">
+                    <v-btn @click="navigate" :href="href">
+                        Compare samples
+                    </v-btn>
+                </router-link>
             </v-container>
-        </v-toolbar>
+        </v-app-bar>
 
         <v-content>
-            <v-container>
+            <v-container class="mt-15">
                 <router-view></router-view>
             </v-container>
         </v-content>
     </v-app>
 </template>
 
-<style>
+<style scoped>
 .homepage-title {
     color: white !important;
     text-decoration: none;
+}
+
+.app-bar-item {
+    text-decoration: none;
+    color: white;
 }
 </style>
