@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--inputType', type = str, required = True, help = 'type of input file, possible values: [Pout, PepShaker, MaxQuant, ProteomeDiscoverer]')
 parser.add_argument('--input', type = str, required = True, help = 'path to search engine input')
-parser.add_argument('--out', type = str, required = True, help = 'output to peptides output file')
+parser.add_argument('--out', type = str, required = True, help = 'path to peptides output file')
 
 
 args = parser.parse_args()
@@ -23,8 +23,10 @@ elif args.inputType == "ProteomeDiscoverer":
 elif args.inputType == "MetaProteomeAnalyzer":
   peptides = format_importers.MetaProteomeAnalyzerParser(args.input, 0.05)
 
-print(peptides[1:10])
+print(peptides[0:10])
 print(len(peptides))
-#peptides.to_csv(args.out)
+
+with open(args.out, 'w') as fp:
+    fp.write('\n'.join(peptides))
 
 
