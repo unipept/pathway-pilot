@@ -89,14 +89,15 @@ def MaxQuantParser(mq_file, filter_by = None, cutoff = None):
                 continue
         
         for l in f:
-            peptide_score_list.append([l.strip().split('\t')[i] for i in col_idx]) # [peptide, filter_param]
+            if l.strip():
+                peptide_score_list.append([l.strip().split('\t')[i] for i in col_idx]) # [peptide, filter_param]
     
-    if col_idx > 1:
+    if len(col_idx) > 1:
         if filter_by == 'PEP':
             peptide_list = [i for i,j in peptide_score_list if float(j) < cutoff] # pep lower better
         else:
             peptide_list = [i for i,j in peptide_score_list if float(j) > cutoff] # score higher better
-    else:
+    else: ## no filter option
         peptide_list = [i for [i] in peptide_score_list]
         
     return peptide_list
@@ -119,7 +120,7 @@ def ProteomeDiscovererParser(pd_file, filter_by = None, cutoff = None):
     peptide_score_list = []
     with open(pd_file, 'r') as f:
         header = next(f)
-        colnames = header.split('\t')
+        colnames = [i.strip('"') for i in header.split('\t')]
         col_idx = []
         for c in cols:
             try:
@@ -129,16 +130,19 @@ def ProteomeDiscovererParser(pd_file, filter_by = None, cutoff = None):
                 continue
         
         for l in f:
-            list_item = [l.strip().split('\t')[i] for i in col_idx]
-            list_item[0] = list_item[0].split('.')[1].upper()
+            if l.strip():
+                list_item = [l.strip().split('\t')[i].strip('"') for i in col_idx]
+                
+                list_item[0] = list_item[0].split('.')[1].upper()
+                
             peptide_score_list.append(list_item) # [peptide, filter_param]
     
-    if col_idx > 1:
+    if len(col_idx) > 1:
         if filter_by == 'DeltaScore':
             peptide_list = [i for i,j in peptide_score_list if float(j) > cutoff] # score higher better
         else:
             peptide_list = [i for i,j in peptide_score_list if float(j) < cutoff] # pep, qval lower better
-    else:
+    else: ## no filter option
         peptide_list = [i for [i] in peptide_score_list]
 
     return peptide_list
