@@ -59,3 +59,84 @@ def PepShakerPeptides(filepath:
 
 
     return pepnames
+
+def MaxQuantParser(mq_file, filter_by = None, cutoff = None):
+    '''
+    Parses MaxQuant output file with filter option
+    Assumes sequence column name is "Sequence"
+    mq_file: str, path to file
+    filter_by: str, "PEP", "score", "delta_score"
+    cutoff: float, value to filter.
+    returns the list of peptides
+    '''
+    
+    cols = ['Sequence'] 
+    if filter_by in set(["PEP", "score", "delta_score"]) and type(cutoff) == float:
+        cols += filter_by
+        
+    peptide_score_list = []
+    with open(mq_file, 'r') as f:
+        header = next(f)
+        colnames = header.split('\t')
+        col_idx = []
+        for c in cols:
+            try:
+                col_idx.append(colnames.index(c))
+            except ValueError:
+                ## warning no column
+                continue
+        
+        for l in f:
+            peptide_score_list.append([l.strip().split('\t')[i] for i in col_idx]) # [peptide, filter_param]
+    
+    if col_idx > 1:
+        if filter_by == 'PEP':
+            peptide_list = [i for i,j in peptide_score_list if float(j) < cutoff] # pep lower better
+        else:
+            peptide_list = [i for i,j in peptide_score_list if float(j) > cutoff] # score higher better
+    else:
+        peptide_list = [i for [i] in peptide_score_list]
+        
+    return peptide_list
+
+
+def ProteomeDiscovererParser(pd_file, filter_by = None, cutoff = None):
+    '''
+    Parses ProteomeDiscoverer output file with filter option
+    Assumes sequence column name is "Annotated Sequence"
+    pd_file: str, path to file
+    filter_by: str, "DeltaScore", "Percolator q-Value", "Percolator PEP"
+    cutoff: float, value to filter.
+    returns the list of peptides
+    '''
+
+    cols = ['Annotated Sequence'] ## assume this sequence column name exists
+    if filter_by in set(["DeltaScore", "Percolator q-Value", "Percolator PEP"]) and type(cutoff) == float:
+        cols += filter_by
+        
+    peptide_score_list = []
+    with open(mq_file, 'r') as f:
+        header = next(f)
+        colnames = header.split('\t')
+        col_idx = []
+        for c in cols:
+            try:
+                col_idx.append(colnames.index(c))
+            except ValueError:
+                ## warning no column
+                continue
+        
+        for l in f:
+            list_item = [l.strip().split('\t')[i] for i in col_idx]
+            list_item[0] = list_item[0].split('.')[1].upper()
+            peptide_score_list.append(list_item) # [peptide, filter_param]
+    
+    if col_idx > 1:
+        if filter_by == 'DeltaScore':
+            peptide_list = [i for i,j in peptide_score_list if float(j) > cutoff] # score higher better
+        else:
+            peptide_list = [i for i,j in peptide_score_list if float(j) < cutoff] # pep, qval lower better
+    else:
+        peptide_list = [i for [i] in peptide_score_list]
+
+    return peptide_list
