@@ -28,10 +28,13 @@ import VerifierError from '@/logic/verifiers/VerifierError';
 import PeptideListVerifier from '@/logic/verifiers/PeptideListVerifier';
 import PeptideListConverter from '@/logic/converters/PeptideListConverter';
 import ErrorModal from '@/components/modals/ErrorModal.vue';
+import useMultiSampleStore from '@/stores/MultiSampleStore';
 
 defineEmits(['submit']);
 
-const { initialize, reset } = useSingleSampleStore('sample2');
+const sampleStore = useMultiSampleStore();
+
+const sample = ref<number | undefined>(undefined);
 
 const currentTab = ref<number>(0);
 const processing = ref<boolean>(false);
@@ -44,7 +47,8 @@ const onSubmit = async (peptideList: string[]) => {
     errors.value = new PeptideListVerifier().verify(peptideList);
 
     if (errors.value.length <= 0) {
-        initialize(await new PeptideListConverter({
+        sample.value = sampleStore.addSample();
+        sampleStore.initializeSample(sample.value, await new PeptideListConverter({
             onProgressUpdate: () => { },
         }).convert(peptideList));
     }
@@ -53,7 +57,9 @@ const onSubmit = async (peptideList: string[]) => {
 };
 
 const onReset = () => {
-    reset();
+    if (sample.value !== undefined) {
+        sampleStore.resetSample(sample.value);
+    }
     errors.value = [];
 };
 </script>

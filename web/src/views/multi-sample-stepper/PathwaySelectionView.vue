@@ -21,7 +21,12 @@
             </v-col>
 
             <v-col cols=7>
-
+                <bubble-plot 
+                    v-model="selectedPathway" 
+                    :pathway-to-counts="pathwaysToPeptideCounts"
+                    :pathway-to-name="pathwayMapping"
+                    @update:model-value="onBubblePlotClick"    
+                />
             </v-col>
         </v-row>
 
@@ -61,22 +66,18 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import PathwayTable from '@/components/tables/selection/PathwayTable.vue';
 import Pathway from '@/logic/entities/Pathway';
-import useSingleSampleStore from '@/stores/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
-import Bubble from '@/components/Bubble.vue';
+import useMultiSampleStore from '@/stores/MultiSampleStore';
+import BubblePlot from '@/components/visualisations/BubblePlot.vue';
 
-const sample1 = useSingleSampleStore('sample1');
-const sample2 = useSingleSampleStore('sample2');
-
-const { initialized: init1, pathways: pathways1 } = storeToRefs(sample1);
-const { initialized: init2, pathways: pathways2 } = storeToRefs(sample2);
-
+const sampleStore = useMultiSampleStore();
 const keggStore = useKeggStore();
-const visualisationStore = useVisualisationStore(); // TODO: use v-model instead of store
+const visualisationStore = useVisualisationStore();
 
+const { initialized, pathways, pathwaysToPeptideCounts } = storeToRefs(sampleStore);
 const { pathway: selectedPathway } = storeToRefs(visualisationStore);
 const { pathwayMapping } = storeToRefs(keggStore);
 
@@ -87,19 +88,15 @@ const pathwayItems = computed(() => [...pathways.value.values()!]
     .map((pathway: Pathway) => ({
             id: pathway.id,
             name: pathwayMapping.value.get(pathway.id)?.name ?? "",
-            count: (sample1.pathwaysToPeptideCounts.get(pathway.id) ?? 0) + (sample2.pathwaysToPeptideCounts.get(pathway.id) ?? 0),
+            count: pathwaysToPeptideCounts.value.get(pathway.id) ?? 0,
         })
     )
 );
 
-const initialized = computed(() => init1.value && init2.value);
-
-const pathways = computed(() => {
-    const pathways = new Map<string, Pathway>();
-    pathways1.value.forEach((pathway: Pathway) => pathways.set(pathway.id, pathway));
-    pathways2.value.forEach((pathway: Pathway) => pathways.set(pathway.id, pathway));
-    return pathways;
-});
+const onBubblePlotClick = (pathway: Pathway) => {
+    visualisationStore.setPathway(pathway);
+    visualisationStore.setHighlightedTaxa([]);
+};
 
 watch(selectedPathway, (pathway: Pathway | undefined) => {
     pathwaySearch.value = "";

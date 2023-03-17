@@ -72,9 +72,9 @@ import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import Pathway from '@/logic/entities/Pathway';
+import useMultiSampleStore from '@/stores/MultiSampleStore';
 
-const sample1 = useSingleSampleStore('sample1');
-const sample2 = useSingleSampleStore('sample2');
+const sampleStore = useMultiSampleStore();
 
 const visualisationStore = useVisualisationStore();
 
@@ -93,17 +93,12 @@ const selectedArea = ref<any | undefined>(undefined)
 const selectedCompound = ref<string>('')
 
 const { pathway } = storeToRefs(visualisationStore);
+const { samples } = storeToRefs(sampleStore);
 
-const legendItems = computed(() => [
-    {
-        color: ColorConstants.LEGEND[0],
-        label: 'Sample 1',
-    },
-    {
-        color: ColorConstants.LEGEND[1],
-        label: 'Sample 2',
-    },
-]);
+const legendItems = computed(() => samples.value.map((sample, i) => ({
+    color: ColorConstants.LEGEND[i],
+    label: `Sample ${i + 1}`,
+})));
 
 const coloredAreas = computed(() => colorAll(areas.value));
 
@@ -112,11 +107,11 @@ const colorAll = (areas: any[]) => {
     return areas.map(area => {
         area.colors = [];
         for (const ecNumber of area.info.ecNumbers) {
-            if (sample1.ecs.has(ecNumber.id) && !area.colors.includes(ColorConstants.LEGEND[0])) {
-                area.colors.push(ColorConstants.LEGEND[0]);
-            }
-            if (sample2.ecs.has(ecNumber.id) && !area.colors.includes(ColorConstants.LEGEND[1])) {
-                area.colors.push(ColorConstants.LEGEND[1]);
+            let i = 0;
+            for (const sample of samples.value) {
+                if (sample.ecs.has(ecNumber.id) && !area.colors.includes(ColorConstants.LEGEND[i])) {
+                    area.colors.push(ColorConstants.LEGEND[i++]);
+                }
             }
         }
 
