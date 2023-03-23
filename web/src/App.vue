@@ -9,7 +9,7 @@
             <v-container class="d-flex">
                 <h2 class="mr-5">
                     <router-link to="/" class="homepage-title">
-                        Van 't pathje
+                        Pathway Pilot
                     </router-link>
                 </h2>
 
