@@ -10,7 +10,7 @@ export default class UnipeptCommunicator {
             const chunk = peptideList.slice(i, i + chunksize);
 
             const url = `${this.baseUrl}/peptinfo.json?input[]=${chunk.join("&input[]=")}`;
-            await fetch(url, { method: 'POST', headers: { "content-type": "application/json" } })
+            await fetch(url, { method: 'POST' })
                 .then(response => response.json())
                 .then(data => result.push(...data));
         }
@@ -23,7 +23,7 @@ export default class UnipeptCommunicator {
     // Start at the root for both trees, as soon as the trees diverge, add the other tree as a child.
     public async fetchTaxonomy(ids: number[]) {
         const url = `${this.baseUrl}/taxa2tree.json?input[]=${ids.join("&input[]=")}`;
-        return fetch(url, { method: 'POST', headers: { "content-type": "application/json" } })
+        return fetch(url, { method: 'POST' })
             .then(response => response.json());
     }
 };
