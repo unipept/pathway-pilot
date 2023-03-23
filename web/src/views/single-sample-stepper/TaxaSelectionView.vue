@@ -46,7 +46,7 @@ import WarningAlert from '@/components/alerts/WarningAlert.vue';
 const mappingStore = useSingleSampleStore('single-sample');
 const visualisationStore = useVisualisationStore();
 
-const { pathwaysToTaxa } = storeToRefs(mappingStore);
+const { pathwaysToTaxa, taxaTree } = storeToRefs(mappingStore);
 const { pathway: selectedPathway, highlightedTaxa: selectedTaxa } = storeToRefs(visualisationStore);
 
 const taxaSearch = ref<string>("");
@@ -70,6 +70,10 @@ const speciesItems = computed(() => {
 watch(() => selectedPathway.value, () => {
     taxaSearch.value = "";
     visualisationStore.setHighlightedTaxa([]);
+});
+
+watch(() => taxaTree.value, () => {
+    console.log(taxaTree.value)
 });
 </script>
 

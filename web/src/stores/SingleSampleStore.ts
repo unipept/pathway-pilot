@@ -4,6 +4,7 @@ import Taxon from "@/logic/entities/Taxon";
 import EcNumber from "@/logic/entities/EcNumber";
 import Pathway from "@/logic/entities/Pathway";
 import { reactive, ref } from 'vue';
+import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 
 const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStore/${sampleId}`, () => {
     // Mappings containing all matched entities
@@ -18,6 +19,8 @@ const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStor
     const pathwaysToTaxa = reactive<Map<string, Set<Taxon>>>(new Map());
 
     const pathwaysToPeptideCounts = new Map<string, number>();
+
+    const taxaTree = ref<any>(undefined);
 
     const initialized = ref<boolean>(false);
 
@@ -76,6 +79,62 @@ const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStor
         console.log("MappingStore initialized");
     }
 
+    const setTree = async (tree: any) => {
+        taxaTree.value = tree;
+    }
+
+    const ancestors = (taxonId: number, pathwayId: string) => {
+        const visited = new Set<any>();
+        const toVisit = [taxaTree.value];
+        const ancestors: any[] = [];
+
+        while (toVisit.length > 0) {
+            const current = toVisit.pop()!;
+            visited.add(current);
+
+            if (current.id === taxonId) {
+                return ancestors;
+            }
+
+            ancestors.push(current);
+
+            const childrenToVisit = current.children.filter((child: any) => !visited.has(child));
+
+            if (childrenToVisit.length === 0) {
+                ancestors.pop();
+            }
+
+            // Add the children to the queue
+            toVisit.push(...childrenToVisit);
+        }
+
+        return [];
+    }
+
+    const descendants = (taxonId: number, pathwayId: string) => {
+        const toVisit = [taxaTree.value];
+
+        while (toVisit.length > 0) {
+            const current = toVisit.pop()!;
+
+            if (current.id === taxonId) {
+                const ids = [...pathwaysToTaxa.get(pathwayId) ?? []].map((taxon: Taxon) => taxon.id);
+                return getChildren(current, ids);
+            }
+
+            toVisit.push(...current.children);
+        }
+
+        return [];
+    }
+
+    const getChildren = (node: any, ids: number[]) => {
+        return [
+            ...node.children.filter((child: any) => ids.includes(child.id)), 
+            ...node.children.flatMap((child: any) => getChildren(child, ids))
+        ];
+    }
+
     const reset = () => {
         initialized.value = false;
 
@@ -103,11 +162,15 @@ const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStor
         pathwaysToEcs,
         pathwaysToTaxa,
         pathwaysToPeptideCounts,
+        taxaTree,
 
         initialized,
 
         initialize,
-        reset
+        setTree,
+        reset,
+        descendants,
+        ancestors
     };
 })();
 

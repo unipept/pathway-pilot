@@ -17,4 +17,13 @@ export default class UnipeptCommunicator {
 
         return result;
     }
+
+    // TODO: what in case of more than 1000 ids?
+    // Fetch id=1 and 99 other ids, then combine trees.
+    // Start at the root for both trees, as soon as the trees diverge, add the other tree as a child.
+    public async fetchTaxonomy(ids: number[]) {
+        const url = `${this.baseUrl}/taxa2tree.json?input[]=${ids.join("&input[]=")}`;
+        return fetch(url, { method: 'POST', headers: { "content-type": "application/json" } })
+            .then(response => response.json());
+    }
 };

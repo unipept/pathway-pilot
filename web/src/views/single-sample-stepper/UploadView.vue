@@ -28,10 +28,11 @@ import VerifierError from '@/logic/verifiers/VerifierError';
 import PeptideListVerifier from '@/logic/verifiers/PeptideListVerifier';
 import PeptideListConverter from '@/logic/converters/PeptideListConverter';
 import ErrorModal from '@/components/modals/ErrorModal.vue';
+import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 
 defineEmits(['submit']);
 
-const { initialize, reset } = useSingleSampleStore('single-sample');
+const sampleStore = useSingleSampleStore('single-sample');
 
 const currentTab = ref<number>(0);
 const processing = ref<boolean>(false);
@@ -44,16 +45,18 @@ const onSubmit = async (peptideList: string[]) => {
     errors.value = new PeptideListVerifier().verify(peptideList);
 
     if (errors.value.length <= 0) {
-        initialize(await new PeptideListConverter({
+        sampleStore.initialize(await new PeptideListConverter({
             onProgressUpdate: () => { },
         }).convert(peptideList));
+
+        sampleStore.setTree(await new UnipeptCommunicator().fetchTaxonomy(Array.from(sampleStore.taxa.keys())))
     }
 
     processing.value = false;
 };
 
 const onReset = () => {
-    reset();
+    sampleStore.reset();
     errors.value = [];
 };
 </script>
