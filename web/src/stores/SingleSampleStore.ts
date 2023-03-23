@@ -83,56 +83,38 @@ const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStor
         taxaTree.value = tree;
     }
 
-    const ancestors = (taxonId: number, pathwayId: string) => {
-        const visited = new Set<any>();
-        const toVisit = [taxaTree.value];
-        const ancestors: any[] = [];
+    const ancestors = (taxonId: number) => {
+        const visited   = new Set<number>();
 
-        while (toVisit.length > 0) {
-            const current = toVisit.pop()!;
-            visited.add(current);
+        const recursive = (current: any, ancestors: Set<number>): Set<number> => {
+            visited.add(current.id);
 
             if (current.id === taxonId) {
                 return ancestors;
             }
 
-            ancestors.push(current);
+            ancestors.add(current.id);
 
-            const childrenToVisit = current.children.filter((child: any) => !visited.has(child));
+            for (const child of current.children) {
+                // Look for the target inside the not yet processed children
+                if (!visited.has(child.id)) {
+                    const updatedAncestors = recursive(child, ancestors);
 
-            if (childrenToVisit.length === 0) {
-                ancestors.pop();
+                    // This set would be empty if no progress was made in the subtree
+                    if (updatedAncestors.size > 0) {
+                        return updatedAncestors;
+                    }
+                }
             }
 
-            // Add the children to the queue
-            toVisit.push(...childrenToVisit);
+            // No suitable child found in this subtree, so remove the current node from the ancestors
+            ancestors.delete(current.id);
+
+            // No progress made in this subtree, so return an empty set
+            return new Set<number>();
         }
 
-        return [];
-    }
-
-    const descendants = (taxonId: number, pathwayId: string) => {
-        const toVisit = [taxaTree.value];
-
-        while (toVisit.length > 0) {
-            const current = toVisit.pop()!;
-
-            if (current.id === taxonId) {
-                const ids = [...pathwaysToTaxa.get(pathwayId) ?? []].map((taxon: Taxon) => taxon.id);
-                return getChildren(current, ids);
-            }
-
-            toVisit.push(...current.children);
-        }
-
-        return [];
-    }
-
-    const getChildren = (node: any, ids: number[]) => {
-        return [
-            ...node.children.filter((child: any) => ids.includes(child.id)), 
-            ...node.children.flatMap((child: any) => getChildren(child, ids))
-        ];
+        return Array.from(recursive(taxaTree.value, new Set()));
     }
 
     const reset = () => {
@@ -169,7 +151,6 @@ const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStor
         initialize,
         setTree,
         reset,
-        descendants,
         ancestors
     };
 })();

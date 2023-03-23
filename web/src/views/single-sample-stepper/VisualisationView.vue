@@ -95,7 +95,6 @@ const compoundModalOpen = ref<boolean>(false)
 const selectedArea = ref<any | undefined>(undefined)
 const selectedCompound = ref<string>('')
 
-const { taxaTree } = storeToRefs(mappingStore);
 const { pathway, highlightedTaxa } = storeToRefs(visualisationStore);
 
 const legendItems = computed(() => highlightedTaxa.value.map(taxon => ({
@@ -127,25 +126,28 @@ const colorAll = (areas: any[]) => {
     });
 };
 
-const colorHighlighted = (areas: any[]) => {    
+const colorHighlighted = (areas: any[]) => {
+    const ancestors = new Map<number, number[]>();
+    for (const taxon of highlightedTaxa.value) {
+        ancestors.set(taxon.id, mappingStore
+            .ancestors(taxon.id)
+            .filter(i => highlightedTaxa.value.map(t => t.id).includes(i))
+        );
+    }
+
     return areas.map(area => {
         area.colors = [];
 
-        // EXAMPLE: Bacteria
         for (const taxon of highlightedTaxa.value) {
-            // TODO: calculate ancestors only once
-            const ancestors = mappingStore.ancestors(taxon.id, pathway.value?.id!).filter(t => highlightedTaxa.value.map(t => t.id).includes(t.id));
-
             const taxonEcs = [...mappingStore.taxaToEcs.get(taxon.id) ?? []].map(e => e.id);
 
             for (const ecNumber of area.info.ecNumbers) {
                 if (taxonEcs.includes(ecNumber.id)) {
-                    // EXAMPLE: Color this node with the color of Bacteria
                     area.colors.push(computeTaxonColor(taxon.id));
 
-                    for (const ancestor of ancestors) {
-                        if (!area.colors.includes(computeTaxonColor(ancestor.id))) {
-                            area.colors.push(computeTaxonColor(ancestor.id));
+                    for (const ancestor of ancestors.get(taxon.id) ?? []) {
+                        if (!area.colors.includes(computeTaxonColor(ancestor))) {
+                            area.colors.push(computeTaxonColor(ancestor));
                         }
                     }
 
@@ -153,6 +155,8 @@ const colorHighlighted = (areas: any[]) => {
                 }
             }
         }
+
+        area.colors.sort();
 
         return area;
     });
