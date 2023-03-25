@@ -12,10 +12,10 @@ parser.add_argument('--out', type = str, required = True, help = 'path to peptid
 
 args = parser.parse_args()
 
-if args.inputType == "Pout":
-  peptides = format_importers.Poutparser(args.input, 0.01, "")
+if args.inputType == "PoutMS2Rescore":
+  peptides = format_importers.PoutMS2RescoreParser(args.input, 0.01, "")
 elif args.inputType == "PepShaker":
-  peptides = format_importers.PepShakerPeptides(args.input)
+  peptides = format_importers.PepShakerPeptides(args.input, 90.0)
 elif args.inputType == "MaxQuant":
   peptides = format_importers.MaxQuantParser(args.input, "score", 50.0)
 elif args.inputType == "ProteomeDiscoverer":
@@ -23,7 +23,7 @@ elif args.inputType == "ProteomeDiscoverer":
 elif args.inputType == "MetaProteomeAnalyzer":
   peptides = format_importers.MetaProteomeAnalyzerParser(args.input, 0.05)
 
-print(peptides[0:10])
+#print(peptides[0:10])
 print(len(peptides))
 
 with open(args.out, 'w') as fp:

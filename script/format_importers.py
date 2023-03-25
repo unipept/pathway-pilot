@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import re
 
-def Poutparser(pout_file, fdr_threshold, decoy_flag):
+def PoutMS2RescoreParser(pout_file, fdr_threshold, decoy_flag):
     '''
     Parses the ms2rescore pout file for peptides, psm numbers and peptide scores
     :param pout_file: str, path to pout file
@@ -11,10 +11,6 @@ def Poutparser(pout_file, fdr_threshold, decoy_flag):
     :return: list of peptides
     '''
     
-    pep_score = dict()
-    pep_psm = dict()
-    pep_score_psm = dict()
-
     assert os.path.exists(pout_file), "input file or folder does not exist"
 
     with open(pout_file, "r") as f:
@@ -50,16 +46,21 @@ def PepShakerProteins(filepath):
     return proteins
 
 
-def PepShakerPeptides(filepath):
-    '''returns confidence value and peptide names from PeptideShaker default PSm results'''
+def PepShakerPeptides(filepath, conf_threshold = None):
+    '''
+    Parses the PeptideShaker default PSm results for identified peptides
+    :param filepath: str, path to PeptideShaker results file
+    :param conf_threshold: float, confidence threshold above which psms are kept
+    :return: list of peptides
+    '''
     pepIDs= pd.read_csv (filepath, sep = '\t', error_bad_lines=False) #error bad lines should be remove when development is done
     pepnames = pepIDs['Sequence'].tolist()
     pepscores = pepIDs['Confidence [%]'].tolist()
 
     #directly remove IDS with zero confidence
-    pepnames = [pepnames[i] for i in range(len(pepscores)) if pepscores[i] != 0]
+    pepnames_filtered = [pepnames[i] for i in range(len(pepscores)) if pepscores[i] >= conf_threshold]
 
-    return pepnames
+    return pepnames_filtered
 
 
 def MaxQuantParser(mq_file, filter_by = None, cutoff = None):
