@@ -4,6 +4,7 @@ import Taxon from "@/logic/entities/Taxon";
 import EcNumber from "@/logic/entities/EcNumber";
 import Pathway from "@/logic/entities/Pathway";
 import { reactive, ref } from 'vue';
+import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 
 const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStore/${sampleId}`, () => {
     // Mappings containing all matched entities
@@ -18,6 +19,8 @@ const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStor
     const pathwaysToTaxa = reactive<Map<string, Set<Taxon>>>(new Map());
 
     const pathwaysToPeptideCounts = new Map<string, number>();
+
+    const taxaTree = ref<any>(undefined);
 
     const initialized = ref<boolean>(false);
 
@@ -76,6 +79,44 @@ const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStor
         console.log("MappingStore initialized");
     }
 
+    const setTree = async (tree: any) => {
+        taxaTree.value = tree;
+    }
+
+    const ancestors = (taxonId: number) => {
+        const visited   = new Set<number>();
+
+        const recursive = (current: any, ancestors: Set<number>): Set<number> => {
+            visited.add(current.id);
+
+            if (current.id === taxonId) {
+                return ancestors;
+            }
+
+            ancestors.add(current.id);
+
+            for (const child of current.children) {
+                // Look for the target inside the not yet processed children
+                if (!visited.has(child.id)) {
+                    const updatedAncestors = recursive(child, ancestors);
+
+                    // This set would be empty if no progress was made in the subtree
+                    if (updatedAncestors.size > 0) {
+                        return updatedAncestors;
+                    }
+                }
+            }
+
+            // No suitable child found in this subtree, so remove the current node from the ancestors
+            ancestors.delete(current.id);
+
+            // No progress made in this subtree, so return an empty set
+            return new Set<number>();
+        }
+
+        return Array.from(recursive(taxaTree.value, new Set()));
+    }
+
     const reset = () => {
         initialized.value = false;
 
@@ -103,11 +144,14 @@ const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStor
         pathwaysToEcs,
         pathwaysToTaxa,
         pathwaysToPeptideCounts,
+        taxaTree,
 
         initialized,
 
         initialize,
-        reset
+        setTree,
+        reset,
+        ancestors
     };
 })();
 

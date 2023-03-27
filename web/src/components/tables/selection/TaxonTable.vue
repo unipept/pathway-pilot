@@ -47,12 +47,12 @@
 <script setup lang="ts">
 import Taxon from '@/logic/entities/Taxon';
 import { ref, watch } from 'vue';
-import { SpeciesTableItem } from './SpeciesTableItem';
+import { TaxonTableItem } from './TaxonTableItem';
 
 export interface Props {
     modelValue: Taxon[];
     search: string;
-    items: SpeciesTableItem[];
+    items: TaxonTableItem[];
     max?: number;
 }
 

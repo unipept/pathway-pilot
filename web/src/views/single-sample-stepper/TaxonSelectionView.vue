@@ -7,7 +7,7 @@
                     By default we will highlight all nodes with a match between the selected pathway and your input data. By selecting <b>a maximum of 4</b> taxa, we can narrow 
                     this down to only highlight nodes that are associated with the selected pathway and taxa.
                 </p>
-                <div class="d-flex" v-if="speciesItems.length > 0">
+                <div class="d-flex" v-if="taxaItems.length > 0">
                     <v-text-field 
                         class="mt-3 mb-n3"
                         v-model="taxaSearch"
@@ -19,9 +19,9 @@
                     <v-label v-if="selectedTaxa.length === 0" class="px-5">No taxa selected</v-label>
                     <v-label v-else class="px-5">{{ selectedTaxa.length }} out of 4 taxa selected</v-label>
                 </div>
-                <species-table v-if="speciesItems.length > 0"
+                <taxon-table v-if="taxaItems.length > 0"
                     v-model="selectedTaxa"
-                    :items="speciesItems"
+                    :items="taxaItems"
                     :search="taxaSearch"
                     :max=4
                 />
@@ -36,7 +36,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
-import SpeciesTable from '@/components/tables/selection/SpeciesTable.vue';
+import TaxonTable from '@/components/tables/selection/TaxonTable.vue';
 import Taxon from '@/logic/entities/Taxon';
 import useSingleSampleStore from '@/stores/SingleSampleStore';
 import { storeToRefs } from 'pinia';
@@ -46,12 +46,12 @@ import WarningAlert from '@/components/alerts/WarningAlert.vue';
 const mappingStore = useSingleSampleStore('single-sample');
 const visualisationStore = useVisualisationStore();
 
-const { pathwaysToTaxa } = storeToRefs(mappingStore);
+const { pathwaysToTaxa, taxaTree } = storeToRefs(mappingStore);
 const { pathway: selectedPathway, highlightedTaxa: selectedTaxa } = storeToRefs(visualisationStore);
 
 const taxaSearch = ref<string>("");
 
-const speciesItems = computed(() => {
+const taxaItems = computed(() => {
     if (!selectedPathway.value) {
         return [];
     }
@@ -70,6 +70,10 @@ const speciesItems = computed(() => {
 watch(() => selectedPathway.value, () => {
     taxaSearch.value = "";
     visualisationStore.setHighlightedTaxa([]);
+});
+
+watch(() => taxaTree.value, () => {
+    console.log(taxaTree.value)
 });
 </script>
 

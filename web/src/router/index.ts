@@ -6,7 +6,7 @@ const routes = [
         path: '/',
         children: [
             { path: '', component: () => import('@/views/HomeView.vue') },
-            { path: 'single', component: () => import('@/views/OrganismComparisonView.vue') },
+            { path: 'single', component: () => import('@/views/TaxonComparisonView.vue') },
             { path: 'multi', component: () => import('@/views/SampleComparisonView.vue') }
         ]
     },

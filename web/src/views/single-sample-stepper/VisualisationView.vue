@@ -127,6 +127,14 @@ const colorAll = (areas: any[]) => {
 };
 
 const colorHighlighted = (areas: any[]) => {
+    const ancestors = new Map<number, number[]>();
+    for (const taxon of highlightedTaxa.value) {
+        ancestors.set(taxon.id, mappingStore
+            .ancestors(taxon.id)
+            .filter(i => highlightedTaxa.value.map(t => t.id).includes(i))
+        );
+    }
+
     return areas.map(area => {
         area.colors = [];
 
@@ -136,10 +144,19 @@ const colorHighlighted = (areas: any[]) => {
             for (const ecNumber of area.info.ecNumbers) {
                 if (taxonEcs.includes(ecNumber.id)) {
                     area.colors.push(computeTaxonColor(taxon.id));
+
+                    for (const ancestor of ancestors.get(taxon.id) ?? []) {
+                        if (!area.colors.includes(computeTaxonColor(ancestor))) {
+                            area.colors.push(computeTaxonColor(ancestor));
+                        }
+                    }
+
                     break;
                 }
             }
         }
+
+        area.colors.sort();
 
         return area;
     });
