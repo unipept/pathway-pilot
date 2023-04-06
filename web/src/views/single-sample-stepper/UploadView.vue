@@ -1,20 +1,6 @@
 <template>
     <div class="mt-5">
-        <v-card>
-            <v-tabs
-                v-model="currentTab"
-                bg-color="secondary"
-                centered
-            >
-                <v-tab value=0>Peptides</v-tab>
-            </v-tabs>
-
-            <v-window v-model="currentTab">
-                <v-window-item value=0>
-                    <peptide-list-form :loading="processing" @submit="onSubmit" @reset="onReset" />
-                </v-window-item>
-            </v-window>
-        </v-card>
+        <peptide-list-form :loading="processing" @submit="onSubmit" @reset="onReset" />
 
         <error-modal v-model="errors" />
     </div>
@@ -34,7 +20,6 @@ defineEmits(['submit']);
 
 const sampleStore = useSingleSampleStore('single-sample');
 
-const currentTab = ref<number>(0);
 const processing = ref<boolean>(false);
 
 const errors = ref<VerifierError[]>([]);

@@ -97,7 +97,7 @@ const { samples } = storeToRefs(sampleStore);
 
 const legendItems = computed(() => samples.value.map((sample, i) => ({
     color: ColorConstants.LEGEND[i],
-    label: `Sample ${i + 1}`,
+    label: sample.name,
 })));
 
 const coloredAreas = computed(() => colorAll(areas.value));

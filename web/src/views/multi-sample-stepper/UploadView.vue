@@ -2,6 +2,7 @@
     <div class="mt-5">
         <sample-table 
             :items="tableItems"
+            :max="4"
             @add="addModalOpen = true"
             @remove="onRemove"
         />

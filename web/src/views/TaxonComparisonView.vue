@@ -8,7 +8,26 @@
             dot-color="primary"
         >
             <template v-slot:icon>1</template>
-            <h2>Upload your data</h2>
+            <h2>Upload your sample</h2>
+        </v-timeline-item>
+
+        <v-timeline-item
+            dot-color="primary"
+            size="20"
+            fill-dot
+            width="100%"
+        >
+            <h4>Select your input format</h4>
+            <input-selection-view />
+        </v-timeline-item>
+
+        <v-timeline-item
+            dot-color="primary"
+            size="20"
+            fill-dot
+            width="100%"
+        >
+            <h4>Upload a list of peptides</h4>
             <upload-view @submit="resetVisualisationStore"/>
         </v-timeline-item>
 
@@ -46,6 +65,7 @@ import UploadView from './single-sample-stepper/UploadView.vue';
 import PathwaySelectionView from './single-sample-stepper/PathwaySelectionView.vue';
 import TaxonSelectionView from './single-sample-stepper/TaxonSelectionView.vue';
 import VisualisationView from './single-sample-stepper/VisualisationView.vue';
+import InputSelectionView from './single-sample-stepper/InputSelectionView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import useSingleSampleStore from '@/stores/SingleSampleStore';
 
@@ -54,5 +74,4 @@ const { reset: resetVisualisationStore } = useVisualisationStore();
 
 resetSingleSampleStore();
 resetVisualisationStore();
-
 </script>

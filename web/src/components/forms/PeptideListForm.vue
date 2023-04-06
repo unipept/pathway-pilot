@@ -1,9 +1,6 @@
 <template>
     <v-card flat>
-        <v-card-title>
-            Upload a list of peptides
-        </v-card-title>
-        <v-card-text>
+        <v-card-text class="pa-0">
             <p class="subtitle">
                 Provide a list of tryptic peptides by either pasting your sequences on the right or selecting a single <span>.txt</span> 
                 file. Each line of input will be interpreted as a single sequence and can't contain any special characters. Have a look 

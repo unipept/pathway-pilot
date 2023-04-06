@@ -45,7 +45,7 @@
             width="100%"
         >
             <template v-slot:icon>3</template>
-            <h2>Select your pathway</h2>
+            <h2>Analyse your pathway</h2>
             <visualisation-view />
         </v-timeline-item>
     </v-timeline>
