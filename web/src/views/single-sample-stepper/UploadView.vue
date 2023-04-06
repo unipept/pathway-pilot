@@ -47,7 +47,7 @@ const onSubmit = async (peptideList: string[]) => {
     if (errors.value.length <= 0) {
         sampleStore.initialize(await new PeptideListConverter({
             onProgressUpdate: () => { },
-        }).convert(peptideList));
+        }).convert(peptideList), peptideList);
 
         sampleStore.setTree(await new UnipeptCommunicator().fetchTaxonomy(Array.from(sampleStore.taxa.keys())))
     }

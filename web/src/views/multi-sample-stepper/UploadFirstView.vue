@@ -47,10 +47,12 @@ const onSubmit = async (peptideList: string[]) => {
     errors.value = new PeptideListVerifier().verify(peptideList);
 
     if (errors.value.length <= 0) {
-        sample.value = sampleStore.addSample();
-        sampleStore.initializeSample(sample.value, await new PeptideListConverter({
-            onProgressUpdate: () => { },
-        }).convert(peptideList));
+        sample.value = sampleStore.addSample("Sample 1");
+        sampleStore.initializeSample(
+            sample.value, 
+            await new PeptideListConverter({
+                onProgressUpdate: () => { },
+            }).convert(peptideList), peptideList);
     }
 
     processing.value = false;

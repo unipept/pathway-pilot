@@ -1,7 +1,9 @@
 <template>
     <v-card flat>
+        <v-card-title>
+            Upload a list of peptides
+        </v-card-title>
         <v-card-text>
-            <h1 class="mb-3">Upload a list of peptides</h1>
             <p class="subtitle">
                 Provide a list of tryptic peptides by either pasting your sequences on the right or selecting a single <span>.txt</span> 
                 file. Each line of input will be interpreted as a single sequence and can't contain any special characters. Have a look 
@@ -101,7 +103,7 @@ const peptidesList = computed(() => {
 const hasList = computed(() => peptidesList.value.length > 0);
 
 const onSubmit = async () => {
-    onReset();
+    emits("reset");
     emits("submit", peptidesList.value);
 };
 
@@ -112,7 +114,7 @@ const onReset = () => {
 const onClear = () => {
     peptides.value = "";
     peptideFile.value = undefined;
-    onReset();
+    emits("reset");
 };
 
 const onUpload = async (file: File) => {

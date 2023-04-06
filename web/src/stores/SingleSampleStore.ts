@@ -6,7 +6,11 @@ import Pathway from "@/logic/entities/Pathway";
 import { reactive, ref } from 'vue';
 import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 
-const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStore/${sampleId}`, () => {
+const useSingleSampleStore = (sampleId: string, sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
+    const name    = ref<string>(sampleName);
+    const size    = ref<number>(0);
+    const rawData = ref<any[]>([]);
+
     // Mappings containing all matched entities
     const taxa     = new Map<number, Taxon>();
     const pathways = reactive<Map<string, Pathway>>(new Map());
@@ -24,12 +28,15 @@ const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStor
 
     const initialized = ref<boolean>(false);
 
-    const initialize = (infoObjects: any[]) => {
+    const initialize = (sampleData: any[], rawSampleData: any[]) => {
+        size.value = rawSampleData.length;
+        rawData.value = rawSampleData;
+
         if (initialized.value) {
             return;
         }
 
-        for (const object of infoObjects) {
+        for (const object of sampleData) {
             let taxon = taxa.get(object.taxon_id);
             if (!taxon) {
                 taxon = new Taxon(object.taxon_id, object.taxon_name, object.taxon_rank);
@@ -136,6 +143,8 @@ const useSingleSampleStore = (sampleId: string) => defineStore(`singleSampleStor
     }
 
     return {
+        name,
+        size,
         taxa,
         pathways,
         ecs,
