@@ -1,22 +1,10 @@
 <template>
     <div class="mt-5">
-        <v-card elevation="10">
-            <v-card-text>
-                <v-select
-                    v-model="inputFormat"
-                    label="Select your input format"
-                    density="comfortable"
-                    :items="inputFormats"
-                />
-
-                <h1 class="mb-3">Upload your samples</h1>
-                <sample-table 
-                    :items="tableItems"
-                    @add="addModalOpen = true"
-                    @remove="onRemove"
-                />
-            </v-card-text>
-        </v-card>
+        <sample-table 
+            :items="tableItems"
+            @add="addModalOpen = true"
+            @remove="onRemove"
+        />
 
         <add-sample-modal 
             v-model="addModalOpen" 
@@ -32,14 +20,15 @@
     </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
+import PeptideListConverter from '@/logic/converters/PeptideListConverter';
+import useMultiSampleStore from '@/stores/MultiSampleStore';
 import AddSampleModal from '@/components/modals/multi-sample/AddSampleModal.vue';
 import DeleteSampleModal from '@/components/modals/multi-sample/DeleteSampleModal.vue';
 import SampleTable from '@/components/tables/multi-sample/SampleTable.vue';
-import PeptideListConverter from '@/logic/converters/PeptideListConverter';
-import useMultiSampleStore from '@/stores/MultiSampleStore';
+import inputFormats from './FileFormat';
 import { storeToRefs } from 'pinia';
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const sampleStore = useMultiSampleStore();
 
@@ -51,9 +40,7 @@ const tableItems = computed(() =>
         size: `${sample.size} peptides`,
         loading: !sample.initialized,
     }))
-)
-
-const inputFormats = ["Peptide list", "MaxQuant", "ProteomeDiscoverer", "PepShaker"]
+);
 
 const inputFormat = ref<string>();
 

@@ -1,5 +1,1 @@
-enum FileFormat {
-    PEPTIDE_LIST
-};
-
-export default FileFormat;
+export default ["Peptide list", "MaxQuant", "ProteomeDiscoverer", "PepShaker"];
