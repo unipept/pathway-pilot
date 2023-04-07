@@ -63,91 +63,34 @@ def PepShakerPeptides(filepath, conf_threshold = None):
     return pepnames_filtered
 
 
-def MaxQuantParser(mq_file, filter_by = None, cutoff = None):
+def MaxQuantParser(filepath, cutoff = 0.01):
     '''
-    Parses MaxQuant output file with filter option
+    Parses MaxQuant output file filtered by "PEP"
     Assumes sequence column name is "Sequence"
     mq_file: str, path to file
-    filter_by: str, "PEP", "score", "delta_score"
     cutoff: float, value to filter.
     returns the list of peptides
     '''
     
-    cols = ['Sequence'] 
-    if filter_by in set(["PEP", "score", "delta_score"]) and type(cutoff) == float:
-        cols += filter_by
-        
-    peptide_score_list = []
-    with open(mq_file, 'r') as f:
-        header = next(f)
-        colnames = header.split('\t')
-        col_idx = []
-        for c in cols:
-            try:
-                col_idx.append(colnames.index(c))
-            except ValueError:
-                ## warning no column
-                continue
-        
-        for l in f:
-            if l.strip():
-                peptide_score_list.append([l.strip().split('\t')[i] for i in col_idx]) # [peptide, filter_param]
-    
-    if len(col_idx) > 1:
-        if filter_by == 'PEP':
-            peptide_list = [i for i,j in peptide_score_list if float(j) < cutoff] # pep lower better
-        else:
-            peptide_list = [i for i,j in peptide_score_list if float(j) > cutoff] # score higher better
-    else: ## no filter option
-        peptide_list = [i for [i] in peptide_score_list]
-        
-    return peptide_list
+    pep_df= pd.read_csv(filepath, sep = '\t') 
+    sub_df = pep_df.loc[pep_df['PEP'] < cutoff]
+    return list(sub_df['Sequence'])
 
 
-def ProteomeDiscovererParser(pd_file, filter_by = None, cutoff = None):
+def ProteomeDiscovererParser(filepath, cutoff = 0.01):
     '''
-    Parses ProteomeDiscoverer output file with filter option
+    Parses ProteomeDiscoverer output file filtered by "Percolator PEP"
     Assumes sequence column name is "Annotated Sequence"
-    pd_file: str, path to file
-    filter_by: str, "DeltaScore", "Percolator q-Value", "Percolator PEP"
+    filepath: str, path to file
     cutoff: float, value to filter.
     returns the list of peptides
     '''
 
-    cols = ['Annotated Sequence'] ## assume this sequence column name exists
-    if filter_by in set(["DeltaScore", "Percolator q-Value", "Percolator PEP"]) and type(cutoff) == float:
-        cols += filter_by
-        
-    peptide_score_list = []
-    with open(pd_file, 'r') as f:
-        header = next(f)
-        colnames = [i.strip('"') for i in header.split('\t')]
-        col_idx = []
-        for c in cols:
-            try:
-                col_idx.append(colnames.index(c))
-            except ValueError:
-                ## warning no column
-                continue
-        
-        for l in f:
-            if l.strip():
-                list_item = [l.strip().split('\t')[i].strip('"') for i in col_idx]
-                
-                list_item[0] = list_item[0].split('.')[1].upper()
-                
-            peptide_score_list.append(list_item) # [peptide, filter_param]
+    pep_df= pd.read_csv(filepath, sep = '\t') 
+    sub_df = pep_df.loc[pep_df['Percolator PEP'] < cutoff]
+    seqs = sub_df['Annotated Sequence'].apply(lambda x: x.split('.')[1].upper())
+    return list(seqs)
     
-    if len(col_idx) > 1:
-        if filter_by == 'DeltaScore':
-            peptide_list = [i for i,j in peptide_score_list if float(j) > cutoff] # score higher better
-        else:
-            peptide_list = [i for i,j in peptide_score_list if float(j) < cutoff] # pep, qval lower better
-    else: ## no filter option
-        peptide_list = [i for [i] in peptide_score_list]
-
-    return peptide_list
-
 
 def MetaProteomeAnalyzerParser(mpa_file, score_cutoff):
     '''returns peptides from MetaProteomeAnalyzer default results'''

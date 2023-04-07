@@ -17,9 +17,9 @@ if args.inputType == "PoutMS2Rescore":
 elif args.inputType == "PepShaker":
   peptides = format_importers.PepShakerPeptides(args.input, 90.0)
 elif args.inputType == "MaxQuant":
-  peptides = format_importers.MaxQuantParser(args.input, "score", 50.0)
+  peptides = format_importers.MaxQuantParser(args.input, 0.01)
 elif args.inputType == "ProteomeDiscoverer":
-  peptides = format_importers.ProteomeDiscovererParser(args.input, "Percolator q-Value", 0.05)
+  peptides = format_importers.ProteomeDiscovererParser(args.input, 0.01)
 elif args.inputType == "MetaProteomeAnalyzer":
   peptides = format_importers.MetaProteomeAnalyzerParser(args.input, 0.05)
 
