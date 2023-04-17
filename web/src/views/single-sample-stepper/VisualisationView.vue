@@ -143,7 +143,9 @@ const colorHighlighted = (areas: any[]) => {
 
             for (const ecNumber of area.info.ecNumbers) {
                 if (taxonEcs.includes(ecNumber.id)) {
-                    area.colors.push(computeTaxonColor(taxon.id));
+                    if (!area.colors.includes(computeTaxonColor(taxon.id))) {
+                        area.colors.push(computeTaxonColor(taxon.id));
+                    }
 
                     for (const ancestor of ancestors.get(taxon.id) ?? []) {
                         if (!area.colors.includes(computeTaxonColor(ancestor))) {

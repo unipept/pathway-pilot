@@ -2,7 +2,7 @@
     <svg width="100%" height="100%" version="1.1">
         <rect class="border" width="100%" height="100%" fill="none" />
 
-        <g v-for="area, i in areas.filter(a => a.shape === 'rect' && isSelectable(a))"
+        <g v-for="area, i in rectangles.filter(a => isSelectable(a))"
             class="group"
             :transform="`scale(${scale})`"
             :onclick="() => onClick(area)"
@@ -21,7 +21,43 @@
             />
         </g>
 
-        <g v-for="area, i in areas.filter(a => a.shape === 'circle')"
+        <g v-for="area in emptyPolygons"
+            :transform="`scale(${scale})`"
+            :onclick="() => onClick(area)"
+        >
+            <polygon :points="area.points" :fill="polygons.length > 20 ? '#e3e3e3' : 'transparent'" />
+        </g>
+
+        <g v-for="area in coloredPolygons"
+            :transform="`scale(${scale})`"
+            :onclick="() => onClick(area)"
+        >
+            <defs>
+                <linearGradient v-if="area.colors.length > 1" 
+                    id="multi-gradient" x1="0%" y1="0%" x2="100%" y2="0%"
+                >
+                    <template v-for="(color, i) in area.colors">
+                        <stop
+                            :offset="`${i * 100 / area.colors.length}%`"
+                            :stop-color="color"
+                            stop-opacity="1"
+                        />
+                        <stop
+                            :offset="`${(i + 1) * 100 / area.colors.length}%`"
+                            :stop-color="color"
+                            stop-opacity="1"
+                        />
+                    </template>
+                </linearGradient>
+            </defs>
+
+            <polygon
+                :points="area.points"
+                :fill="area.colors.length === 1 ? area.colors[0] : 'url(#multi-gradient)'"
+            />
+        </g>
+
+        <g v-for="area, i in circles"
             class="group"
             :transform="`scale(${scale})`"
             :onclick="() => onClickCompound(area)"
@@ -30,15 +66,16 @@
         >
             <circle
                 class="group-item group-item-trans"
-                :cx="area.x"
-                :cy="area.y"
+                :cx="area.x + 1"
+                :cy="area.y + 1"
                 :r="area.r"
-                fill="transparent"
-                fill-opacity="0.5"
+                fill="white"
+                :stroke="polygons.length > 20 ? '#e3e3e3' : 'black'"
+                :stroke-width="polygons.length > 20 ? 5 : 2"
             />
         </g>
 
-        <g v-for="tt, i in areas.filter(a => a.shape === 'rect' && isSelectable(a)).map(a => tooltip(a))"
+        <g v-for="tt, i in rectangles.filter(a => isSelectable(a)).map(a => tooltip(a))"
             :transform="`scale(${scale})`"
         >
             <rect v-if="areaHover === i"
@@ -63,22 +100,12 @@
                 > {{ t }} </tspan>
             </text>
         </g>
-
-        <g v-for="area in areas.filter(a => a.shape === 'poly')"
-            :transform="`scale(${scale})`"
-            :onclick="() => onClick(area)"
-        >
-            <polygon
-                :points="area.points"
-                fill="green"
-            />
-        </g>
     </svg>
 </template>
 
 <script setup lang="ts">
 import useKeggStore from '@/stores/KeggStore';
-import { onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 
 export interface Props {
     areas: any[];
@@ -88,9 +115,18 @@ export interface Props {
     onClickCompound: (compound: any) => void;
 };
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const l = console.log;
 
 const keggStore = useKeggStore();
+
+const rectangles = computed(() => props.areas.filter(a => a.shape === 'rect'));
+const circles = computed(() => props.areas.filter(a => a.shape === 'circle'));
+
+const polygons = computed(() => props.areas.filter(a => a.shape === 'poly'));
+const coloredPolygons = computed(() => polygons.value.filter(a => a.colors.length > 0));
+const emptyPolygons = computed(() => polygons.value.filter(a => a.colors.length <= 0));
 
 const tooltip = (area: any): any => {
     // In order to show the tooltip, we need to have the EC mapping
