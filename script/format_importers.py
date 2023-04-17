@@ -1,4 +1,8 @@
-def Poutparser(pout_file, fdr_threshold, decoy_flag):
+import os
+import pandas as pd
+import re
+
+def PoutMS2RescoreParser(pout_file, fdr_threshold, decoy_flag):
     '''
     Parses the ms2rescore pout file for peptides, psm numbers and peptide scores
     :param pout_file: str, path to pout file
@@ -7,10 +11,6 @@ def Poutparser(pout_file, fdr_threshold, decoy_flag):
     :return: list of peptides
     '''
     
-    pep_score = dict()
-    pep_psm = dict()
-    pep_score_psm = dict()
-
     assert os.path.exists(pout_file), "input file or folder does not exist"
 
     with open(pout_file, "r") as f:
@@ -27,8 +27,7 @@ def Poutparser(pout_file, fdr_threshold, decoy_flag):
                 peptide = re.sub("\[.*?\]", "", peptide)
                 peptide = peptide.split(".")[1]
                 pepList.add(peptide)
-                pepList = list(PepList)
-
+    pepList = list(pepList)
           
     return pepList
 
@@ -47,15 +46,62 @@ def PepShakerProteins(filepath):
     return proteins
 
 
-def PepShakerPeptides(filepath:
-    '''returns confidence value and peptide names from PeptideShaker default PSm results'''
+def PepShakerPeptides(filepath, conf_threshold = None):
+    '''
+    Parses the PeptideShaker default PSm results for identified peptides
+    :param filepath: str, path to PeptideShaker results file
+    :param conf_threshold: float, confidence threshold above which psms are kept
+    :return: list of peptides
+    '''
     pepIDs= pd.read_csv (filepath, sep = '\t', error_bad_lines=False) #error bad lines should be remove when development is done
     pepnames = pepIDs['Sequence'].tolist()
     pepscores = pepIDs['Confidence [%]'].tolist()
 
     #directly remove IDS with zero confidence
-    pepnames = [pepnames[i] for i in range(len(pepscores)) if pepscores[i] != 0]
+    pepnames_filtered = [pepnames[i] for i in range(len(pepscores)) if pepscores[i] >= conf_threshold]
+
+    return pepnames_filtered
 
 
+def MaxQuantParser(filepath, cutoff = 0.01):
+    '''
+    Parses MaxQuant output file filtered by "PEP"
+    Assumes sequence column name is "Sequence"
+    mq_file: str, path to file
+    cutoff: float, value to filter.
+    returns the list of peptides
+    '''
+    
+    pep_df= pd.read_csv(filepath, sep = '\t') 
+    sub_df = pep_df.loc[pep_df['PEP'] < cutoff]
+    return list(sub_df['Sequence'])
 
-    return pepnames
+
+def ProteomeDiscovererParser(filepath, cutoff = 0.01):
+    '''
+    Parses ProteomeDiscoverer output file filtered by "Percolator PEP"
+    Assumes sequence column name is "Annotated Sequence"
+    filepath: str, path to file
+    cutoff: float, value to filter.
+    returns the list of peptides
+    '''
+
+    pep_df= pd.read_csv(filepath, sep = '\t') 
+    sub_df = pep_df.loc[pep_df['Percolator PEP'] < cutoff]
+    seqs = sub_df['Annotated Sequence'].apply(lambda x: x.split('.')[1].upper())
+    return list(seqs)
+    
+
+def MetaProteomeAnalyzerParser(mpa_file, score_cutoff):
+    '''returns peptides from MetaProteomeAnalyzer default results'''
+    peptide_list = set()
+    with open(mpa_file, 'r') as f:
+        for line in f:
+            splitted_line = line.rstrip().split("\t", maxsplit=7)
+            #print(len(splitted_line))
+            # assert len(splitted_line) >= 7, "Input file is wrongly formatted. Make sure that the input is a valid file."
+            _, protein_id, peptide, _, _, _, score = splitted_line
+            if float(score) < score_cutoff:
+                peptide_list.add(peptide)
+    peptide_list = list(peptide_list)
+    return peptide_list
