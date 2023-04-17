@@ -27,7 +27,7 @@ import useMultiSampleStore from '@/stores/MultiSampleStore';
 import AddSampleModal from '@/components/modals/multi-sample/AddSampleModal.vue';
 import DeleteSampleModal from '@/components/modals/multi-sample/DeleteSampleModal.vue';
 import SampleTable from '@/components/tables/multi-sample/SampleTable.vue';
-import inputFormats from './FileFormat';
+import inputFormats from '../FileFormat';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 

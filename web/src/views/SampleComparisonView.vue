@@ -52,8 +52,6 @@
 </template>
 
 <script setup lang="ts">
-import UploadFirstView from './multi-sample-stepper/UploadFirstView.vue';
-import UploadSecondView from './multi-sample-stepper/UploadSecondView.vue';
 import PathwaySelectionView from './multi-sample-stepper/PathwaySelectionView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import VisualisationView from './multi-sample-stepper/VisualisationView.vue';

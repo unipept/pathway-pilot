@@ -32,7 +32,6 @@
 
         <v-row class="mt-5">
             <v-col cols=12>
-                <h3>Select your pathway</h3>
                 <p class="subtitle">
                     The table below list all the pathways that have at least one node in common with your input data. You can either 
                     scroll through the table or use the search bar to find the specific pathway you wish to visualise.
