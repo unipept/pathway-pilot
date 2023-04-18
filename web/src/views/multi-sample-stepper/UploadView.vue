@@ -8,7 +8,8 @@
         />
 
         <add-sample-modal 
-            v-model="addModalOpen" 
+            v-model="addModalOpen"
+            :file-format="fileFormat"
             @submit="onSubmit"
         />
 
@@ -22,14 +23,27 @@
 </template>
 
 <script setup lang="ts">
-import PeptideListConverter from '@/logic/converters/PeptideListConverter';
 import useMultiSampleStore from '@/stores/MultiSampleStore';
 import AddSampleModal from '@/components/modals/multi-sample/AddSampleModal.vue';
 import DeleteSampleModal from '@/components/modals/multi-sample/DeleteSampleModal.vue';
 import SampleTable from '@/components/tables/multi-sample/SampleTable.vue';
-import inputFormats from '../FileFormat';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
+import FileFormat from '../FileFormat';
+
+import PeptideListForm from '@/components/forms/multi-sample/PeptideListForm.vue'; // TODO: CHANGE
+
+import PeptideListVerifier from '@/logic/verifiers/PeptideListVerifier';
+import PeptideShakerVerifier from '@/logic/verifiers/PeptideShakerVerifier';
+
+import PeptideListConverter from '@/logic/converters/PeptideListConverter';
+import PeptideShakerConverter from '@/logic/converters/PeptideShakerConverter';
+
+export interface Props {
+    fileFormat: FileFormat;
+}
+
+const props = defineProps<Props>();
 
 const sampleStore = useMultiSampleStore();
 
@@ -43,13 +57,31 @@ const tableItems = computed(() =>
     }))
 );
 
-const inputFormat = ref<string>();
-
 const addModalOpen = ref<boolean>(false);
 
 const deleteModalOpen = ref<boolean>(false);
 const deleteModalIndex = ref<number>(-1);
 const deleteModalName = ref<string>("");
+
+const processing = ref<boolean>(false);
+
+const formatMap = new Map<FileFormat, { converter: any }>([
+    [ FileFormat.PEPTIDE_LIST, { converter: new PeptideListConverter({ onProgressUpdate: () => {} }) } ],
+    [ FileFormat.PEPTIDE_SHAKER, { converter: new PeptideShakerConverter({ onProgressUpdate: () => {} }) } ],
+]);
+
+const onSubmit = async (peptideList: string[], sampleName: string) => {
+    processing.value = true;
+
+    const sample = sampleStore.addSample(sampleName);
+    sampleStore.initializeSample(
+        sample, 
+        await formatMap.get(props.fileFormat)?.converter.convert(peptideList),
+        peptideList
+    );
+
+    processing.value = false;
+};
 
 const onRemove = (index: number, name: string) => {
     deleteModalIndex.value = index;
@@ -59,22 +91,5 @@ const onRemove = (index: number, name: string) => {
 
 const onRemoveConfirmed = () => {
     sampleStore.removeSample(deleteModalIndex.value);
-};
-
-const processing = ref<boolean>(false);
-
-const onSubmit = async (peptideList: string[], sampleName: string) => {
-    processing.value = true;
-
-    const sample = sampleStore.addSample(sampleName);
-    sampleStore.initializeSample(
-        sample, 
-        await new PeptideListConverter({
-            onProgressUpdate: () => { },
-        }).convert(peptideList),
-        peptideList
-    );
-
-    processing.value = false;
 };
 </script>

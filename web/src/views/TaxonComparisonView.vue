@@ -18,7 +18,7 @@
             width="100%"
         >
             <h4>Select your input format</h4>
-            <input-selection-view />
+            <input-selection-view v-model="fileFormat" />
         </v-timeline-item>
 
         <v-timeline-item
@@ -28,7 +28,7 @@
             width="100%"
         >
             <h4>Upload a list of peptides</h4>
-            <upload-view @submit="resetVisualisationStore"/>
+            <upload-view :file-format="fileFormat" @submit="resetVisualisationStore"/>
         </v-timeline-item>
 
         <v-timeline-item
@@ -68,10 +68,19 @@ import VisualisationView from './single-sample-stepper/VisualisationView.vue';
 import InputSelectionView from './single-sample-stepper/InputSelectionView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import useSingleSampleStore from '@/stores/SingleSampleStore';
+import FileFormat from './FileFormat';
+import { ref, watch } from 'vue';
 
 const { reset: resetSingleSampleStore } = useSingleSampleStore('single-sample');
 const { reset: resetVisualisationStore } = useVisualisationStore();
 
+const fileFormat = ref<FileFormat>(FileFormat.PEPTIDE_LIST);
+
 resetSingleSampleStore();
 resetVisualisationStore();
+
+watch(() => fileFormat.value, (newVal: FileFormat) => {
+    resetSingleSampleStore();
+    resetVisualisationStore();
+});
 </script>

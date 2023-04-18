@@ -1,7 +1,7 @@
 <template>
     <v-card flat>
         <v-card-title>
-            Upload a list of peptides
+            Upload a list of PS files
         </v-card-title>
         <v-card-text>
             <p class="subtitle">
@@ -25,7 +25,7 @@
             </p>
 
             <peptide-form
-                label="Paste your peptide list here"
+                label="Paste your peptide shaker results here"
                 :example="example"
                 :loading="loading"
                 @submit="onSubmit"
@@ -38,7 +38,7 @@
 import PeptideForm from './PeptideForm.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
 
-import example from '../examples/PeptideListExample';
+import example from '../examples/PeptideShakerExample';
 
 export interface Props {
     loading?: boolean;

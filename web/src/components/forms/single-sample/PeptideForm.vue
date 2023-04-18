@@ -1,28 +1,6 @@
 <template>
     <v-card flat>
         <v-card-text class="pa-0">
-            <!--
-            <p class="subtitle">
-                Provide a list of tryptic peptides by either pasting your sequences on the right or selecting a single <span>.txt</span> 
-                file. Each line of input will be interpreted as a single sequence and can't contain any special characters. Have a look 
-                at the example below to get a feel about the input format.
-            </p>
-
-            <p class="subtitle mt-3">
-                Two processing steps will happen whenever you upload your data:
-                <ol class="ms-5">
-                    <li class="ms-5">
-                        Each input line will be analyzed with <resource-link url="https://unipept.ugent.be/">Unipept</resource-link>. 
-                        this results is list of functional annotations and taxa per sequence.  <b>Note: Unipept works with peptides of 
-                        length 5 - 50. Shorter and longer peptides will be ignored</b>.
-                    </li>
-                    <li class="ms-5">
-                        Each functional annotation gets mapped onto zero or more <resource-link url="https://www.genome.jp/kegg/pathway.html">Kegg pathways</resource-link>.
-                    </li>
-                </ol>
-            </p>
-            -->
-
             <v-row class="mt-5 input-container">
                 <v-col :class="{ 'loading': loading }">
                     <file-input v-model="peptideFile" @upload="onUpload" />
@@ -74,20 +52,17 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import FileInput from '../inputs/FileInput.vue';
+import FileInput from '../../inputs/FileInput.vue';
 import { useFileReader } from '@/composables/useFileReader';
-import ResourceLink from '../misc/ResourceLink.vue';
-
-import example from "./examples/PeptideListExample";
 
 export interface Props {
-    loading?: boolean;
-    label?: string;
+    label: string
+    example: string[]
+    loading?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
-    loading: false,
-    label: "Paste your peptide list here"
+const props = withDefaults(defineProps<Props>(), {
+    loading: false
 });
 
 const emits = defineEmits(["submit", "reset"]);
@@ -121,7 +96,7 @@ const onUpload = async (file: File) => {
 
 const onLoadExample = () => {
     peptideFile.value = undefined;
-    peptides.value = example.join("\n");
+    peptides.value = props.example.join("\n");
 };
 </script>
 

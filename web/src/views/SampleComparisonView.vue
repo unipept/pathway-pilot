@@ -18,7 +18,7 @@
             width="100%"
         >
             <h4>Select your input format</h4>
-            <input-selection-view />
+            <input-selection-view v-model="fileFormat" />
         </v-timeline-item>
 
         <v-timeline-item
@@ -28,7 +28,7 @@
             width="100%"
         >
             <h4>You can upload and compare a maximum of 4 samples</h4>
-            <upload-view />
+            <upload-view :file-format="fileFormat" />
         </v-timeline-item>
 
         <v-timeline-item
@@ -58,10 +58,19 @@ import VisualisationView from './multi-sample-stepper/VisualisationView.vue';
 import useMultiSampleStore from '@/stores/MultiSampleStore';
 import InputSelectionView from './multi-sample-stepper/InputSelectionView.vue';
 import UploadView from './multi-sample-stepper/UploadView.vue';
+import { ref, watch } from 'vue';
+import FileFormat from './FileFormat';
 
 const { reset: resetMultiSampleStore } = useMultiSampleStore();
 const { reset: resetVisualisationStore } = useVisualisationStore();
 
+const fileFormat = ref<FileFormat>(FileFormat.PEPTIDE_LIST);
+
 resetMultiSampleStore();
 resetVisualisationStore();
+
+watch(() => fileFormat.value, (newVal: FileFormat) => {
+    resetMultiSampleStore();
+    resetVisualisationStore();
+});
 </script>

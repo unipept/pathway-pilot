@@ -1,9 +1,6 @@
 <template>
     <v-card flat>
-        <v-card-title>
-            Upload a list of peptides
-        </v-card-title>
-        <v-card-text>
+        <v-card-text class="pa-0">
             <p class="subtitle">
                 Provide a list of tryptic peptides by either pasting your sequences on the right or selecting a single <span>.txt</span> 
                 file. Each line of input will be interpreted as a single sequence and can't contain any special characters. Have a look 
@@ -28,15 +25,15 @@
                 label="Paste your peptide list here"
                 :example="example"
                 :loading="loading"
-                @submit="onSubmit"
+                @submit="e => $emit('submit', e)"
+                @reset="e => $emit('reset', e)"
             />
         </v-card-text>
     </v-card>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import PeptideForm from './PeptideForm.vue';
-import ResourceLink from '@/components/misc/ResourceLink.vue';
 
 import example from '../examples/PeptideListExample';
 
@@ -48,9 +45,5 @@ withDefaults(defineProps<Props>(), {
     loading: false,
 });
 
-const emits = defineEmits(["submit"]);
-
-const onSubmit = async (peptideList: string[], sampleName: string) => {
-    emits("submit", peptideList, sampleName);
-};
+defineEmits(["submit", "reset"]);
 </script>
