@@ -7,7 +7,7 @@ export default class MetaProteomeAnalyzerConverter {
     ) {}
 
     public async convert(mpaResult: string[]) {
-        const peptideList = mpaResult.map(s => s.split('\t')[3]);
+        const peptideList = mpaResult.map(s => s.split('\t')[2]);
 
         return await new PeptideListConverter(this.progressListener).convert(peptideList);
     }
