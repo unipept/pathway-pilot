@@ -19,14 +19,23 @@ import ErrorModal from '@/components/modals/ErrorModal.vue';
 import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 import FileFormat from '../FileFormat';
 
-import PeptideListForm from '@/components/forms/PeptideListForm.vue';
+import PeptideListForm from '@/components/forms/single-sample/PeptideListForm.vue';
 import PeptideShakerForm from '@/components/forms/single-sample/PeptideShakerForm.vue';
+import MaxQuantForm from '@/components/forms/single-sample/MaxQuantForm.vue';
+import ProteomeDiscovererForm from '@/components/forms/single-sample/ProteomeDiscovererForm.vue';
+import MetaProteomeAnalyzerForm from '@/components/forms/single-sample/MetaProteomeAnalyzerForm.vue';
 
 import PeptideListVerifier from '@/logic/verifiers/PeptideListVerifier';
 import PeptideShakerVerifier from '@/logic/verifiers/PeptideShakerVerifier';
+import MaxQuantVerifier from '@/logic/verifiers/MaxQuantVerifier';
+import ProteomeDiscovererVerifier from '@/logic/verifiers/ProteomeDiscovererVerifier';
+import MetaProteomeAnalyzerVerifier from '@/logic/verifiers/MetaProteomeAnalyzerVerifier';
 
 import PeptideListConverter from '@/logic/converters/PeptideListConverter';
 import PeptideShakerConverter from '@/logic/converters/PeptideShakerConverter';
+import MaxQuantConverter from '@/logic/converters/MaxQuantConverter';
+import ProteomeDiscovererConverter from '@/logic/converters/ProteomeDiscovererConverter';
+import MetaProteomeAnalyzerConverter from '@/logic/converters/MetaProteomeAnalyzerConverter';
 
 export interface Props {
     fileFormat: FileFormat;
@@ -52,6 +61,21 @@ const formatMap = new Map<FileFormat, { component: any, verifier: any, converter
         component: PeptideShakerForm, 
         verifier: new PeptideShakerVerifier(),
         converter: new PeptideShakerConverter({ onProgressUpdate: () => {} })
+    } ],
+    [ FileFormat.MAX_QUANT, {
+        component: MaxQuantForm, 
+        verifier: new MaxQuantVerifier(),
+        converter: new MaxQuantConverter({ onProgressUpdate: () => {} })
+    } ],
+    [ FileFormat.PROTEOME_DISCOVERER, { 
+        component: ProteomeDiscovererForm, 
+        verifier: new ProteomeDiscovererVerifier(),
+        converter: new ProteomeDiscovererConverter({ onProgressUpdate: () => {} })
+    } ],
+    [ FileFormat.META_PROTEOME_ANALYZER, { 
+        component: MetaProteomeAnalyzerForm, 
+        verifier: new MetaProteomeAnalyzerVerifier(),
+        converter: new MetaProteomeAnalyzerConverter({ onProgressUpdate: () => {} })
     } ],
 ]);
 

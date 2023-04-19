@@ -21,9 +21,15 @@ import FileFormat from '@/views/FileFormat';
 
 import PeptideListForm from '@/components/forms/multi-sample/PeptideListForm.vue';
 import PeptideShakerForm from '@/components/forms/multi-sample/PeptideShakerForm.vue';
+import MaxQuantForm from '@/components/forms/multi-sample/MaxQuantForm.vue';
+import ProteomeDiscovererForm from '@/components/forms/multi-sample/ProteomeDiscovererForm.vue';
+import MetaProteomeAnalyzerForm from '@/components/forms/multi-sample/MetaProteomeAnalyzerForm.vue';
 
 import PeptideListVerifier from '@/logic/verifiers/PeptideListVerifier';
 import PeptideShakerVerifier from '@/logic/verifiers/PeptideShakerVerifier';
+import MaxQuantVerifier from '@/logic/verifiers/MaxQuantVerifier';
+import ProteomeDiscovererVerifier from '@/logic/verifiers/ProteomeDiscovererVerifier';
+import MetaProteomeAnalyzerVerifier from '@/logic/verifiers/MetaProteomeAnalyzerVerifier';
 
 export interface Props {
     modelValue: boolean;
@@ -46,6 +52,18 @@ const formatMap = new Map<FileFormat, { component: any, verifier: any }>([
     [ FileFormat.PEPTIDE_SHAKER, { 
         component: PeptideShakerForm, 
         verifier: new PeptideShakerVerifier()
+    } ],
+    [ FileFormat.MAX_QUANT, { 
+        component: MaxQuantForm, 
+        verifier: new MaxQuantVerifier()
+    } ],
+    [ FileFormat.PROTEOME_DISCOVERER, { 
+        component: ProteomeDiscovererForm, 
+        verifier: new ProteomeDiscovererVerifier()
+    } ],
+    [ FileFormat.META_PROTEOME_ANALYZER, { 
+        component: MetaProteomeAnalyzerForm, 
+        verifier: new MetaProteomeAnalyzerVerifier()
     } ],
 ]);
 

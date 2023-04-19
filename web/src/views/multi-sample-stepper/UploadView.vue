@@ -31,13 +31,11 @@ import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import FileFormat from '../FileFormat';
 
-import PeptideListForm from '@/components/forms/multi-sample/PeptideListForm.vue'; // TODO: CHANGE
-
-import PeptideListVerifier from '@/logic/verifiers/PeptideListVerifier';
-import PeptideShakerVerifier from '@/logic/verifiers/PeptideShakerVerifier';
-
 import PeptideListConverter from '@/logic/converters/PeptideListConverter';
 import PeptideShakerConverter from '@/logic/converters/PeptideShakerConverter';
+import MaxQuantConverter from '@/logic/converters/MaxQuantConverter';
+import ProteomeDiscovererConverter from '@/logic/converters/ProteomeDiscovererConverter';
+import MetaProteomeAnalyzerConverter from '@/logic/converters/MetaProteomeAnalyzerConverter';
 
 export interface Props {
     fileFormat: FileFormat;
@@ -68,6 +66,9 @@ const processing = ref<boolean>(false);
 const formatMap = new Map<FileFormat, { converter: any }>([
     [ FileFormat.PEPTIDE_LIST, { converter: new PeptideListConverter({ onProgressUpdate: () => {} }) } ],
     [ FileFormat.PEPTIDE_SHAKER, { converter: new PeptideShakerConverter({ onProgressUpdate: () => {} }) } ],
+    [ FileFormat.MAX_QUANT, { converter: new MaxQuantConverter({ onProgressUpdate: () => {} }) } ],
+    [ FileFormat.PROTEOME_DISCOVERER, { converter: new ProteomeDiscovererConverter({ onProgressUpdate: () => {} }) } ],
+    [ FileFormat.META_PROTEOME_ANALYZER, { converter: new MetaProteomeAnalyzerConverter({ onProgressUpdate: () => {} }) } ],
 ]);
 
 const onSubmit = async (peptideList: string[], sampleName: string) => {
