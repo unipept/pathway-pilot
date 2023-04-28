@@ -31,11 +31,11 @@ import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import FileFormat from '../FileFormat';
 
-import PeptideListConverter from '@/logic/converters/PeptideListConverter';
-import PeptideShakerConverter from '@/logic/converters/PeptideShakerConverter';
-import MaxQuantConverter from '@/logic/converters/MaxQuantConverter';
-import ProteomeDiscovererConverter from '@/logic/converters/ProteomeDiscovererConverter';
-import MetaProteomeAnalyzerConverter from '@/logic/converters/MetaProteomeAnalyzerConverter';
+import PeptideListConverter from '@/logic/converters/peptide/PeptideListConverter';
+import PeptideShakerConverter from '@/logic/converters/peptide/PeptideShakerConverter';
+import MaxQuantConverter from '@/logic/converters/peptide/MaxQuantConverter';
+import ProteomeDiscovererConverter from '@/logic/converters/peptide/ProteomeDiscovererConverter';
+import MetaProteomeAnalyzerConverter from '@/logic/converters/peptide/MetaProteomeAnalyzerConverter';
 
 export interface Props {
     fileFormat: FileFormat;

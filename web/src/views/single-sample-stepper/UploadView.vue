@@ -31,11 +31,11 @@ import MaxQuantVerifier from '@/logic/verifiers/MaxQuantVerifier';
 import ProteomeDiscovererVerifier from '@/logic/verifiers/ProteomeDiscovererVerifier';
 import MetaProteomeAnalyzerVerifier from '@/logic/verifiers/MetaProteomeAnalyzerVerifier';
 
-import PeptideListConverter from '@/logic/converters/PeptideListConverter';
-import PeptideShakerConverter from '@/logic/converters/PeptideShakerConverter';
-import MaxQuantConverter from '@/logic/converters/MaxQuantConverter';
-import ProteomeDiscovererConverter from '@/logic/converters/ProteomeDiscovererConverter';
-import MetaProteomeAnalyzerConverter from '@/logic/converters/MetaProteomeAnalyzerConverter';
+import PeptideListConverter from '@/logic/converters/peptide/PeptideListConverter';
+import PeptideShakerConverter from '@/logic/converters/peptide/PeptideShakerConverter';
+import MaxQuantConverter from '@/logic/converters/peptide/MaxQuantConverter';
+import ProteomeDiscovererConverter from '@/logic/converters/peptide/ProteomeDiscovererConverter';
+import MetaProteomeAnalyzerConverter from '@/logic/converters/peptide/MetaProteomeAnalyzerConverter';
 
 export interface Props {
     fileFormat: FileFormat;

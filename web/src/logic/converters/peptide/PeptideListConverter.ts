@@ -1,5 +1,5 @@
-import KeggCommunicator from "../communicators/KeggCommunicator";
-import UnipeptCommunicator from "../communicators/UnipeptCommunicator";
+import KeggCommunicator from "../../communicators/KeggCommunicator";
+import UnipeptCommunicator from "../../communicators/UnipeptCommunicator";
 import ProgressListener from "./ProgressListener";
 
 export default class PeptideListConverter {
