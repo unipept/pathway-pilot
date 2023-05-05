@@ -1,92 +1,63 @@
 <template>
-    <div class="mt-5">
-        <v-card elevation="10">
-            <v-card-text>
-                <v-select
-                    v-model="inputFormat"
-                    label="Select your input format"
-                    density="comfortable"
-                    :items="inputFormats"
-                />
+    <v-text-field
+        class="mt-3 mb-n3"
+        v-model="search"
+        label="Search for an identifier or name"
+        prepend-inner-icon="mdi-magnify"
+        variant="solo"
+        density="comfortable"
+    />
 
-                <h1 class="mb-3">Upload your samples</h1>
-                <sample-table 
-                    :items="tableItems"
-                    @add="addModalOpen = true"
-                    @remove="onRemove"
-                />
-            </v-card-text>
-        </v-card>
-
-        <add-sample-modal 
-            v-model="addModalOpen" 
-            @submit="onSubmit"
-        />
-
-        <delete-sample-modal 
-            v-model="deleteModalOpen" 
-            :index="deleteModalIndex" 
-            :name="deleteModalName"
-            @remove="onRemoveConfirmed"
-        />
-    </div>
+    <treeview 
+        :name="test.name" 
+        :children="test.children" 
+        :lines="[]"
+        size="default"
+        expanded
+    />
 </template>
 
 <script lang="ts" setup>
-import AddSampleModal from '@/components/modals/multi-sample/AddSampleModal.vue';
-import DeleteSampleModal from '@/components/modals/multi-sample/DeleteSampleModal.vue';
-import SampleTable from '@/components/tables/multi-sample/SampleTable.vue';
-import PeptideListConverter from '@/logic/converters/PeptideListConverter';
-import useMultiSampleStore from '@/stores/MultiSampleStore';
-import { storeToRefs } from 'pinia';
-import { ref, computed } from 'vue';
+import Treeview from '@/components/visualisations/Treeview.vue';
+import { ref } from 'vue';
 
-const sampleStore = useMultiSampleStore();
+const search = ref<string>("");
 
-const { samples } = storeToRefs(sampleStore);
-
-const tableItems = computed(() => 
-    samples.value.map(sample => ({
-        name: sample.name,
-        size: `${sample.size} peptides`,
-        loading: !sample.initialized,
-    }))
-)
-
-const inputFormats = ["Peptide list", "MaxQuant", "ProteomeDiscoverer", "PepShaker"]
-
-const inputFormat = ref<string>();
-
-const addModalOpen = ref<boolean>(false);
-
-const deleteModalOpen = ref<boolean>(false);
-const deleteModalIndex = ref<number>(-1);
-const deleteModalName = ref<string>("");
-
-const onRemove = (index: number, name: string) => {
-    deleteModalIndex.value = index;
-    deleteModalName.value = name;
-    deleteModalOpen.value = true;
-};
-
-const onRemoveConfirmed = () => {
-    sampleStore.removeSample(deleteModalIndex.value);
-};
-
-const processing = ref<boolean>(false);
-
-const onSubmit = async (peptideList: string[], sampleName: string) => {
-    processing.value = true;
-
-    const sample = sampleStore.addSample(sampleName);
-    sampleStore.initializeSample(
-        sample, 
-        await new PeptideListConverter({
-            onProgressUpdate: () => { },
-        }).convert(peptideList),
-        peptideList
-    );
-
-    processing.value = false;
-};
+const test = {
+    name: "Pathway maps",
+    children: [
+        { name: "Metabolism", children: [
+            { name: "Global and overview maps", children: [
+                { name: "Metabolic pathways", children: [] },
+                { name: "Biosynthesis of secondary metabolites", children: [] },
+                { name: "Microbial metabolism in diverse environments", children: [] },
+                { name: "Carbon metabolism", children: [] },
+                { name: "2-Oxocarboxylic acid metabolism", children: [] },
+                { name: "Fatty acid metabolism", children: [] },
+                { name: "Biosynthesis of amino acids", children: [] },
+                { name: "Nucleotide metabolism", children: [] },
+                { name: "Biosynthesis of nucleotide sugars", children: [] },
+                { name: "Biosynthesis of cofactors", children: [] },
+                { name: "Degradation of aromatic compounds", children: [] }
+            ]},
+            { name: "Carbohydrate metabolism", children: [
+                { name: "Glycolysis / Gluconeogenesis", children: [] },
+                { name: "Citrate cycle (TCA cycle)", children: [] },
+                { name: "Pentose phosphate pathway", children: [] },
+                { name: "Pentose and glucuronate interconversions", children: [] },
+                { name: "Fructose and mannose metabolism", children: [] },
+                { name: "Galactose metabolism", children: [] },
+                { name: "Ascorbate and aldarate metabolism", children: [] },
+                { name: "Starch and sucrose metabolism", children: [] },
+                { name: "Amino sugar and nucleotide sugar metabolism", children: [] },
+                { name: "Pyruvate metabolism", children: [] },
+                { name: "Glyoxylate and dicarboxylate metabolism", children: [] },
+                { name: "Propanoate metabolism", children: [] },
+                { name: "Butanoate metabolism", children: [] },
+                { name: "C5-Branched dibasic acid metabolism", children: [] },
+                { name: "Inositol phosphate metabolism", children: [] },
+            ]}
+        ]}
+    ]
+}
 </script>
