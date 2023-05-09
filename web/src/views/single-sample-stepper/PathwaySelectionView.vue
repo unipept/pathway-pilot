@@ -87,6 +87,8 @@ const pathwayItems = computed(() => [...pathways.value.values()!]
     .map((pathway: Pathway) => ({
             id: pathway.id,
             name: pathwayMapping.value.get(pathway.id)?.name ?? "",
+            category: pathwayMapping.value.get(pathway.id)?.category ?? "",
+            subCategory: pathwayMapping.value.get(pathway.id)?.subCategory ?? "",
             count: mappingStore.pathwaysToPeptideCounts.get(pathway.id)!
         })
     )
@@ -98,7 +100,6 @@ const onBubblePlotClick = (pathway: Pathway) => {
 };
 
 watch(selectedPathway, (pathway: Pathway | undefined) => {
-    pathwaySearch.value = "";
     visualisationStore.setPathway(pathway);
     visualisationStore.setHighlightedTaxa([]);
 });

@@ -7,7 +7,8 @@ import Pathway from "@/logic/entities/Pathway";
 import * as d3 from "d3";
 import { onMounted, ref, watch } from 'vue';
 
-import { DataItem, pathwayToCategory, pathwayGroups } from "./BubblePlotInfo";
+import { DataItem } from "./BubblePlotInfo";
+import { groupColors, pathwayGroups } from "@/types/PathwayGroup";
 
 export interface Props {
     modelValue: Pathway | undefined;
@@ -27,14 +28,15 @@ const legendRadius = 10;
 const lineSize = 20;
 const forceStrength = 0.03;
 
-const groupColors = pathwayGroups.map((group, i) => {
-    return d3.hsl(1.9 + i * 360 / pathwayGroups.length, 0.721, 0.747);
-});
-groupColors[groupColors.length - 1] = d3.hsl(0, 0, 0.5);
-
 const data: DataItem[] = [];
 for (const [pathway, count] of props.pathwayToCounts) {
-    const category = pathwayToCategory.get(pathway) ?? "Others";
+    let category = props.pathwayToName.get(pathway)?.category;
+    if (category === "Metabolism") {
+        category = props.pathwayToName.get(pathway).subCategory;
+    } else {
+        category = "Others";
+    }
+
     data.push({
         'id': pathway,
         'name': props.pathwayToName.get(pathway)?.name ?? "",
