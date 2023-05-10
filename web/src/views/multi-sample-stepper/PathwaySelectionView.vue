@@ -22,9 +22,8 @@
 
             <v-col cols=7>
                 <bubble-plot 
-                    v-model="selectedPathway" 
-                    :pathway-to-counts="pathwaysToPeptideCounts"
-                    :pathway-to-name="pathwayMapping"
+                    v-model="selectedPathway"
+                    :items="pathwayItems"
                     @update:model-value="onBubblePlotClick"    
                 />
             </v-col>
@@ -87,20 +86,19 @@ const sampleStore = useMultiSampleStore();
 const keggStore = useKeggStore();
 const visualisationStore = useVisualisationStore();
 
-const { initialized, pathways, pathwaysToPeptideCounts } = storeToRefs(sampleStore);
+const { initialized, pathways, filtered, filteredPathways, pathwaysToPeptideCounts } = storeToRefs(sampleStore);
 const { pathway: selectedPathway } = storeToRefs(visualisationStore);
 const { pathwayMapping } = storeToRefs(keggStore);
 
 const pathwaySearch = ref<string>("");
 
-const pathwayItems = computed(() => [...pathways.value.values()!]
-    .filter((pathway: Pathway) => pathway.id)
-    .map((pathway: Pathway) => ({
-            id: pathway.id,
-            name: pathwayMapping.value.get(pathway.id)?.name ?? "",
-            category: pathwayMapping.value.get(pathway.id)?.category ?? "",
-            subCategory: pathwayMapping.value.get(pathway.id)?.subCategory ?? "",
-            count: pathwaysToPeptideCounts.value.get(pathway.id) ?? 0,
+const pathwayItems = computed(() => [ ... (filtered.value ? filteredPathways.value : pathways.value) ]
+    .map((pathway: string) => ({
+            id: pathway,
+            name: pathwayMapping.value.get(pathway)?.name ?? "",
+            category: pathwayMapping.value.get(pathway)?.category ?? "",
+            subCategory: pathwayMapping.value.get(pathway)?.subCategory ?? "",
+            count: pathwaysToPeptideCounts.value.get(pathway) ?? 0,
         })
     )
 );

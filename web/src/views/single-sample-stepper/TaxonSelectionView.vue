@@ -43,7 +43,7 @@ import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 
-const mappingStore = useSingleSampleStore('single-sample');
+const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
 const { pathwaysToTaxa, taxaTree } = storeToRefs(mappingStore);
@@ -57,7 +57,8 @@ const taxaItems = computed(() => {
     }
 
     return [...pathwaysToTaxa.value.get(selectedPathway.value.id) ?? []]
-        .filter((taxon: Taxon) => taxon.id !== 1)
+        .filter((taxon: number) => taxon !== 1)
+        .map((taxon: number) => mappingStore.taxa.get(taxon)!)
         .map((taxon: Taxon) => ({
                 id: taxon.id,
                 name: taxon.name,

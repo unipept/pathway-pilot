@@ -45,7 +45,7 @@ const props = defineProps<Props>();
 
 defineEmits(['submit']);
 
-const sampleStore = useSingleSampleStore('single-sample');
+const sampleStore = useSingleSampleStore();
 
 const processing = ref<boolean>(false);
 

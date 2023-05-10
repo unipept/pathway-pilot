@@ -78,7 +78,7 @@ import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import Pathway from '@/logic/entities/Pathway';
 
-const mappingStore = useSingleSampleStore('single-sample');
+const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
 const image = ref<HTMLElement | null>(null);
@@ -139,7 +139,7 @@ const colorHighlighted = (areas: any[]) => {
         area.colors = [];
 
         for (const taxon of highlightedTaxa.value) {
-            const taxonEcs = [...mappingStore.taxaToEcs.get(taxon.id) ?? []].map(e => e.id);
+            const taxonEcs = [...mappingStore.taxaToEcs.get(taxon.id) ?? []];
 
             for (const ecNumber of area.info.ecNumbers) {
                 if (taxonEcs.includes(ecNumber.id)) {

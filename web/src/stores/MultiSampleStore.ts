@@ -14,6 +14,10 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
         return samples.value.length > 0 && samples.value.some(sample => sample.initialized);
     });
 
+    const filtered = computed(() => {
+        return samples.value.length > 0 && samples.value.some(sample => sample.filtered);
+    });
+
     const addSample = (sampleName: string) => {
         samples.value.push(useSingleSampleStore(`multiSampleStore_sample${_counter++}`, sampleName));
         return samples.value.length - 1;
@@ -38,10 +42,20 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
     }
 
     const pathways = computed(() => {
-        const pathways = new Map<string, Pathway>();
+        const pathways = new Set<string>();
 
         samples.value.forEach(sample =>
-            sample.pathways.forEach((pathway: Pathway) => pathways.set(pathway.id, pathway))
+            sample.pathways.forEach((pathway: string) => pathways.add(pathway))
+        );
+
+        return pathways;
+    });
+
+    const filteredPathways = computed(() => {
+        const pathways = new Set<string>();
+
+        samples.value.forEach(sample =>
+            sample.filteredPathways.forEach((pathway: string) => pathways.add(pathway))
         );
 
         return pathways;
@@ -66,12 +80,14 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
     return {
         samples,
         initialized,
+        filtered,
         addSample,
         initializeSample,
         resetSample,
         removeSample,
         reset,
         pathways,
+        filteredPathways,
         pathwaysToPeptideCounts
     };
 });
