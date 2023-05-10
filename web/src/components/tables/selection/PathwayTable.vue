@@ -50,12 +50,17 @@
         </template>
 
         <template #bottom>
-            <v-pagination
-                v-model="page"
-                :length="pageOptions.pageCount"
-                :total-visible="7"
-                density="comfortable"
-            ></v-pagination>
+            <div style="position: relative;">
+                <v-pagination
+                    v-model="page"
+                    :length="pageOptions.pageCount"
+                    :total-visible="7"
+                    density="comfortable"
+                ></v-pagination>
+                <div style="position: absolute; right: 0; top: 5px;">
+                    <slot name="download"></slot>
+                </div>
+            </div>
         </template>
     </v-data-table>
 </template>
