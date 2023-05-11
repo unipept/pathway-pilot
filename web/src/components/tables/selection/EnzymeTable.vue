@@ -1,12 +1,14 @@
 <template>
-    <v-data-table-virtual
+    <v-data-table
         :headers="headers"
         :items="items"
         :search="search"
+        :page="page"
         :filter-keys="['name', 'description']"
-        height="300"
+        items-per-page="5"
         density="compact"
         @click:row="onRowClicked"
+        @update:options="pageOptions = $event"
     >
         <template #item.checkbox="{ item }">
             <div v-if="rowActive(item)" class="active">
@@ -30,7 +32,16 @@
                 {{ item.raw.description }}
             </div>
         </template>
-    </v-data-table-virtual>
+
+        <template #bottom>
+            <v-pagination
+                v-model="page"
+                :length="pageOptions.pageCount"
+                :total-visible="3"
+                density="compact"
+            ></v-pagination>
+        </template>
+    </v-data-table>
 </template>
 
 <script setup lang="ts">
@@ -46,6 +57,11 @@ export interface Props {
 const props = defineProps<Props>();
 
 const emits = defineEmits(["update:model-value"]);
+
+const page = ref(1);
+const pageOptions = ref({
+    pageCount: 1
+});
 
 const selected = ref<string[]>([]);
 

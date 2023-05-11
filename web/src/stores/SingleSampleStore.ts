@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia';
 
 import Taxon from "@/logic/entities/Taxon";
-import EcNumber from "@/logic/entities/EcNumber";
-import Pathway from "@/logic/entities/Pathway";
 import { reactive, ref } from 'vue';
 
 const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
