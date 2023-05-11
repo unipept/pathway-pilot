@@ -3,7 +3,6 @@
 
 import fs from 'fs';
 import axios from "axios"
-import path from 'path';
 import config from '../config/config';
 
 export default class KeggFetcher {
