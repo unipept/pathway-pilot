@@ -4,26 +4,29 @@
     >
         <div 
             class="d-flex"
-            @click="onClick"
         >
-            <div class="d-flex" v-if="level > 0">
+            <div v-if="level > 0" class="d-flex">
                 <div v-for="line in lines">
                     <line-icon :size="size" v-if="line" />
                     <empty-icon :size="size" v-else />
                 </div>
 
                 <corner-icon :size="size" v-if="last" />
-                <cross-t-icon :size="size" v-if="!last" />
 
-                <!--<treeview-checkbox v-if="!hasChildren"
-                    :size="size"  
-                />-->
+                <cross-t-icon v-if="!last" :size="size" />
+                <flat-line-icon v-if="selectable && !hasChildren" :size="size" />
             </div>
             
-            <close-icon style="cursor: pointer;" :size="size" v-if="hasChildren && isExpanded" />
-            <open-icon style="cursor: pointer;" :size="size" v-else-if="hasChildren && !isExpanded" />
+            <close-icon v-if="hasChildren && isExpanded" style="cursor: pointer;" :size="size" @click="onClick" />
+            <open-icon v-else-if="hasChildren && !isExpanded" style="cursor: pointer;" :size="size" @click="onClick" />
 
-            <div class="text" :class="size">
+            <treeview-checkbox
+                v-if="selectable"
+                :size="size"  
+                @click=""
+            />
+
+            <div class="text" :class="size" @click="onClick">
                 {{ name }}
             </div>
         </div>
@@ -36,6 +39,7 @@
                 :size="size"
                 :first="i === 0"
                 :last="i === amountOfChildren - 1"
+                :selectable="selectable"
             />
         </div>
     </div>
@@ -46,6 +50,7 @@ import { computed, ref } from 'vue';
 
 import CornerIcon from '@/components/icons/treeview/CornerIcon.vue';
 import CrossTIcon from '../icons/treeview/CrossTIcon.vue';
+import FlatLineIcon from '../icons/treeview/FlatLineIcon.vue';
 import LineIcon from '../icons/treeview/LineIcon.vue';
 import EmptyIcon from '../icons/treeview/EmptyIcon.vue';
 import CloseIcon from '../icons/treeview/CloseIcon.vue';
@@ -62,6 +67,7 @@ export interface Props {
     level?: number
     expanded?: boolean
     size?: IconSize
+    selectable?: boolean
 
     first?: boolean
     last?: boolean
@@ -71,6 +77,7 @@ const props = withDefaults(defineProps<Props>(), {
     level: 0,
     expanded: false,
     size: 'default',
+    selectable: false,
 
     first: false,
     last: false

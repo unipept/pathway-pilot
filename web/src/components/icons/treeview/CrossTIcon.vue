@@ -8,8 +8,7 @@
                 <g transform="matrix(1,0,0,1,-2.27374e-13,472.441)">
                     <path d="M1653.54,472.441L1653.54,944.882" style="fill:none;stroke:black;stroke-width:41.67px;" />
                 </g>
-                <path d="M1653.54,944.882L2125.98,944.882" style="fill:none;stroke:black;stroke-width:41.67px;" />
-                <rect x="1181.1" y="472.441" width="944.882" height="944.882" style="fill:none;" />
+                <path d="M1653.54,944.882L2300.98,944.882" style="fill:none;stroke:black;stroke-width:41.67px;" />
             </g>
         </svg>
     </div>

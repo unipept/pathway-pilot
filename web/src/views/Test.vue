@@ -14,6 +14,7 @@
         :lines="[]"
         size="default"
         expanded
+        selectable
     />
 </template>
 
