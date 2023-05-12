@@ -7,7 +7,7 @@
                     By default we will highlight all nodes with a match between the selected pathway and your input data. By selecting <b>a maximum of 4</b> taxa, we can narrow 
                     this down to only highlight nodes that are associated with the selected pathway and taxa.
                 </p>
-                <div class="d-flex" v-if="taxaItems.length > 0">
+                <div class="d-flex">
                     <v-text-field 
                         class="mt-3 mb-n3"
                         v-model="taxaSearch"
@@ -19,11 +19,15 @@
                     <v-label v-if="selectedTaxa.length === 0" class="px-5">No taxa selected</v-label>
                     <v-label v-else class="px-5">{{ selectedTaxa.length }} out of 4 taxa selected</v-label>
                 </div>
-                <taxon-table v-if="taxaItems.length > 0"
-                    v-model="selectedTaxa"
-                    :items="taxaItems"
-                    :search="taxaSearch"
-                    :max=4
+                <treeview v-if="taxaTree"
+                    :taxon="taxaTree"
+                    :lines="[]"
+                    size="default"
+                    expanded
+                    selectable
+                    :selected="selectedTaxa.length"
+                    @add="onAdd"
+                    @remove="onRemove"
                 />
                 <warning-alert v-else class="mt-3">
                     It seems like all matches for this pathway point back to the taxonomic root. As a result, you will not be able 
@@ -36,12 +40,12 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
-import TaxonTable from '@/components/tables/selection/TaxonTable.vue';
 import Taxon from '@/logic/entities/Taxon';
 import useSingleSampleStore from '@/stores/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
+import Treeview from '@/components/visualisations/Treeview.vue';
 
 const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
@@ -51,30 +55,17 @@ const { pathway: selectedPathway, highlightedTaxa: selectedTaxa } = storeToRefs(
 
 const taxaSearch = ref<string>("");
 
-const taxaItems = computed(() => {
-    if (!selectedPathway.value) {
-        return [];
-    }
+const onAdd = (taxon: Taxon) => {
+    selectedTaxa.value = [...selectedTaxa.value, taxon];
+};
 
-    return [...pathwaysToTaxa.value.get(selectedPathway.value.id) ?? []]
-        .filter((taxon: number) => taxon !== 1)
-        .map((taxon: number) => mappingStore.taxa.get(taxon)!)
-        .map((taxon: Taxon) => ({
-                id: taxon.id,
-                name: taxon.name,
-                rank: taxon.rank,
-                count: 0
-            })
-        );
-});
+const onRemove = (taxon: Taxon) => {
+    selectedTaxa.value = selectedTaxa.value.filter((v) => v.id !== taxon.id);
+};
 
 watch(() => selectedPathway.value, () => {
     taxaSearch.value = "";
     visualisationStore.setHighlightedTaxa([]);
-});
-
-watch(() => taxaTree.value, () => {
-    console.log(taxaTree.value)
 });
 </script>
 

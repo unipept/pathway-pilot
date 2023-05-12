@@ -78,8 +78,11 @@ import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import BubblePlot from '@/components/visualisations/BubblePlot.vue';
 import { useCsvDownloader } from '@/composables/useCsvDownloader';
+import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
+import { useTaxonomyTree } from '@/composables/useTaxonomyTree';
 
 const { downloadCsv } = useCsvDownloader();
+const { fetchTaxonomyTree } = useTaxonomyTree();
 
 const mappingStore = useSingleSampleStore();
 const keggStore = useKeggStore();
@@ -116,9 +119,15 @@ const onDownload = () => {
     downloadCsv(csvData, "pathway-table.csv", csvHeader);
 };
 
-watch(selectedPathway, (pathway: Pathway | undefined) => {
+watch(selectedPathway, async (pathway: Pathway | undefined) => {
     visualisationStore.setPathway(pathway);
     visualisationStore.setHighlightedTaxa([]);
+
+    if (pathway) {
+        const tree = await fetchTaxonomyTree(Array.from(mappingStore.pathwaysToTaxa.get(pathway?.id)!), true);
+
+        mappingStore.setTree(tree);
+    }
 });
 
 onMounted(async () => {

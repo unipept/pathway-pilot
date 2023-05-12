@@ -1,5 +1,10 @@
 <template>
-    <check-box-icon v-if="!ticked" :size="size" @click="onClick" />
+    <check-box-icon v-if="!ticked" 
+        :size="size" 
+        :fill="disabled ? '#f7f7f7' : 'none'"
+        :stroke="disabled ? '#7d7d7d' : 'black'"
+        @click="onClick"
+    />
     <check-box-ticked-icon v-else :size="size" @click="onClick" />
 </template>
 
@@ -11,13 +16,14 @@ import CheckBoxTickedIcon from '@/components/icons/treeview/CheckBoxTickedIcon.v
 export type IconSize = 'x-small' | 'small' | 'default' | 'large' | 'x-large';
 
 export interface Props {
-    modelValue: boolean,
+    modelValue: boolean
     size?: IconSize
+    disabled?: boolean
 };
 
 const props = withDefaults(defineProps<Props>(), {
-    modelValue: false,
-    size: 'default'
+    size: 'default',
+    disabled: false
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -25,7 +31,12 @@ const emit = defineEmits(['update:modelValue']);
 const ticked = ref<boolean>(props.modelValue);
 
 const onClick = () => {
-    ticked.value = !ticked.value;
-    emit('update:modelValue', ticked.value);
+    if (ticked.value) {
+        ticked.value = !ticked.value;
+        emit('update:modelValue', ticked.value);
+    } else if(!props.disabled) {
+        ticked.value = !ticked.value;
+        emit('update:modelValue', ticked.value);
+    }
 };
 </script>
