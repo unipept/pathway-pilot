@@ -21,17 +21,18 @@ export function useTaxonomyTree() {
         }
 
         if (taxa.includes(tree.id)) {
-            tree.included = tree.id !== 1;
+            tree.highlighted = tree.id !== 1;
             tree.children = updatedChildren;
+            tree.nameExtra = tree.rank;
             return [ tree ];
         } else {
-            tree.included = false;
+            tree.highlighted = false;
             return updatedChildren;
         }
     }
 
     const filterRankTree = (tree: any, taxa: number[]) => {
-        tree.included = taxa.includes(tree.id) && tree.id !== 1;
+        tree.highlighted = taxa.includes(tree.id) && tree.id !== 1;
 
         const updatedChildren: any[] = [];
         for (const child of tree.children) {
@@ -40,6 +41,7 @@ export function useTaxonomyTree() {
 
         if (RANKS.includes(tree.rank)) {
             tree.children = updatedChildren;
+            tree.nameExtra = tree.rank;
             return [ tree ];
         } else {
             return updatedChildren;

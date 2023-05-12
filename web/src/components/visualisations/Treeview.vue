@@ -1,29 +1,33 @@
 <template>
-    <div 
-        class="d-flex flex-column" 
-    >
-        <div 
-            class="d-flex"
-        >
-            <div v-if="level > 0" class="d-flex">
+    <div class="d-flex flex-column">
+        <div class="d-flex">
+            <div v-if="depth > 0" class="d-flex">
                 <div v-for="line in lines">
-                    <line-icon :size="size" v-if="line" />
-                    <empty-icon :size="size" v-else />
+                    <line-icon  v-if="line" :size="size" />
+                    <empty-icon v-else      :size="size" />
                 </div>
 
-                <corner-icon :size="size" v-if="last" />
+                <corner-icon v-if="last" :size="size" />
 
-                <cross-t-icon v-if="!last" :size="size" />
+                <cross-t-icon   v-if="!last"                      :size="size" />
                 <flat-line-icon v-if="selectable && !hasChildren" :size="size" />
             </div>
             
-            <close-icon v-if="hasChildren && isExpanded" style="cursor: pointer;" :size="size" @click="onClick" />
-            <open-icon v-else-if="hasChildren && !isExpanded" style="cursor: pointer;" :size="size" @click="onClick" />
+            <close-icon v-if="hasChildren && isExpanded" 
+                style="cursor: pointer;" 
+                :size="size"
+                @click="onClick" 
+            />
+            <open-icon v-else-if="hasChildren && !isExpanded" 
+                style="cursor: pointer;" 
+                :size="size" 
+                @click="onClick"
+            />
 
-            <treeview-checkbox v-if="selectable && level > 0"
+            <treeview-checkbox v-if="selectable && depth > 0"
                 v-model="itemSelected"
                 :size="size"
-                :disabled="selected >= maxSelected"
+                :disabled="amountSelected >= maxSelected"
                 @update:modelValue="onSelect"
             />
 
@@ -31,27 +35,27 @@
                 class="text" 
                 :class="size"
                 :style="{
-                    'font-weight': taxon.included ? 'bold' : 'normal',
-                    'color': selected >= maxSelected && !itemSelected ? '#7d7d7d' : 'black'
+                    'font-weight': node.highlighted ? 'bold' : 'normal',
+                    'color': amountSelected >= maxSelected && !itemSelected ? '#7d7d7d' : 'black'
                 }"
                 @click="onClick"
             >
-                {{ taxon.name }} ({{ taxon.rank }})
+                {{ node.name }} ({{ node.nameExtra }})
             </div>
         </div>
+
         <div v-if="isExpanded">
-            <treeview v-for="child, i in taxon.children"
-                :taxon="child"
-                :lines="level > 0 ? [ ...lines, !last ] : lines"
-                :level="level + 1"
+            <treeview v-for="child, i in node.children"
+                :node="child"
+                :lines="depth > 0 ? [ ...lines, !last ] : lines"
+                :depth="depth + 1"
+                :expanded="isExpanded"
                 :size="size"
                 :first="i === 0"
                 :last="i === amountOfChildren - 1"
-                :selectable="selectable"
-                :selected="selected"
-                :expanded="isExpanded"
-                @add="$emit('add', $event)"
-                @remove="$emit('remove', $event)"
+                :amountSelected="amountSelected"
+                :maxSelected="maxSelected"
+                @toggle-node="$emit('toggle-node', $event)"
             />
         </div>
     </div>
@@ -68,60 +72,57 @@ import EmptyIcon from '../icons/treeview/EmptyIcon.vue';
 import CloseIcon from '../icons/treeview/CloseIcon.vue';
 import OpenIcon from '../icons/treeview/OpenIcon.vue';
 import TreeviewCheckbox from '../inputs/TreeviewCheckbox.vue';
-import Taxon from '@/logic/entities/Taxon';
-
-export type IconSize = 'x-small' | 'small' | 'default' | 'large' | 'x-large';
+import { TreeviewItem } from './TreeviewItem';
+import Size from '@/types/Size';
 
 export interface Props {
-    taxon: any
-    lines: boolean[]
+    node: TreeviewItem
+    lines?: boolean[]
 
-    level?: number
+    depth?: number
     expanded?: boolean
-    size?: IconSize
-    selectable?: boolean
-
-    selected?: number
-    maxSelected?: number
-
+    size?: Size
     first?: boolean
     last?: boolean
+
+    amountSelected?: number
+    maxSelected?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    level: 0,
+    lines: () => [],
+
+    depth: 0,
     expanded: false,
     size: 'default',
-    selectable: false,
-
-    selected: 0,
-    maxSelected: 4,
-
     first: false,
-    last: false
+    last: false,
+
+    amountSelected: 0,
+    maxSelected: 0
 });
 
-const emits = defineEmits(['add', 'remove']);
+const emits = defineEmits(['toggle-node']);
 
 const isExpanded = ref<boolean>(props.expanded);
 const itemSelected = ref<boolean>(false);
 
-const amountOfChildren = computed(() => props.taxon.children.length)
+const selectable = computed(() => props.maxSelected > 0);
+
+const amountOfChildren = computed(() => props.node.children.length)
 
 const hasChildren = computed(() => amountOfChildren.value > 0);
 
-const onSelect = (selected: boolean) => {
-    emits(selected ? "add" : "remove", new Taxon(props.taxon.id, props.taxon.name, props.taxon.rank));
+const onSelect = () => {
+    emits('toggle-node', props.node);
 };
 
 const onClick = () => {
-    if (amountOfChildren.value > 0) {
-        isExpanded.value = !isExpanded.value;
-    }
+    isExpanded.value = !isExpanded.value;
 }
 </script>
 
-<style>
+<style scoped>
 .text {
     padding-left: 4px;
 }

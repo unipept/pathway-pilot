@@ -12,12 +12,11 @@
 import { ref } from 'vue';
 import CheckBoxIcon from '@/components/icons/treeview/CheckBoxIcon.vue';
 import CheckBoxTickedIcon from '@/components/icons/treeview/CheckBoxTickedIcon.vue';
-
-export type IconSize = 'x-small' | 'small' | 'default' | 'large' | 'x-large';
+import Size from '@/types/Size';
 
 export interface Props {
     modelValue: boolean
-    size?: IconSize
+    size?: Size
     disabled?: boolean
 };
 

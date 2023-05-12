@@ -12,11 +12,11 @@
 </template>
 
 <script setup lang="ts">
-export type IconSize = 'x-small' | 'small' | 'default' | 'large' | 'x-large';
+import Size from '@/types/Size';
 
 export interface Props {
     color?: string
-    size?: IconSize
+    size?: Size
 };
 
 withDefaults(defineProps<Props>(), {
@@ -25,34 +25,6 @@ withDefaults(defineProps<Props>(), {
 });
 </script>
 
-<style scoped>
-    .icon {
-        display: flex;
-    }
-
-    .icon.x-small {
-        width: 1em !important;
-        height: 1em !important;
-    }
-
-    .icon.small {
-        width: 1.25em !important;
-        height: 1.25em !important;
-    }
-
-    .icon.default {
-        width: 1.5em !important;
-        height: 1.5em !important;
-    }
-
-    .icon.large {
-        width: 1.75em !important;
-        height: 1.75em !important;
-    }
-
-    .icon.x-large {
-        width: 2em !important;
-        height: 2em !important;
-    }
+<style scoped lang="scss">
+@import '@/styles/icons.scss';
 </style>
-
