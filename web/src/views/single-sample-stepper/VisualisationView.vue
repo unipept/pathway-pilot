@@ -77,9 +77,15 @@ import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import Pathway from '@/logic/entities/Pathway';
+import { useMapAnnotator } from '@/composables/useMapAnnotator';
+import Taxon from '@/logic/entities/Taxon';
 
 const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
+
+const { colorAllTaxa, colorHighlightedTaxa } = useMapAnnotator(
+    mappingStore.ecs, mappingStore.taxaToEcs, mappingStore.children
+);
 
 const image = ref<HTMLElement | null>(null);
 
@@ -99,70 +105,17 @@ const { pathway, highlightedTaxa } = storeToRefs(visualisationStore);
 
 const legendItems = computed(() => highlightedTaxa.value.map(taxon => ({
         label: taxon.name,
-        color: computeTaxonColor(taxon.id)
+        color: ColorConstants.LEGEND[visualisationStore.highlightedTaxa.map(t => t.id).indexOf(taxon.id)]
     }))
 );
 
 const coloredAreas = computed(() => {
     if (highlightedTaxa.value.length === 0) {
-        return colorAll(areas.value);
+        return colorAllTaxa(areas.value);
     } else {
-        return colorHighlighted(areas.value);
+        return colorHighlightedTaxa(areas.value, highlightedTaxa.value.map((t: Taxon) => t.id));
     }
 });
-
-// TODO: move coloring to a different file
-const colorAll = (areas: any[]) => {
-    return areas.map(area => {
-        area.colors = [];
-        for (const ecNumber of area.info.ecNumbers) {
-            if (mappingStore.ecs.has(ecNumber.id)) {
-                area.colors = [ColorConstants.LEGEND[0]];
-                break;
-            }
-        }
-
-        return area;
-    });
-};
-
-const colorHighlighted = (areas: any[]) => {
-    const ancestors = new Map<number, number[]>();
-    for (const taxon of highlightedTaxa.value) {
-        ancestors.set(taxon.id, mappingStore
-            .ancestors(taxon.id)
-            .filter(i => highlightedTaxa.value.map(t => t.id).includes(i))
-        );
-    }
-
-    return areas.map(area => {
-        area.colors = [];
-
-        for (const taxon of highlightedTaxa.value) {
-            const taxonEcs = [...mappingStore.taxaToEcs.get(taxon.id) ?? []];
-
-            for (const ecNumber of area.info.ecNumbers) {
-                if (taxonEcs.includes(ecNumber.id)) {
-                    if (!area.colors.includes(computeTaxonColor(taxon.id))) {
-                        area.colors.push(computeTaxonColor(taxon.id));
-                    }
-
-                    for (const ancestor of ancestors.get(taxon.id) ?? []) {
-                        if (!area.colors.includes(computeTaxonColor(ancestor))) {
-                            area.colors.push(computeTaxonColor(ancestor));
-                        }
-                    }
-
-                    break;
-                }
-            }
-        }
-
-        area.colors.sort();
-
-        return area;
-    });
-};
 
 const onResize = (event: any) => {
     if (event.width && event.width !== 0) {
@@ -179,10 +132,6 @@ const onClickArea = (area: any) => {
 const onClickCompound = (compound: any) => {
     selectedCompound.value = compound.info.compounds[0].id;
     compoundModalOpen.value = true;
-}
-
-const computeTaxonColor = (taxonId: number) => {
-    return ColorConstants.LEGEND[visualisationStore.highlightedTaxa.map(t => t.id).indexOf(taxonId)];
 }
 
 const onDownload = async () => {

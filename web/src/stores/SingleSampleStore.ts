@@ -89,38 +89,36 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         taxaTree.value = tree;
     }
 
-    const ancestors = (taxonId: number) => {
-        const visited   = new Set<number>();
+    const children = (taxonId: number) => {
+        const collectChildren = (root: any) => {
+            const children = [];
 
-        const recursive = (current: any, ancestors: Set<number>): Set<number> => {
-            visited.add(current.id);
+            const nodes = [ ...root.children ];
+            while (nodes.length > 0) {
+                const node = nodes.pop();
 
-            if (current.id === taxonId) {
-                return ancestors;
-            }
-
-            ancestors.add(current.id);
-
-            for (const child of current.children) {
-                // Look for the target inside the not yet processed children
-                if (!visited.has(child.id)) {
-                    const updatedAncestors = recursive(child, ancestors);
-
-                    // This set would be empty if no progress was made in the subtree
-                    if (updatedAncestors.size > 0) {
-                        return updatedAncestors;
-                    }
+                if (taxa.has(node.id)) {
+                    children.push(node.id);
                 }
+
+                nodes.push(...node.children);
             }
 
-            // No suitable child found in this subtree, so remove the current node from the ancestors
-            ancestors.delete(current.id);
-
-            // No progress made in this subtree, so return an empty set
-            return new Set<number>();
+            return children;
         }
 
-        return Array.from(recursive(taxaTree.value, new Set()));
+        const nodes = [ taxaTree.value ];
+        while (nodes.length > 0) {
+            const node = nodes.pop();
+
+            if (node.id === taxonId) {
+                return collectChildren(node);
+            }
+
+            nodes.push(...node.children);
+        }
+
+        return [];
     }
 
     const reset = () => {
@@ -173,7 +171,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         initialize,
         setTree,
         reset,
-        ancestors,
+        children,
 
         updateFilter
     };

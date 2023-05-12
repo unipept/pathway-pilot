@@ -8,13 +8,11 @@
         density="comfortable"
     />
 
-    <treeview 
-        :name="test.name" 
-        :children="test.children" 
-        :lines="[]"
-        size="default"
+    <treeview v-if="test"
         expanded
-        selectable
+        :node="test"
+        :amount-selected="0"
+        :max-selected="4"
     />
 </template>
 
@@ -24,41 +22,38 @@ import { ref } from 'vue';
 
 const search = ref<string>("");
 
-const test = {
-    name: "Pathway maps",
-    children: [
-        { name: "Metabolism", children: [
-            { name: "Global and overview maps", children: [
-                { name: "Metabolic pathways", children: [] },
-                { name: "Biosynthesis of secondary metabolites", children: [] },
-                { name: "Microbial metabolism in diverse environments", children: [] },
-                { name: "Carbon metabolism", children: [] },
-                { name: "2-Oxocarboxylic acid metabolism", children: [] },
-                { name: "Fatty acid metabolism", children: [] },
-                { name: "Biosynthesis of amino acids", children: [] },
-                { name: "Nucleotide metabolism", children: [] },
-                { name: "Biosynthesis of nucleotide sugars", children: [] },
-                { name: "Biosynthesis of cofactors", children: [] },
-                { name: "Degradation of aromatic compounds", children: [] }
-            ]},
-            { name: "Carbohydrate metabolism", children: [
-                { name: "Glycolysis / Gluconeogenesis", children: [] },
-                { name: "Citrate cycle (TCA cycle)", children: [] },
-                { name: "Pentose phosphate pathway", children: [] },
-                { name: "Pentose and glucuronate interconversions", children: [] },
-                { name: "Fructose and mannose metabolism", children: [] },
-                { name: "Galactose metabolism", children: [] },
-                { name: "Ascorbate and aldarate metabolism", children: [] },
-                { name: "Starch and sucrose metabolism", children: [] },
-                { name: "Amino sugar and nucleotide sugar metabolism", children: [] },
-                { name: "Pyruvate metabolism", children: [] },
-                { name: "Glyoxylate and dicarboxylate metabolism", children: [] },
-                { name: "Propanoate metabolism", children: [] },
-                { name: "Butanoate metabolism", children: [] },
-                { name: "C5-Branched dibasic acid metabolism", children: [] },
-                { name: "Inositol phosphate metabolism", children: [] },
-            ]}
-        ]}
-    ]
+const test = JSON.parse('{"id":1,"name":"Organism","rank":"no rank","data":{"count":8,"self_count":1},"children":[{"id":2,"name":"Bacteria","rank":"superkingdom","data":{"count":6,"self_count":1},"children":[{"id":1239,"name":"Firmicutes","rank":"phylum","data":{"count":2,"self_count":1},"children":[{"id":186802,"name":"Eubacteriales","rank":"order","data":{"count":1,"self_count":1},"children":[],"highlighted":true,"nameExtra":"order"}],"highlighted":true,"nameExtra":"phylum"},{"id":201174,"name":"Actinobacteria","rank":"phylum","data":{"count":2,"self_count":0},"children":[{"id":85004,"name":"Bifidobacteriales","rank":"order","data":{"count":2,"self_count":0},"children":[{"id":31953,"name":"Bifidobacteriaceae","rank":"family","data":{"count":2,"self_count":1},"children":[{"id":1678,"name":"Bifidobacterium","rank":"genus","data":{"count":1,"self_count":1},"children":[],"highlighted":true,"nameExtra":"genus"}],"highlighted":true,"nameExtra":"family"}],"highlighted":false,"nameExtra":"order"}],"highlighted":false,"nameExtra":"phylum"},{"id":976,"name":"Bacteroidetes","rank":"phylum","data":{"count":1,"self_count":0},"children":[{"id":171549,"name":"Bacteroidales","rank":"order","data":{"count":1,"self_count":1},"children":[],"highlighted":true,"nameExtra":"order"}],"highlighted":false,"nameExtra":"phylum"}],"highlighted":true,"nameExtra":"superkingdom"},{"id":2759,"name":"Eukaryota","rank":"superkingdom","data":{"count":1,"self_count":0},"children":[{"id":4751,"name":"Fungi","rank":"kingdom","data":{"count":1,"self_count":0},"children":[{"id":4890,"name":"Ascomycota","rank":"phylum","data":{"count":1,"self_count":0},"children":[{"id":4892,"name":"Saccharomycetales","rank":"order","data":{"count":1,"self_count":0},"children":[{"id":4893,"name":"Saccharomycetaceae","rank":"family","data":{"count":1,"self_count":0},"children":[{"id":4930,"name":"Saccharomyces","rank":"genus","data":{"count":1,"self_count":1},"children":[],"highlighted":true,"nameExtra":"genus"}],"highlighted":false,"nameExtra":"family"}],"highlighted":false,"nameExtra":"order"}],"highlighted":false,"nameExtra":"phylum"}],"highlighted":false,"nameExtra":"kingdom"}],"highlighted":false,"nameExtra":"superkingdom"}],"highlighted":false,"nameExtra":"no rank"}')
+
+const children = (taxonId: number) => {
+    const collectChildren = (root: any) => {
+        const _children = [];
+
+        const nodes = [ ...root.children ];
+        while (nodes.length > 0) {
+            const node = nodes.pop();
+
+            // TODO: check whether this node is in the list of taxa
+            _children.push(node.id);
+
+            nodes.push(...node.children)
+        }
+
+        return _children;
+    }
+
+    const nodes = [ test ];
+    while (nodes.length > 0) {
+        const node = nodes.pop();
+
+        if (node.id === taxonId) {
+            return collectChildren(node);
+        }
+
+        nodes.push(...node.children);
+    }
+
+    return [];
 }
+
+console.log(children(976))
 </script>
