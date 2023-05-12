@@ -98,7 +98,7 @@ const selectedCompound = ref<string>('')
 const { pathway, highlightedTaxa } = storeToRefs(visualisationStore);
 
 const legendItems = computed(() => highlightedTaxa.value.map(taxon => ({
-        label: mappingStore.taxa.get(taxon.id)?.name ?? "Unknown",
+        label: taxon.name,
         color: computeTaxonColor(taxon.id)
     }))
 );
