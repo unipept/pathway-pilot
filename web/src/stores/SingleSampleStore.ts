@@ -1,32 +1,34 @@
 import { defineStore } from 'pinia';
 
 import Taxon from "@/logic/entities/Taxon";
-import EcNumber from "@/logic/entities/EcNumber";
-import Pathway from "@/logic/entities/Pathway";
 import { reactive, ref } from 'vue';
-import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 
-const useSingleSampleStore = (sampleId: string, sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
+const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
     const name    = ref<string>(sampleName);
     const size    = ref<number>(0);
     const rawData = ref<any[]>([]);
 
     // Mappings containing all matched entities
     const taxa     = new Map<number, Taxon>();
-    const pathways = reactive<Map<string, Pathway>>(new Map());
-    const ecs      = new Map<string, EcNumber>();
+    const pathways = reactive<Set<string>>(new Set());
+    const ecs      = reactive<Set<string>>(new Set());
 
-    const taxaToPathways = new Map<number, Set<Pathway>>();
-    const taxaToEcs      = new Map<number, Set<EcNumber>>();
+    const taxaToPathways = new Map<number, Set<string>>();
+    const taxaToEcs      = new Map<number, Set<string>>();
 
-    const pathwaysToEcs  = new Map<string, Set<EcNumber>>();
-    const pathwaysToTaxa = reactive<Map<string, Set<Taxon>>>(new Map());
-
+    const pathwaysToEcs  = new Map<string, Set<string>>();
+    const pathwaysToTaxa = reactive<Map<string, Set<number>>>(new Map());
     const pathwaysToPeptideCounts = new Map<string, number>();
+
+    const ecToPathways = new Map<string, Set<string>>();
 
     const taxaTree = ref<any>(undefined);
 
     const initialized = ref<boolean>(false);
+
+    // Mapping filters
+    const filtered = ref<boolean>(false);
+    const filteredPathways = reactive<Set<string>>(new Set());
 
     const initialize = (sampleData: any[], rawSampleData: any[]) => {
         size.value = rawSampleData.length;
@@ -43,17 +45,11 @@ const useSingleSampleStore = (sampleId: string, sampleName: string = '') => defi
                 taxa.set(object.taxon_id, taxon);
             }
 
-            let ec = ecs.get(object.ec);
-            if (!ec) {
-                ec = new EcNumber(object.ec);
-                ecs.set(object.ec, ec);
-            }
+            const ec = object.ec;
+            ecs.add(ec);
 
-            let pathway = pathways.get(object.pathway);
-            if (!pathway) {
-                pathway = new Pathway(object.pathway);
-                pathways.set(object.pathway, pathway);
-            }
+            const pathway = object.pathway;
+            pathways.add(pathway);
 
             if (!taxaToPathways.has(object.taxon_id)) {
                 taxaToPathways.set(object.taxon_id, new Set());
@@ -73,55 +69,56 @@ const useSingleSampleStore = (sampleId: string, sampleName: string = '') => defi
             if (!pathwaysToTaxa.has(object.pathway)) {
                 pathwaysToTaxa.set(object.pathway, new Set());
             }
-            pathwaysToTaxa.get(object.pathway)!.add(taxon);
+            pathwaysToTaxa.get(object.pathway)!.add(taxon.id);
 
             if (!pathwaysToPeptideCounts.has(object.pathway)) {
                 pathwaysToPeptideCounts.set(object.pathway, 0);
             }
             pathwaysToPeptideCounts.set(object.pathway, pathwaysToPeptideCounts.get(object.pathway)! + object.count);
+
+            if (!ecToPathways.has(object.ec)) {
+                ecToPathways.set(object.ec, new Set());
+            }
+            ecToPathways.get(object.ec)!.add(pathway);
         }
 
         initialized.value = true;
-
-        console.log("MappingStore initialized");
     }
 
     const setTree = async (tree: any) => {
         taxaTree.value = tree;
     }
 
-    const ancestors = (taxonId: number) => {
-        const visited   = new Set<number>();
+    const children = (taxonId: number) => {
+        const collectChildren = (root: any) => {
+            const children = [];
 
-        const recursive = (current: any, ancestors: Set<number>): Set<number> => {
-            visited.add(current.id);
+            const nodes = [ ...root.children ];
+            while (nodes.length > 0) {
+                const node = nodes.pop();
 
-            if (current.id === taxonId) {
-                return ancestors;
-            }
-
-            ancestors.add(current.id);
-
-            for (const child of current.children) {
-                // Look for the target inside the not yet processed children
-                if (!visited.has(child.id)) {
-                    const updatedAncestors = recursive(child, ancestors);
-
-                    // This set would be empty if no progress was made in the subtree
-                    if (updatedAncestors.size > 0) {
-                        return updatedAncestors;
-                    }
+                if (taxa.has(node.id)) {
+                    children.push(node.id);
                 }
+
+                nodes.push(...node.children);
             }
 
-            // No suitable child found in this subtree, so remove the current node from the ancestors
-            ancestors.delete(current.id);
-
-            // No progress made in this subtree, so return an empty set
-            return new Set<number>();
+            return children;
         }
 
-        return Array.from(recursive(taxaTree.value, new Set()));
+        const nodes = [ taxaTree.value ];
+        while (nodes.length > 0) {
+            const node = nodes.pop();
+
+            if (node.id === taxonId) {
+                return collectChildren(node);
+            }
+
+            nodes.push(...node.children);
+        }
+
+        return [];
     }
 
     const reset = () => {
@@ -129,7 +126,6 @@ const useSingleSampleStore = (sampleId: string, sampleName: string = '') => defi
 
         taxa.clear();
 
-        console.log(taxa);
         pathways.clear();
         ecs.clear();
 
@@ -138,8 +134,19 @@ const useSingleSampleStore = (sampleId: string, sampleName: string = '') => defi
 
         pathwaysToEcs.clear();
         pathwaysToTaxa.clear();
-
         pathwaysToPeptideCounts.clear();
+
+        ecToPathways.clear();
+    }
+
+    const updateFilter = (pathways: string[]) => {
+        filteredPathways.clear();
+
+        for (const pathway of pathways) {
+            filteredPathways.add(pathway);
+        }
+
+        filtered.value = filteredPathways.size > 0;
     }
 
     return {
@@ -152,15 +159,21 @@ const useSingleSampleStore = (sampleId: string, sampleName: string = '') => defi
         taxaToEcs,
         pathwaysToEcs,
         pathwaysToTaxa,
+        ecToPathways,
         pathwaysToPeptideCounts,
         taxaTree,
+
+        filtered,
+        filteredPathways,
 
         initialized,
 
         initialize,
         setTree,
         reset,
-        ancestors
+        children,
+
+        updateFilter
     };
 })();
 

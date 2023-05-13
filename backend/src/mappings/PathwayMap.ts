@@ -1,6 +1,8 @@
 import ReaderMap from "./ReaderMap";
 import config from "../config/config";
 
+import categoryMap from "./pathway/CategoryMap";
+
 // TODO: Replaces could be done on fetch once a day
 // TODO: Then also throw out path:ko or path:ec from the file
 // TODO: So much duplicate code, refactor
@@ -10,6 +12,8 @@ export type PathwayKey = string;
 
 export type PathwayValue = {
     name: string;
+    category: string;
+    subCategory: string;
     ecNumbers: string[];
     koNumbers: string[];
     reactionIds: string[];
@@ -33,9 +37,13 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
     private handleDescriptionFile(descriptionFile: string) {
         this.readlines(descriptionFile, (line: string) => {
             const [ pathwayId, description ] = line.split('\t');
+            console.log(pathwayId);
+            const [ category, subCategory ] = categoryMap.get(pathwayId) ?? [ "Unknown", "Unknown" ];
 
             this.set(pathwayId, { 
                 name: description.trim(),
+                category: category,
+                subCategory: subCategory,
                 ecNumbers: [],
                 koNumbers: [],
                 reactionIds: []

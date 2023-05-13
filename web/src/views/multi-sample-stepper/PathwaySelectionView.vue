@@ -22,9 +22,8 @@
 
             <v-col cols=7>
                 <bubble-plot 
-                    v-model="selectedPathway" 
-                    :pathway-to-counts="pathwaysToPeptideCounts"
-                    :pathway-to-name="pathwayMapping"
+                    v-model="selectedPathway"
+                    :items="pathwayItems"
                     @update:model-value="onBubblePlotClick"    
                 />
             </v-col>
@@ -49,7 +48,14 @@
                     v-model="selectedPathway"
                     :items="pathwayItems"
                     :search="pathwaySearch"
-                />
+                >
+                    <template #download>
+                        <v-btn class="ms-3" color="primary" variant="outlined" @click="onDownload">
+                            <v-icon left>mdi-download</v-icon>
+                            <span class="ms-1">Download table</span>
+                        </v-btn>
+                    </template>
+                </pathway-table>
                 <warning-alert v-else class="mt-3">
                     We were unable to match your input data with any pathways. You can always try to analyse a different input sample.
                 </warning-alert>
@@ -72,23 +78,27 @@ import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import useMultiSampleStore from '@/stores/MultiSampleStore';
 import BubblePlot from '@/components/visualisations/BubblePlot.vue';
+import { useCsvDownloader } from '@/composables/useCsvDownloader';
+
+const { downloadCsv } = useCsvDownloader();
 
 const sampleStore = useMultiSampleStore();
 const keggStore = useKeggStore();
 const visualisationStore = useVisualisationStore();
 
-const { initialized, pathways, pathwaysToPeptideCounts } = storeToRefs(sampleStore);
+const { initialized, pathways, filtered, filteredPathways, pathwaysToPeptideCounts } = storeToRefs(sampleStore);
 const { pathway: selectedPathway } = storeToRefs(visualisationStore);
 const { pathwayMapping } = storeToRefs(keggStore);
 
 const pathwaySearch = ref<string>("");
 
-const pathwayItems = computed(() => [...pathways.value.values()!]
-    .filter((pathway: Pathway) => pathway.id)
-    .map((pathway: Pathway) => ({
-            id: pathway.id,
-            name: pathwayMapping.value.get(pathway.id)?.name ?? "",
-            count: pathwaysToPeptideCounts.value.get(pathway.id) ?? 0,
+const pathwayItems = computed(() => [ ... (filtered.value ? filteredPathways.value : pathways.value) ]
+    .map((pathway: string) => ({
+            id: pathway,
+            name: pathwayMapping.value.get(pathway)?.name ?? "",
+            category: pathwayMapping.value.get(pathway)?.category ?? "",
+            subCategory: pathwayMapping.value.get(pathway)?.subCategory ?? "",
+            count: pathwaysToPeptideCounts.value.get(pathway) ?? 0,
         })
     )
 );
@@ -98,8 +108,16 @@ const onBubblePlotClick = (pathway: Pathway) => {
     visualisationStore.setHighlightedTaxa([]);
 };
 
+const onDownload = () => {
+    const csvHeader = "id,name,category,subCategory,count";
+    const csvData   =[...pathwayItems.value].sort((a, b) => b.count - a.count).map((pathway) => {
+        return `${pathway.id},${pathway.name},${pathway.category},${pathway.subCategory},${pathway.count}`;
+    });
+
+    downloadCsv(csvData, "pathway-table.csv", csvHeader);
+};
+
 watch(selectedPathway, (pathway: Pathway | undefined) => {
-    pathwaySearch.value = "";
     visualisationStore.setPathway(pathway);
     visualisationStore.setHighlightedTaxa([]);
 });

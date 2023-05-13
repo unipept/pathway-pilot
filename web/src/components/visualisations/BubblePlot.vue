@@ -7,12 +7,14 @@ import Pathway from "@/logic/entities/Pathway";
 import * as d3 from "d3";
 import { onMounted, ref, watch } from 'vue';
 
-import { DataItem, pathwayToCategory, pathwayGroups } from "./BubblePlotInfo";
+import { DataItem } from "./BubblePlotInfo";
+import { groupColors, pathwayGroups } from "@/types/PathwayGroup";
+import { PathwayTableItem } from "../tables/selection/PathwayTableItem";
+import { computed } from "vue";
 
 export interface Props {
-    modelValue: Pathway | undefined;
-    pathwayToCounts: Map<string, number>
-    pathwayToName: Map<string, any>
+    modelValue: Pathway | undefined
+    items: PathwayTableItem[]
 }
 
 const props = defineProps<Props>();
@@ -27,32 +29,27 @@ const legendRadius = 10;
 const lineSize = 20;
 const forceStrength = 0.03;
 
-const groupColors = pathwayGroups.map((group, i) => {
-    return d3.hsl(1.9 + i * 360 / pathwayGroups.length, 0.721, 0.747);
-});
-groupColors[groupColors.length - 1] = d3.hsl(0, 0, 0.5);
+const data = computed(() => [ ...props.items ].map((item) => ({
+    'id': item.id,
+    'name': item.name,
+    'group': pathwayGroups.indexOf(item.category === "Metabolism" ? item.subCategory : "Others"),
+    'value': item.count
+})));
 
-const data: DataItem[] = [];
-for (const [pathway, count] of props.pathwayToCounts) {
-    const category = pathwayToCategory.get(pathway) ?? "Others";
-    data.push({
-        'id': pathway,
-        'name': props.pathwayToName.get(pathway)?.name ?? "",
-        'group': pathwayGroups.indexOf(category),
-        'value': count
-    });
-}
-
-const radiusScale = d3
+const radiusScale = computed(() => d3
     .scalePow()
     .exponent(0.5)
-    .range([2, 46])
-    .domain([0, d3.max(data, (d: any) => d.value)]);
+    .range([
+        Math.min(Math.max(200 / data.value.length, 3), 20), 
+        Math.max(Math.min(1000 / data.value.length, 70), 46)
+    ])
+    .domain([0, d3.max(data.value, (d: any) => d.value)])
+);
 
 const createNodes = (rawData: any) => {
     const nodes = rawData.map((d: any) => ({
         id: d.id,
-        radius: radiusScale(d.value),
+        radius: radiusScale.value(d.value),
         value: d.value,
         group: d.group,
         name: d.name,
@@ -156,12 +153,9 @@ const hideDetail = (d: any) => {
         });
 };
 
-watch(() => props.modelValue, (newVal) => {
-    removeHighlight();
-    addHighlight(newVal?.id);
-});
+const draw = () => {
+    d3.select("#svgcontainer").selectAll("*").remove();
 
-onMounted(() => {
     // Insert an svg element in the template
     const svg = d3
         .select("#svgcontainer")
@@ -194,7 +188,7 @@ onMounted(() => {
                 .attr("fill", "#515151");
     });
 
-    const nodes = createNodes(data);
+    const nodes = createNodes(data.value);
 
     // Create bubbles
     const bubbles = svg.selectAll('.bubble')
@@ -225,5 +219,18 @@ onMounted(() => {
             .attr('cx', (d: any) => d.x)
             .attr('cy', (d: any) => d.y))
         .nodes(nodes);
+}
+
+watch(() => props.modelValue, (newVal) => {
+    removeHighlight();
+    addHighlight(newVal?.id);
+});
+
+watch(() => props.items, () => {
+    draw();
+});
+
+onMounted(() => {
+    draw();
 });
 </script>

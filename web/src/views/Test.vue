@@ -1,92 +1,59 @@
 <template>
-    <div class="mt-5">
-        <v-card elevation="10">
-            <v-card-text>
-                <v-select
-                    v-model="inputFormat"
-                    label="Select your input format"
-                    density="comfortable"
-                    :items="inputFormats"
-                />
+    <v-text-field
+        class="mt-3 mb-n3"
+        v-model="search"
+        label="Search for an identifier or name"
+        prepend-inner-icon="mdi-magnify"
+        variant="solo"
+        density="comfortable"
+    />
 
-                <h1 class="mb-3">Upload your samples</h1>
-                <sample-table 
-                    :items="tableItems"
-                    @add="addModalOpen = true"
-                    @remove="onRemove"
-                />
-            </v-card-text>
-        </v-card>
-
-        <add-sample-modal 
-            v-model="addModalOpen" 
-            @submit="onSubmit"
-        />
-
-        <delete-sample-modal 
-            v-model="deleteModalOpen" 
-            :index="deleteModalIndex" 
-            :name="deleteModalName"
-            @remove="onRemoveConfirmed"
-        />
-    </div>
+    <treeview v-if="test"
+        expanded
+        :node="test"
+        :amount-selected="0"
+        :max-selected="4"
+    />
 </template>
 
 <script lang="ts" setup>
-import AddSampleModal from '@/components/modals/multi-sample/AddSampleModal.vue';
-import DeleteSampleModal from '@/components/modals/multi-sample/DeleteSampleModal.vue';
-import SampleTable from '@/components/tables/multi-sample/SampleTable.vue';
-import PeptideListConverter from '@/logic/converters/PeptideListConverter';
-import useMultiSampleStore from '@/stores/MultiSampleStore';
-import { storeToRefs } from 'pinia';
-import { ref, computed } from 'vue';
+import Treeview from '@/components/visualisations/Treeview.vue';
+import { ref } from 'vue';
 
-const sampleStore = useMultiSampleStore();
+const search = ref<string>("");
 
-const { samples } = storeToRefs(sampleStore);
+const test = JSON.parse('{"id":1,"name":"Organism","rank":"no rank","data":{"count":8,"self_count":1},"children":[{"id":2,"name":"Bacteria","rank":"superkingdom","data":{"count":6,"self_count":1},"children":[{"id":1239,"name":"Firmicutes","rank":"phylum","data":{"count":2,"self_count":1},"children":[{"id":186802,"name":"Eubacteriales","rank":"order","data":{"count":1,"self_count":1},"children":[],"highlighted":true,"nameExtra":"order"}],"highlighted":true,"nameExtra":"phylum"},{"id":201174,"name":"Actinobacteria","rank":"phylum","data":{"count":2,"self_count":0},"children":[{"id":85004,"name":"Bifidobacteriales","rank":"order","data":{"count":2,"self_count":0},"children":[{"id":31953,"name":"Bifidobacteriaceae","rank":"family","data":{"count":2,"self_count":1},"children":[{"id":1678,"name":"Bifidobacterium","rank":"genus","data":{"count":1,"self_count":1},"children":[],"highlighted":true,"nameExtra":"genus"}],"highlighted":true,"nameExtra":"family"}],"highlighted":false,"nameExtra":"order"}],"highlighted":false,"nameExtra":"phylum"},{"id":976,"name":"Bacteroidetes","rank":"phylum","data":{"count":1,"self_count":0},"children":[{"id":171549,"name":"Bacteroidales","rank":"order","data":{"count":1,"self_count":1},"children":[],"highlighted":true,"nameExtra":"order"}],"highlighted":false,"nameExtra":"phylum"}],"highlighted":true,"nameExtra":"superkingdom"},{"id":2759,"name":"Eukaryota","rank":"superkingdom","data":{"count":1,"self_count":0},"children":[{"id":4751,"name":"Fungi","rank":"kingdom","data":{"count":1,"self_count":0},"children":[{"id":4890,"name":"Ascomycota","rank":"phylum","data":{"count":1,"self_count":0},"children":[{"id":4892,"name":"Saccharomycetales","rank":"order","data":{"count":1,"self_count":0},"children":[{"id":4893,"name":"Saccharomycetaceae","rank":"family","data":{"count":1,"self_count":0},"children":[{"id":4930,"name":"Saccharomyces","rank":"genus","data":{"count":1,"self_count":1},"children":[],"highlighted":true,"nameExtra":"genus"}],"highlighted":false,"nameExtra":"family"}],"highlighted":false,"nameExtra":"order"}],"highlighted":false,"nameExtra":"phylum"}],"highlighted":false,"nameExtra":"kingdom"}],"highlighted":false,"nameExtra":"superkingdom"}],"highlighted":false,"nameExtra":"no rank"}')
 
-const tableItems = computed(() => 
-    samples.value.map(sample => ({
-        name: sample.name,
-        size: `${sample.size} peptides`,
-        loading: !sample.initialized,
-    }))
-)
+const children = (taxonId: number) => {
+    const collectChildren = (root: any) => {
+        const _children = [];
 
-const inputFormats = ["Peptide list", "MaxQuant", "ProteomeDiscoverer", "PepShaker"]
+        const nodes = [ ...root.children ];
+        while (nodes.length > 0) {
+            const node = nodes.pop();
 
-const inputFormat = ref<string>();
+            // TODO: check whether this node is in the list of taxa
+            _children.push(node.id);
 
-const addModalOpen = ref<boolean>(false);
+            nodes.push(...node.children)
+        }
 
-const deleteModalOpen = ref<boolean>(false);
-const deleteModalIndex = ref<number>(-1);
-const deleteModalName = ref<string>("");
+        return _children;
+    }
 
-const onRemove = (index: number, name: string) => {
-    deleteModalIndex.value = index;
-    deleteModalName.value = name;
-    deleteModalOpen.value = true;
-};
+    const nodes = [ test ];
+    while (nodes.length > 0) {
+        const node = nodes.pop();
 
-const onRemoveConfirmed = () => {
-    sampleStore.removeSample(deleteModalIndex.value);
-};
+        if (node.id === taxonId) {
+            return collectChildren(node);
+        }
 
-const processing = ref<boolean>(false);
+        nodes.push(...node.children);
+    }
 
-const onSubmit = async (peptideList: string[], sampleName: string) => {
-    processing.value = true;
+    return [];
+}
 
-    const sample = sampleStore.addSample(sampleName);
-    sampleStore.initializeSample(
-        sample, 
-        await new PeptideListConverter({
-            onProgressUpdate: () => { },
-        }).convert(peptideList),
-        peptideList
-    );
-
-    processing.value = false;
-};
+console.log(children(976))
 </script>
