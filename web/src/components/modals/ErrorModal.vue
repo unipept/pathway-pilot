@@ -38,7 +38,7 @@ const errors = ref<VerifierError[]>(props.modelValue);
 const dialogOpen = ref<boolean>(props.modelValue.length > 0);
 
 const onClickOutside = () => {
-    emits('update:model-value', false);
+    emits('update:model-value', []);
 };
 
 watch(() => props.modelValue, (value) => {

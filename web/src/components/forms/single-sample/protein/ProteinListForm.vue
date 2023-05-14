@@ -1,21 +1,21 @@
 <template>
     <v-card flat>
         <v-card-text class="pa-0">
-            <peptide-form
-                label="Paste your MaxQuant results here"
+            <upload-form
+                label="Paste your protein list here"
                 :loading="loading"
                 :example="example"
-                @submit="e => $emit('submit', e)"
-                @reset="e => $emit('reset', e)"
+                @submit="$emit('submit', $event)"
+                @reset="$emit('reset', $event)"
             />
         </v-card-text>
     </v-card>
 </template>
 
 <script setup lang="ts">
-import PeptideForm from './PeptideForm.vue';
+import UploadForm from '../UploadForm.vue';
 
-import example from '../examples/MaxQuantExample';
+import example from '../../examples/protein/ProteinListExample';
 
 export interface Props {
     loading?: boolean;

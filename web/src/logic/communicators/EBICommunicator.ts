@@ -3,7 +3,7 @@ export default class EBICommunicator {
         private readonly baseUrl: string = "https://www.ebi.ac.uk/proteins/api/proteins"
     ) {}
 
-    public async fetchPeptideInfo(proteinList: string[], chunksize=100) {
+    public async fetchProteinInfo(proteinList: string[], chunksize=100) {
         const result: any[] = [];
 
         for (const protein of proteinList) {
@@ -12,6 +12,8 @@ export default class EBICommunicator {
                 .then(response => response.json())
                 .then(data => result.push(data));
         }
+
+        console.log(result);
 
         return result;
     }

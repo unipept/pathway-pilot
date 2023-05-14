@@ -21,21 +21,21 @@
                 </ol>
             </p>
 
-            <peptide-form
-                label="Paste your peptide shaker results here"
-                :loading="loading"
+            <upload-form
+                label="Paste your peptide list here"
                 :example="example"
-                @submit="e => $emit('submit', e)"
-                @reset="e => $emit('reset', e)"
+                :loading="loading"
+                @submit="$emit('submit', $event)"
+                @reset="$emit('reset', $event)"
             />
         </v-card-text>
     </v-card>
 </template>
 
 <script setup lang="ts">
-import PeptideForm from './PeptideForm.vue';
+import UploadForm from '../UploadForm.vue';
 
-import example from '../examples/PeptideShakerExample';
+import example from '../../examples/peptide/PeptideListExample';
 
 export interface Props {
     loading?: boolean;

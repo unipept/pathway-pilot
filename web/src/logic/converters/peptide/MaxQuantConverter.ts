@@ -1,4 +1,4 @@
-import ProgressListener from "./ProgressListener";
+import ProgressListener from "../ProgressListener";
 import PeptideListConverter from "./PeptideListConverter";
 
 export default class MaxQuantConverter {

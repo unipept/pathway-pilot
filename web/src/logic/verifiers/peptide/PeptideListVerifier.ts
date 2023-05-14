@@ -1,4 +1,4 @@
-import VerifierError from "./VerifierError";
+import VerifierError from "../VerifierError";
 
 export default class PeptideListVerifier {
     constructor() {}
