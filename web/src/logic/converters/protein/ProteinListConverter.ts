@@ -1,21 +1,20 @@
 import KeggCommunicator from "../../communicators/KEGGCommunicator";
-import EbiCommunicator from "@/logic/communicators/EBICommunicator";
+import UnipeptCommunicator from "../../communicators/UnipeptCommunicator";
 import ProgressListener from "../ProgressListener";
 
-export default class PeptideListConverter {
-    private ebiCommunicator: EbiCommunicator;
+export default class ProteinListConverter {
+    private unipeptCommunicator: UnipeptCommunicator;
     private keggCommunicator: KeggCommunicator;
 
     constructor(
         private readonly progressListener: ProgressListener
     ) {
-        this.ebiCommunicator = new EbiCommunicator();
+        this.unipeptCommunicator = new UnipeptCommunicator();
         this.keggCommunicator = new KeggCommunicator();
     }
 
-    // TODO: Create a unipept endpoint for this
     public async convert(proteinList: string[]) {
-        const proteinInfo = await this.ebiCommunicator.fetchProteinInfo(proteinList);
+        const proteinInfo = await this.unipeptCommunicator.fetchProteinInfo(proteinList);
 
         const ecMapping = await this.keggCommunicator.fetchEcMapping();
 

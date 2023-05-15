@@ -4,18 +4,11 @@ export default class UnipeptCommunicator {
     ) {}
 
     public async fetchPeptideInfo(peptideList: string[], chunksize=100) {
-        const result: any[] = [];
+        return this.batchedFetch(`${this.baseUrl}/peptinfo.json`, peptideList, chunksize);
+    }
 
-        for (let i = 0; i < peptideList.length; i += chunksize) {
-            const chunk = peptideList.slice(i, i + chunksize);
-
-            const url = `${this.baseUrl}/peptinfo.json?input[]=${chunk.join("&input[]=")}`;
-            await fetch(url, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => result.push(...data));
-        }
-
-        return result;
+    public async fetchProteinInfo(proteinList: string[], chunksize=100) {
+        return this.batchedFetch(`${this.baseUrl}/protinfo.json`, proteinList, chunksize);
     }
 
     // TODO: what in case of more than 1000 ids?
@@ -25,5 +18,20 @@ export default class UnipeptCommunicator {
         const url = `${this.baseUrl}/taxa2tree.json?input[]=${ids.join("&input[]=")}`;
         return fetch(url, { method: 'POST' })
             .then(response => response.json());
+    }
+
+    private async batchedFetch(url: string, items: string[], chunksize=100) {
+        const result: any[] = [];
+
+        for (let i = 0; i < items.length; i += chunksize) {
+            const chunk = items.slice(i, i + chunksize);
+
+            const fetchUrl = `${url}?input[]=${chunk.join("&input[]=")}`;
+            await fetch(fetchUrl, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => result.push(...data));
+        }
+
+        return result;
     }
 };
