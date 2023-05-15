@@ -50,7 +50,6 @@ export default class ProteinListConverter {
 
                     resultMapping.set(key, entry);
                 }
-
             }
 
             this.progressListener.onProgressUpdate((i + 1) / proteinInfoLength);
