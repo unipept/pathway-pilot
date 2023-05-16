@@ -4,4 +4,6 @@ export interface TreeviewItem {
     nameExtra: string
     highlighted: boolean
     children: TreeviewItem[]
+
+    match?: { start: number, end: number }
 };

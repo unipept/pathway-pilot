@@ -13,6 +13,7 @@ import { ref } from 'vue';
 import CheckBoxIcon from '@/components/icons/treeview/CheckBoxIcon.vue';
 import CheckBoxTickedIcon from '@/components/icons/treeview/CheckBoxTickedIcon.vue';
 import Size from '@/types/Size';
+import { watch } from 'vue';
 
 export interface Props {
     modelValue: boolean
@@ -38,4 +39,8 @@ const onClick = () => {
         emit('update:modelValue', ticked.value);
     }
 };
+
+watch(() => props.modelValue, (newVal) => {
+    ticked.value = newVal;
+});
 </script>

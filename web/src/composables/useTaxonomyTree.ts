@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { TreeviewItem } from '@/components/visualisations/TreeviewItem';
 import UnipeptCommunicator from '../logic/communicators/UnipeptCommunicator';
 
 const RANKS = [
@@ -13,30 +13,38 @@ const RANKS = [
     'species'
 ]
 
-export function useTaxonomyTree() {
-    const filterTree = (tree: any, taxa: number[]) => {
+export function useTaxonomyTree() {    
+    const compressTree = (tree: any, taxa: number[], highlight: boolean = true) => {
         const updatedChildren: any[] = [];
         for (const child of tree.children) {
-            updatedChildren.push(...filterTree(child, taxa));
+            updatedChildren.push(...compressTree(child, taxa));
         }
 
         if (taxa.includes(tree.id)) {
-            tree.highlighted = tree.id !== 1;
+            if (highlight) {
+                tree.highlighted = tree.id !== 1;
+            }
+
             tree.children = updatedChildren;
             tree.nameExtra = tree.rank;
             return [ tree ];
         } else {
-            tree.highlighted = false;
+            if (highlight) {
+                tree.highlighted = false;
+            }
+
             return updatedChildren;
         }
     }
 
-    const filterRankTree = (tree: any, taxa: number[]) => {
-        tree.highlighted = taxa.includes(tree.id) && tree.id !== 1;
+    const compressRankTree = (tree: any, taxa: number[], highlight: boolean = true) => {
+        if (highlight) {
+            tree.highlighted = taxa.includes(tree.id) && tree.id !== 1;
+        }
 
         const updatedChildren: any[] = [];
         for (const child of tree.children) {
-            updatedChildren.push(...filterRankTree(child, taxa));
+            updatedChildren.push(...compressRankTree(child, taxa));
         }
 
         if (RANKS.includes(tree.rank)) {
@@ -48,17 +56,47 @@ export function useTaxonomyTree() {
         }
     }
 
-    const fetchTaxonomyTree = async (taxa: number[], filterRanks: boolean = true) => {
+    const fetchTaxonomyTree = async (taxa: number[], compressRanks: boolean = true) => {
         const _tree = await new UnipeptCommunicator().fetchTaxonomy(taxa);
 
         // Filter the tree
-        if (filterRanks) {
-            return filterRankTree(_tree, taxa)[0];
+        if (compressRanks) {
+            return compressRankTree(_tree, taxa)[0];
         }
-        return filterTree(_tree, taxa)[0];
+        return compressTree(_tree, taxa)[0];
+    }
+
+    const matchItem = (item: TreeviewItem, filter: string) => {
+        return item.name.toLowerCase().indexOf(filter.toLowerCase());
+    }
+
+    const filterTree = (node: TreeviewItem, filter: string): [ boolean, TreeviewItem ] => {
+        if (filter === '') {
+            return [ true, node ];
+        }
+
+        const updatedChildren: TreeviewItem[] = [];
+        for (const child of node.children) {
+            const [ keep, updatedChild ] = filterTree(child, filter);
+
+            if (keep) {
+                updatedChildren.push(updatedChild);
+            }
+        }
+
+        node.children = updatedChildren;
+
+        const match = matchItem(node, filter);
+
+        if (match !== -1) {
+            node.match = { start: match, end: match + filter.length };
+        }
+
+        return [ updatedChildren.length > 0 || match !== -1, node ];
     }
 
     return {
-        fetchTaxonomyTree
+        fetchTaxonomyTree,
+        filterTree
     };
 };

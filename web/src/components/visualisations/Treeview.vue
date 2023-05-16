@@ -27,42 +27,48 @@
             <treeview-checkbox v-if="selectable && depth > 0"
                 v-model="itemSelected"
                 :size="size"
-                :disabled="amountSelected >= maxSelected"
-                @update:modelValue="onSelect"
+                :disabled="selectedItems.length >= max"
             />
 
-            <div 
+            <div
                 class="text" 
                 :class="size"
                 :style="{
                     'font-weight': node.highlighted ? 'bold' : 'normal',
-                    'color': amountSelected >= maxSelected && !itemSelected ? '#7d7d7d' : 'black'
+                    'color': selectedItems.length >= max && !itemSelected ? '#7d7d7d' : 'black'
                 }"
                 @click="onClick"
             >
-                {{ node.name }} ({{ node.nameExtra }})
+                <span v-if="node.match">
+                    <span>{{ node.name.slice(0, node.match.start) }}</span>
+                    <span :style="{ 'color': '#306ccf' }">
+                        {{ node.name.slice(node.match.start, node.match.end) }}
+                    </span>
+                    <span>{{ node.name.slice(node.match.end) }}</span>
+                    <span> ({{ node.nameExtra }})</span>
+                </span>
+                <span v-else> {{ node.name }} ({{ node.nameExtra }}) </span>
             </div>
         </div>
 
         <div v-if="isExpanded">
             <treeview v-for="child, i in node.children"
+                v-model="selectedItems"
                 :node="child"
                 :lines="depth > 0 ? [ ...lines, !last ] : lines"
                 :depth="depth + 1"
-                :expanded="isExpanded"
                 :size="size"
                 :first="i === 0"
                 :last="i === amountOfChildren - 1"
-                :amountSelected="amountSelected"
-                :maxSelected="maxSelected"
-                @toggle-node="$emit('toggle-node', $event)"
+                :max="max"
+                @update:modelValue="$emit('update:modelValue', $event)"
             />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import CornerIcon from '@/components/icons/treeview/CornerIcon.vue';
 import CrossTIcon from '../icons/treeview/CrossTIcon.vue';
@@ -76,6 +82,8 @@ import { TreeviewItem } from './TreeviewItem';
 import Size from '@/types/Size';
 
 export interface Props {
+    modelValue: TreeviewItem[]
+
     node: TreeviewItem
     lines?: boolean[]
 
@@ -84,9 +92,7 @@ export interface Props {
     size?: Size
     first?: boolean
     last?: boolean
-
-    amountSelected?: number
-    maxSelected?: number
+    max?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -97,29 +103,43 @@ const props = withDefaults(defineProps<Props>(), {
     size: 'default',
     first: false,
     last: false,
-
-    amountSelected: 0,
-    maxSelected: 0
+    max: 0
 });
 
-const emits = defineEmits(['toggle-node']);
+const emits = defineEmits(['update:modelValue']);
+
+const selectedItems = ref<TreeviewItem[]>(props.modelValue);
 
 const isExpanded = ref<boolean>(props.expanded);
-const itemSelected = ref<boolean>(false);
+const itemSelected = ref<boolean>(props.modelValue.some(item => item.id === props.node.id));
 
-const selectable = computed(() => props.maxSelected > 0);
+const selectable = computed(() => props.max > 0);
 
 const amountOfChildren = computed(() => props.node.children.length)
 
 const hasChildren = computed(() => amountOfChildren.value > 0);
 
-const onSelect = () => {
-    emits('toggle-node', props.node);
-};
-
 const onClick = () => {
     isExpanded.value = !isExpanded.value;
 }
+
+watch(() => itemSelected.value, (newValue) => {
+    if (newValue) {
+        selectedItems.value = [ ...selectedItems.value, props.node ];
+    } else {
+        selectedItems.value = selectedItems.value.filter(item => item.id !== props.node.id);
+    }
+    emits('update:modelValue', selectedItems.value);
+});
+
+watch(() => props.modelValue, (newValue) => {
+    selectedItems.value = newValue;
+    itemSelected.value = newValue.some(item => item.id === props.node.id);
+});
+
+watch(() => props.node, (newValue) => {
+    console.log(newValue);
+});
 </script>
 
 <style scoped>
