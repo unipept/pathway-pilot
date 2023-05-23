@@ -4,38 +4,51 @@
             <span class="align-self-center me-1 text-caption">
                 Scroll to zoom, drag to pan, click a node to reveal additional information
             </span>
+            
+            <tooltip message="Download the pathway as a PNG image" v-slot="{ props }">
+                <v-btn v-if="download"
+                    class="mx-1"
+                    color="#f7f7f7"
+                    density="comfortable"
+                    icon="mdi-download"
+                    elevation="0"
+                    size="small"
+                    @click="onDownload"
+                    v-bind="props"
+                />
+            </tooltip>
 
-            <v-btn v-if="download" 
-                class="mx-1"
-                density="comfortable"
-                icon="mdi-download"
-                elevation="0"
-                size="small"
-                @click="onDownload"
-            />
+            <tooltip message="Reset the pathway to its original state" v-slot="{ props }">
+                <v-btn v-if="restore" 
+                    class="mx-1"
+                    color="#f7f7f7"
+                    density="comfortable"
+                    icon="mdi-restore"
+                    elevation="0"
+                    size="small"
+                    @click="onRestore"
+                    v-bind="props"
+                />
+            </tooltip>
 
-            <v-btn v-if="restore" 
-                class="mx-1"
-                density="comfortable"
-                icon="mdi-restore"
-                elevation="0"
-                size="small"
-                @click="onRestore"
-            />
-
-            <v-btn v-if="fullscreen" 
-                class="mx-1"
-                density="comfortable"
-                icon="mdi-fullscreen"
-                elevation="0"
-                size="small"
-                @click="onFullscreen"
-            />
+            <tooltip message="Fullscreen mode" v-slot="{ props }">
+                <v-btn v-if="fullscreen" 
+                    class="mx-1"
+                    color="#f7f7f7"
+                    density="comfortable"
+                    icon="mdi-fullscreen"
+                    elevation="0"
+                    size="small"
+                    @click="onFullscreen"
+                    v-bind="props"
+                />
+            </tooltip>
 
             <v-menu v-if="settings">
                 <template v-slot:activator="{ props }">
                     <v-btn
                         class="mx-1"
+                        color="#f7f7f7"
                         density="comfortable"
                         icon="mdi-cog-outline"
                         elevation="0"
@@ -56,8 +69,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useFullscreen } from '@vueuse/core';
+import { nextTick } from 'vue';
+import Tooltip from '@/components/misc/Tooltip.vue';
 
 export interface Props {
     settings?: boolean
