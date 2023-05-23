@@ -23,8 +23,8 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
         return samples.value.length - 1;
     };
 
-    const initializeSample = (index: number, sampleData: any[], rawSampleData: any[]) => {
-        samples.value[index].initialize(sampleData, rawSampleData);
+    const initializeSample = (index: number, inputList: any[], sampleConverter: any) => {
+        samples.value[index].initialize(inputList, sampleConverter);
     };
 
     const resetSample = (index: number) => {

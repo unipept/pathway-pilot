@@ -85,7 +85,7 @@ const onSubmit = async (peptideList: string[]) => {
     errors.value = formatMap.get(props.fileFormat)?.verifier.verify(peptideList);
 
     if (errors.value.length <= 0) {
-        sampleStore.initialize(await formatMap.get(props.fileFormat)?.converter.convert(peptideList), peptideList);
+        await sampleStore.initialize(peptideList, formatMap.get(props.fileFormat)?.converter);
         sampleStore.setTree(await new UnipeptCommunicator().fetchTaxonomy(Array.from(sampleStore.taxa.keys())))
     }
 

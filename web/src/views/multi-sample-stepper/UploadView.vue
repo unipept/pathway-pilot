@@ -75,10 +75,10 @@ const onSubmit = async (peptideList: string[], sampleName: string) => {
     processing.value = true;
 
     const sample = sampleStore.addSample(sampleName);
-    sampleStore.initializeSample(
-        sample, 
-        await formatMap.get(props.fileFormat)?.converter.convert(peptideList),
-        peptideList
+    await sampleStore.initializeSample(
+        sample,
+        peptideList,
+        formatMap.get(props.fileFormat)?.converter
     );
 
     processing.value = false;

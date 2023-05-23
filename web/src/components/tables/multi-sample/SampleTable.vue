@@ -26,7 +26,7 @@
             </v-icon>
 
             <div class="flex-grow-1">{{ item.name }}</div>
-            <div v-if="!item.loading" class="flex-grow-1">{{ item.size }}</div>
+            <div class="flex-grow-1">{{ item.size }}</div>
 
             <v-icon class="me-3" color="error" @click="$emit('remove', i, item.name)">mdi-delete</v-icon>
         </v-card-text>

@@ -1,4 +1,4 @@
-import KeggCommunicator from "../communicators/KeggCommunicator";
+import KeggCommunicator from "../communicators/KEGGCommunicator";
 import UnipeptCommunicator from "../communicators/UnipeptCommunicator";
 import ProgressListener from "./ProgressListener";
 
@@ -36,6 +36,7 @@ export default class PeptideListConverter {
 
                     if (!entry) {
                         entry = {
+                            peptides: new Map<String, number>(),
                             taxon_id: info.taxon_id,
                             taxon_name: info.taxon_name,
                             taxon_rank: info.taxon_rank,
@@ -46,6 +47,11 @@ export default class PeptideListConverter {
                         };
                     }
 
+                    if (!entry.peptides.has(info.peptide)) {
+                        entry.peptides.set(info.peptide, 0);
+                    }
+                    entry.peptides.set(info.peptide, entry.peptides.get(info.peptide) + 1);
+
                     entry.count += 1;
 
                     resultMapping.set(key, entry);
@@ -55,6 +61,8 @@ export default class PeptideListConverter {
 
             this.progressListener.onProgressUpdate((i + 1) / peptideInfoLength);
         }
+
+        // TODO: Do some precomputed normalisation here?
 
         return Array.from(resultMapping.values());
     }

@@ -1,7 +1,7 @@
 <template>
     <div v-if="initialized">
         <v-row>
-            <v-col cols=6>
+            <v-col cols=12>
                 <v-text-field
                     class="mt-3 mb-n3"
                     v-model="enzymeSearch"
@@ -17,6 +17,13 @@
                 />
             </v-col>
         </v-row>
+
+        <div class="d-flex justify-end mt-3">
+            <v-btn class="ms-3" color="primary" @click="onDownload">
+                <v-icon left>mdi-download</v-icon>
+                <span class="ms-1">Download pathway mapping</span>
+            </v-btn>
+        </div>
     </div>
 
     <warning-alert v-else class="mt-5">
@@ -33,10 +40,10 @@ import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import EnzymeTable from '@/components/tables/selection/EnzymeTable.vue';
 import { watch } from 'vue';
 
-const mappingStore = useSingleSampleStore();
+const sampleStore = useSingleSampleStore();
 const keggStore = useKeggStore();
 
-const { initialized, ecs } = storeToRefs(mappingStore);
+const { initialized, ecs } = storeToRefs(sampleStore);
 const { ecMapping } = storeToRefs(keggStore);
 
 const enzymeSearch = ref<string>("");
@@ -50,9 +57,13 @@ const enzymeItems = computed(() => [ ...ecs.value ]
     )
 );
 
+const onDownload = () => {
+    sampleStore.download("PathwayMapping.csv");
+};
+
 watch(() => selectedEnzymes.value, () => {
-    mappingStore.updateFilter(
-        selectedEnzymes.value.map((ec: string) => Array.from(mappingStore.ecToPathways.get(ec)!) ).flat()
+    sampleStore.updateFilter(
+        selectedEnzymes.value.map((ec: string) => Array.from(sampleStore.ecToPathways.get(ec)!) ).flat()
     );
 });
 

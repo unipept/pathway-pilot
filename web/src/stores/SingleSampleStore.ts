@@ -2,16 +2,27 @@ import { defineStore } from 'pinia';
 
 import Taxon from "@/logic/entities/Taxon";
 import { reactive, ref } from 'vue';
+import { useCsvDownloader } from '@/composables/useCsvDownloader';
+import useKeggStore from './KeggStore';
 
 const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
+    const keggStore = useKeggStore();
+
+    const { downloadCsv } = useCsvDownloader();
+
+
+    
     const name    = ref<string>(sampleName);
     const size    = ref<number>(0);
-    const rawData = ref<any[]>([]);
 
     // Mappings containing all matched entities
+    const peptides = new Set<string>();
     const taxa     = new Map<number, Taxon>();
     const pathways = reactive<Set<string>>(new Set());
     const ecs      = reactive<Set<string>>(new Set());
+
+    const peptideToTaxa     = new Map<string, Taxon>();
+    const peptideToPathways = new Map<string, Set<string>>();
 
     const taxaToPathways = new Map<number, Set<string>>();
     const taxaToEcs      = new Map<number, Set<string>>();
@@ -30,9 +41,10 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
     const filtered = ref<boolean>(false);
     const filteredPathways = reactive<Set<string>>(new Set());
 
-    const initialize = (sampleData: any[], rawSampleData: any[]) => {
-        size.value = rawSampleData.length;
-        rawData.value = rawSampleData;
+    const initialize = async (inputList: any[], sampleConverter: any) => {
+        size.value = inputList.length;
+
+        const sampleData = await sampleConverter.convert(inputList);
 
         if (initialized.value) {
             return;
@@ -80,6 +92,17 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
                 ecToPathways.set(object.ec, new Set());
             }
             ecToPathways.get(object.ec)!.add(pathway);
+
+            for (const peptide of object.peptides.keys()) {
+                peptides.add(peptide);
+
+                peptideToTaxa.set(peptide, taxon);
+
+                if (!peptideToPathways.has(peptide)) {
+                    peptideToPathways.set(peptide, new Set());
+                }
+                peptideToPathways.get(peptide)!.add(pathway);
+            }
         }
 
         initialized.value = true;
@@ -149,6 +172,28 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         filtered.value = filteredPathways.size > 0;
     }
 
+    const download = async (filename: string) => {
+        await keggStore.fetchPathwayMapping();
+
+        const header = [ 'peptide', 'taxon id', 'taxon rank', 'taxon name', 'pathways', 'pathway names' ].join(';');
+
+        const data = [ ...peptides ].map(peptide => {
+            const taxon = peptideToTaxa.get(peptide)!;
+            const pathways = [ ...peptideToPathways.get(peptide) ?? [] ].join(',');
+
+            return [
+                peptide,
+                taxon.id,
+                taxon.rank,
+                taxon.name,
+                pathways,
+                '""' + pathways.split(',').map(pathway => `"${keggStore.pathwayMapping.get(pathway).name}"` ?? "Unknown").join(',')
+            ].join(';')
+        });
+
+        downloadCsv(data, filename, header);
+    }
+
     return {
         name,
         size,
@@ -173,7 +218,9 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         reset,
         children,
 
-        updateFilter
+        updateFilter,
+
+        download
     };
 })();
 
