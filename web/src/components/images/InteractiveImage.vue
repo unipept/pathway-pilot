@@ -10,15 +10,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+
+export interface Props {
+    scale?: number
+    translate?: { x: number, y: number }
+};
+
+const props = withDefaults(defineProps<Props>(), {
+    scale: 1,
+    translate: () => ({ x: 0, y: 0 })
+});
+
+const emits = defineEmits(['update:scale', 'update:translate']);
 
 const image = ref<HTMLDivElement | null>(null);
 
-const scale = ref(1);
-const translate = ref({ x: 0, y: 0 });
+const _scale = ref(props.scale);
+const _translate = ref(props.translate);
 
 const style = computed(() => ({
-    transform: `scale(${scale.value}) translate(${translate.value.x}px, ${translate.value.y}px)`
+    transform: `scale(${_scale.value}) translate(${_translate.value.x}px, ${_translate.value.y}px)`
 }));
 
 let mouseDown = false;
@@ -41,8 +53,10 @@ const onMouseMove = (e: MouseEvent) => {
 
     e.preventDefault();
 
-    translate.value.x += e.movementX / scale.value;
-    translate.value.y += e.movementY / scale.value;
+    _translate.value.x += e.movementX / _scale.value;
+    _translate.value.y += e.movementY / _scale.value;
+
+    emits('update:translate', _translate.value);
 };
 
 const onMouseUp = (e: MouseEvent) => {
@@ -53,9 +67,19 @@ const onMouseUp = (e: MouseEvent) => {
 const onZoom = (e: WheelEvent) => {
     e.preventDefault();
 
-    scale.value += e.deltaY * -0.005;
-    scale.value = Math.min(Math.max(.250, scale.value), 4);
+    _scale.value += e.deltaY * -0.005;
+    _scale.value = Math.min(Math.max(.250, _scale.value), 4);
+
+    emits('update:scale', _scale.value);
 };
+
+watch(() => props.scale, (scale) => {
+    _scale.value = scale;
+});
+
+watch(() => props.translate, (translate) => {
+    _translate.value = translate;
+});
 
 onMounted(() => {
     image.value?.addEventListener('mousedown', onMouseDown);

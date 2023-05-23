@@ -5,31 +5,46 @@
             in the previous step.
         </warning-alert>
 
-        <div ref="image" class="mt-3">
-            <!-- TODO: height has to be responsive here I guess -->
-            <v-card elevation="5" max-height="700px" style="position: relative;">
-                <taxon-legend v-if="imageLoaded"
-                    class="legend"
-                    :items="legendItems"
-                />
-
-                <interactive-image>
-                    <reactive-image
-                        class="image-container"
-                        :src="pngUrl"
-                        alt="Pathway"
-                        @resize="onResize"
-                    >
-                        <image-overlay v-if="imageLoaded"
-                            :areas="coloredAreas"
-                            :scale="scale"
-                            :onClick="onClickArea"
-                            :onClickCompound="onClickCompound"
+        <v-card class="mt-3" elevation="5" max-height="700px">
+            <image-controls
+                settings
+                download
+                restore
+                @download="onDownload"
+                @restore="onRestore"
+            >
+                <div ref="image">
+                    <!-- TODO: height has to be responsive here I guess -->
+                    <v-card style="position: relative;">
+                        <taxon-legend v-if="imageLoaded"
+                            class="legend"
+                            :items="legendItems"
                         />
-                    </reactive-image>
-                </interactive-image>
-            </v-card>
-        </div>
+
+                        <interactive-image
+                            :scale="scale"
+                            :translate="translate"
+                            @update:scale="scale = $event"
+                            @update:translate="translate = $event"
+                        >
+                            <reactive-image
+                                class="image-container"
+                                :src="pngUrl"
+                                alt="Pathway"
+                                @resize="onResize"
+                            >
+                                <image-overlay v-if="imageLoaded"
+                                    :areas="coloredAreas"
+                                    :scale="imageScale"
+                                    :onClick="onClickArea"
+                                    :onClickCompound="onClickCompound"
+                                />
+                            </reactive-image>
+                        </interactive-image>
+                    </v-card>
+                </div>
+            </image-controls>
+        </v-card>
 
         <area-modal
             :model-value="areaModalOpen"
@@ -42,10 +57,6 @@
             :compoundId="selectedCompound"
             @update:model-value="compoundModalOpen = $event"
         />
-
-        <v-btn class="mt-5 float-right" color="primary" @click="onDownload">
-            Download
-        </v-btn>
     </div>
 
     <warning-alert v-else-if="!pathway" class="mt-5">
@@ -79,6 +90,7 @@ import { storeToRefs } from 'pinia';
 import Pathway from '@/logic/entities/Pathway';
 import { useMapAnnotator } from '@/composables/useMapAnnotator';
 import Taxon from '@/logic/entities/Taxon';
+import ImageControls from '@/components/images/ImageControls.vue';
 
 const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
@@ -93,13 +105,16 @@ const pngUrl = ref<string | undefined>(undefined)
 const areas  = ref<any[]>([])
 
 const imageLoaded = ref<boolean>(false)
-const scale = ref<number>(1)
+const imageScale = ref<number>(1)
 
 const areaModalOpen = ref<boolean>(false)
 const compoundModalOpen = ref<boolean>(false)
 
 const selectedArea = ref<any | undefined>(undefined)
 const selectedCompound = ref<string>('')
+
+const scale = ref<number>(1);
+const translate = ref<{ x: number, y: number }>({ x: 0, y: 0 });
 
 const { pathway, highlightedTaxa } = storeToRefs(visualisationStore);
 
@@ -119,7 +134,7 @@ const coloredAreas = computed(() => {
 
 const onResize = (event: any) => {
     if (event.width && event.width !== 0) {
-        scale.value = event.width / event.naturalWidth;
+        imageScale.value = event.width / event.naturalWidth;
         imageLoaded.value = true;
     }
 }
@@ -145,6 +160,11 @@ const onDownload = async () => {
     link.download = 'pathway.png';
     link.href = url;
     link.click();
+}
+
+const onRestore = () => {
+    scale.value = 1;
+    translate.value = { x: 0, y: 0 };
 }
 
 watch(pathway, async (pathway: Pathway | undefined) => {
