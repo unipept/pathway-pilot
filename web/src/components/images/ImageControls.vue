@@ -5,7 +5,7 @@
                 Scroll to zoom, drag to pan, click a node to reveal additional information
             </span>
             
-            <tooltip message="Download the pathway as a PNG image" v-slot="{ props }">
+            <tooltip message="Download the pathway as a PNG image">
                 <v-btn v-if="download"
                     class="mx-1"
                     color="#f7f7f7"
@@ -14,11 +14,10 @@
                     elevation="0"
                     size="small"
                     @click="onDownload"
-                    v-bind="props"
                 />
             </tooltip>
 
-            <tooltip message="Reset the pathway to its original state" v-slot="{ props }">
+            <tooltip message="Reset the pathway to its original state">
                 <v-btn v-if="restore" 
                     class="mx-1"
                     color="#f7f7f7"
@@ -27,11 +26,10 @@
                     elevation="0"
                     size="small"
                     @click="onRestore"
-                    v-bind="props"
                 />
             </tooltip>
 
-            <tooltip message="Fullscreen mode" v-slot="{ props }">
+            <tooltip message="Fullscreen mode">
                 <v-btn v-if="fullscreen" 
                     class="mx-1"
                     color="#f7f7f7"
@@ -40,7 +38,6 @@
                     elevation="0"
                     size="small"
                     @click="onFullscreen"
-                    v-bind="props"
                 />
             </tooltip>
 

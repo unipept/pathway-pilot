@@ -1,44 +1,93 @@
 <template>
-    <v-tooltip
-        v-model="hovering"
-        location="top center"
-        origin="auto"
-    >
-        <template v-slot:activator="{ props }">
-            <slot :props="props"></slot>
-        </template>
-
-        <span>{{ message }}</span>
-    </v-tooltip>
+    <div ref="tooltip" class="tooltip">
+        <slot></slot>
+        <span
+            ref="tooltipText"
+            class="tooltip-text"
+            :style="{
+                top: top + 'px',
+                left: left + 'px',
+                maxWidth: props.maxWidth + 'px'
+            }"
+        >
+            {{ message }}
+        </span>
+    </div>
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 export interface Props {
-    message: string
+    message: string,
+
+    offset?: number
+    maxWidth?: number
 };
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    offset: 0,
+    maxWidth: 500
+});
 
-const hovering = ref<boolean>(false);
+const tooltip = ref<HTMLElement | null>(null);
+const tooltipText = ref<HTMLElement | null>(null);
 
-watch(hovering, async () => {
-    // La crème de la crème of hacks
+const top = ref(0);
+const left = ref(0);
 
-    // Problem:
-    // Whenever a vuetify tooltip is first opened, it is rendered incorrectly
-    // A scroll event triggers an update when the 'scroll-strategy' prop is set to 'reposition'
-    // This tooltip update fixes the position of the tooltip. 
-    
-    // Explanation:
-    // nextTick is needed to make sure the incorrect rendering is finished
-    // Then we have to use scrollTo twice to simulate a scroll
-    // We can not use dispatchEvent because it does not spawn trusted events
-    await nextTick(() => {
-        window.scrollTo(window.scrollX, window.scrollY - 1);
-        window.scrollTo(window.scrollX, window.scrollY + 1);
+const setTooltipPosition = () => {
+    window.addEventListener('scroll', setTooltipPosition);
+
+    if (tooltip.value && tooltipText.value) {
+        const tooltipBox = tooltip.value.getBoundingClientRect();
+        const tooltipTextBox = tooltipText.value.getBoundingClientRect();
+
+        const offsetLeft = tooltipBox.left - (tooltipTextBox.width / 2)  + (tooltipBox.width / 2);
+        const offsetTop  = tooltipBox.top  - tooltipTextBox.height - props.offset;
+
+        left.value = offsetLeft;
+        top.value  = offsetTop;
+    }
+};
+
+onMounted(() => {
+    tooltip.value?.addEventListener('mouseenter', setTooltipPosition);
+    tooltip.value?.addEventListener('mouseleave', () => {
+        window.removeEventListener('scroll', setTooltipPosition);
+    });
+    setTooltipPosition();
+});
+
+onUnmounted(() => {
+    tooltip.value?.removeEventListener('mouseenter', setTooltipPosition);
+    tooltip.value?.removeEventListener('mouseleave', () => {
+        window.removeEventListener('scroll', setTooltipPosition);
     });
 });
 </script>
 
+<style scoped>
+.tooltip {
+    display: inline;
+}
+
+.tooltip-text {
+    display: block;
+    position: fixed;
+    visibility: hidden;
+    text-align: center;
+    background-color: black;
+    opacity: 0.7;
+    color: white;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: small;
+    height: fit-content;
+    z-index: 9999;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+}
+</style>
