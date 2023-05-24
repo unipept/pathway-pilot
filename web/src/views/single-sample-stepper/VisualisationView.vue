@@ -82,7 +82,6 @@ import ColorConstants from "@/logic/constants/ColorConstants";
 import TaxonLegend from '@/components/legends/TaxonLegend.vue';
 import AreaModal from '@/components/modals/AreaModal.vue';
 import useSingleSampleStore from '@/stores/SingleSampleStore';
-import { toPng } from 'html-to-image';
 import CompoundModal from '@/components/modals/CompoundModal.vue';
 import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
@@ -91,6 +90,7 @@ import Pathway from '@/logic/entities/Pathway';
 import { useMapAnnotator } from '@/composables/useMapAnnotator';
 import Taxon from '@/logic/entities/Taxon';
 import ImageControls from '@/components/images/ImageControls.vue';
+import { usePngDownloader } from '@/composables/download/usePngDownloader';
 
 const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
@@ -98,6 +98,7 @@ const visualisationStore = useVisualisationStore();
 const { colorAllTaxa, colorHighlightedTaxa } = useMapAnnotator(
     mappingStore.ecs, mappingStore.taxaToEcs, mappingStore.children
 );
+const { downloadPng } = usePngDownloader();
 
 const image = ref<HTMLElement | null>(null);
 
@@ -150,16 +151,9 @@ const onClickCompound = (compound: any) => {
 }
 
 const onDownload = async () => {
-    if (!image.value) {
-        return;
+    if (image.value) {
+        downloadPng(image.value, 'pathway.png');
     }
-
-    const url = await toPng(image.value, { pixelRatio: 4 });
-
-    const link = document.createElement('a');
-    link.download = 'pathway.png';
-    link.href = url;
-    link.click();
 }
 
 const onRestore = () => {

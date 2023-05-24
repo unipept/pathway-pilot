@@ -77,7 +77,7 @@ import useVisualisationStore from '@/stores/VisualisationStore';
 import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import BubblePlot from '@/components/visualisations/BubblePlot.vue';
-import { useCsvDownloader } from '@/composables/useCsvDownloader';
+import { useCsvDownloader } from '@/composables/download/useCsvDownloader';
 import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 import { useTaxonomyTree } from '@/composables/useTaxonomyTree';
 

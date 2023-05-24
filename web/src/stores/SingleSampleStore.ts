@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 
 import Taxon from "@/logic/entities/Taxon";
 import { reactive, ref } from 'vue';
-import { useCsvDownloader } from '@/composables/useCsvDownloader';
+import { useCsvDownloader } from '@/composables/download/useCsvDownloader';
 import useKeggStore from './KeggStore';
 
 const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
