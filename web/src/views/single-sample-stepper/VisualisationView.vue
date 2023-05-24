@@ -5,7 +5,7 @@
             in the previous step.
         </warning-alert>
 
-        <v-card class="mt-3" elevation="5" max-height="700px">
+        <v-card class="mt-3" elevation="5">
             <image-controls
                 settings
                 download
@@ -15,7 +15,7 @@
             >
                 <div ref="image">
                     <!-- TODO: height has to be responsive here I guess -->
-                    <v-card style="position: relative;">
+                    <v-card style="position: relative;" max-height="700px">
                         <taxon-legend v-if="imageLoaded"
                             class="legend"
                             :items="legendItems"

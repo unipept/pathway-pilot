@@ -1,7 +1,7 @@
 <template>
     <div ref="image" class="container">
         <div class="control-bar">
-            <span class="align-self-center me-1 text-caption">
+            <span class="align-self-center me-1 text-caption font-weight-medium">
                 Scroll to zoom, drag to pan, click a node to reveal additional information
             </span>
             

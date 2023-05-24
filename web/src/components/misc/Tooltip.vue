@@ -26,7 +26,7 @@ export interface Props {
 };
 
 const props = withDefaults(defineProps<Props>(), {
-    offset: 0,
+    offset: 10,
     maxWidth: 500
 });
 
