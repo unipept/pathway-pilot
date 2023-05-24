@@ -24,7 +24,14 @@ defineProps<Props>();
 const hovering = ref<boolean>(false);
 
 watch(hovering, async () => {
-    // La crème de crème of hacks
+    // La crème de la crème of hacks
+
+    // Problem:
+    // Whenever a vuetify tooltip is first opened, it is rendered incorrectly
+    // A scroll event triggers an update when the 'scroll-strategy' prop is set to 'reposition'
+    // This tooltip update fixes the position of the tooltip. 
+    
+    // Explanation:
     // nextTick is needed to make sure the incorrect rendering is finished
     // Then we have to use scrollTo twice to simulate a scroll
     // We can not use dispatchEvent because it does not spawn trusted events
