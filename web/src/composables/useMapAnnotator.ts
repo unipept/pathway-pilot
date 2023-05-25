@@ -1,5 +1,6 @@
 import ColorConstants from "@/logic/constants/ColorConstants";
 import EcNumber from "@/logic/entities/EcNumber";
+import { useLinearGradient } from "./useLinearGradient";
 
 export function useMapAnnotator(
     ecNumbers: Set<string>, 
@@ -46,7 +47,18 @@ export function useMapAnnotator(
 
             return area;
         });
+    };
 
+    const colorDifferential = (areas: any[], group1: number, group2: number) => {
+        const { getColor } = useLinearGradient(ColorConstants.LEGEND[0], ColorConstants.LEGEND[1]);
+
+
+
+        // TODO: look at the difference
+        //  - Negative: Group 2 has more (Position in gradient > 0.5)
+        //  - Positive: Group 1 has more (Position in gradient < 0.5)
+
+        // TODO: How do we determine the color in the gradient?
     };
 
     return {

@@ -10,8 +10,6 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
     const { downloadCsv } = useCsvDownloader();
 
-
-    
     const name    = ref<string>(sampleName);
     const size    = ref<number>(0);
 
@@ -32,6 +30,8 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
     const pathwaysToPeptideCounts = new Map<string, number>();
 
     const ecToPathways = new Map<string, Set<string>>();
+
+    const specificCounts = reactive<Map<string, number>>(new Map());
 
     const taxaTree = ref<any>(undefined);
 
@@ -102,6 +102,11 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
                     peptideToPathways.set(peptide, new Set());
                 }
                 peptideToPathways.get(peptide)!.add(pathway);
+            }
+
+            const key = `${taxon.id}-${ec}`;
+            if (!specificCounts.has(key)) {
+                specificCounts.set(key, object.count);
             }
         }
 

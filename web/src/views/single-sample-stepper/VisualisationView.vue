@@ -17,9 +17,15 @@
                 <div ref="image">
                     <!-- TODO: height has to be responsive here I guess -->
                     <v-card style="position: relative;" max-height="700px">
-                        <taxon-legend v-if="imageLoaded"
+                        <taxon-legend v-if="imageLoaded && !showAbundanceView"
                             class="legend"
                             :items="legendItems"
+                        />
+
+                        <abundance-legend v-if="imageLoaded && showAbundanceView" 
+                            class="abundance-legend"
+                            :topItem="legendItems[0]"
+                            :bottomItem="legendItems[1]"
                         />
 
                         <interactive-image
@@ -92,6 +98,7 @@ import { useMapAnnotator } from '@/composables/useMapAnnotator';
 import Taxon from '@/logic/entities/Taxon';
 import ImageControls, { ToggleButtonValue } from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
+import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
 
 const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
@@ -202,6 +209,15 @@ watch(highlightedTaxa, () => {
 }
 
 .legend {
+    position: absolute;
+    right: 0;
+    margin: 12px;
+    font-size: 90%;
+    background-color: white;
+    z-index: 1;
+}
+
+.abundance-legend {
     position: absolute;
     right: 0;
     margin: 12px;
