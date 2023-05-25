@@ -41,6 +41,17 @@
                 />
             </tooltip>
 
+            <tooltip :message="abundanceTooltip">
+                <toggle-button v-if="abundance"
+                    class="mx-1"
+                    :style="{
+                        color: abundanceDisabled ? '#ededed' : ''
+                    }"
+                    :disabled="abundanceDisabled"
+                    @toggle="onAbundance"
+                />
+            </tooltip>
+
             <v-menu v-if="settings">
                 <template v-slot:activator="{ props }">
                     <v-btn
@@ -66,30 +77,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useFullscreen } from '@vueuse/core';
-import { nextTick } from 'vue';
 import Tooltip from '@/components/misc/Tooltip.vue';
+import ToggleButton from '../inputs/ToggleButton.vue';
+import { computed } from 'vue';
+
+export type ToggleButtonValue = boolean | 'disabled';
 
 export interface Props {
     settings?: boolean
     download?: boolean
     restore?: boolean
     fullscreen?: boolean
+    abundance?: ToggleButtonValue
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     settings: false,
     download: false,
     restore: false,
     fullscreen: false,
+    abundance: false
 });
 
-const emits = defineEmits(["download", "fullscreen", "restore"]);
+const emits = defineEmits(["download", "fullscreen", "restore", "abundance"]);
 
 const image = ref<HTMLElement | null>(null);
 
 const { isFullscreen, exit, toggle } = useFullscreen(image);
+
+const abundanceDisabled = computed(() => props.abundance === 'disabled');
+
+const abundanceTooltip = computed(() => {
+    if (abundanceDisabled.value) {
+        return "Select two groups to show the differential abundances";
+    }
+    return `Toggle differential abundances`;
+});
 
 const onFullscreen = () => {
     toggle();
@@ -105,6 +130,10 @@ const onDownload = () => {
 
 const onRestore = () => {
     emits("restore");
+}
+
+const onAbundance = (toggled: boolean) => {
+    emits("abundance", toggled);
 }
 </script>
 

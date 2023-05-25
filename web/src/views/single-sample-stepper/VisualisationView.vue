@@ -7,11 +7,12 @@
 
         <v-card class="mt-3" elevation="5">
             <image-controls
-                settings
                 download
                 restore
+                :abundance="abundance"
                 @download="onDownload"
                 @restore="onRestore"
+                @abundance="onAbundance"
             >
                 <div ref="image">
                     <!-- TODO: height has to be responsive here I guess -->
@@ -89,7 +90,7 @@ import { storeToRefs } from 'pinia';
 import Pathway from '@/logic/entities/Pathway';
 import { useMapAnnotator } from '@/composables/useMapAnnotator';
 import Taxon from '@/logic/entities/Taxon';
-import ImageControls from '@/components/images/ImageControls.vue';
+import ImageControls, { ToggleButtonValue } from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
 
 const mappingStore = useSingleSampleStore();
@@ -118,6 +119,9 @@ const scale = ref<number>(1);
 const translate = ref<{ x: number, y: number }>({ x: 0, y: 0 });
 
 const { pathway, highlightedTaxa } = storeToRefs(visualisationStore);
+
+const abundance = ref<ToggleButtonValue>(false);
+const showAbundanceView = ref<boolean>(false);
 
 const legendItems = computed(() => highlightedTaxa.value.map(taxon => ({
         label: taxon.name,
@@ -161,6 +165,10 @@ const onRestore = () => {
     translate.value = { x: 0, y: 0 };
 }
 
+const onAbundance = (value: boolean) => {
+    showAbundanceView.value = value;
+}
+
 watch(pathway, async (pathway: Pathway | undefined) => {
     pngUrl.value = undefined;
     
@@ -169,6 +177,10 @@ watch(pathway, async (pathway: Pathway | undefined) => {
 
     pngUrl.value = data?.image;
     areas.value  = data?.nodes ?? [];
+});
+
+watch(highlightedTaxa, () => {
+    abundance.value = highlightedTaxa.value.length !== 2 ? 'disabled' : true;
 });
 </script>
 

@@ -17,7 +17,7 @@
       "@/*": [
        "src/*"
       ]
-     }
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/components/visualisations/BubblePlotInfo.json"],
   "references": [{ "path": "./tsconfig.node.json" }],
