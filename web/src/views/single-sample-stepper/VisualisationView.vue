@@ -103,8 +103,12 @@ import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
 const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
-const { colorAllTaxa, colorHighlightedTaxa } = useMapAnnotator(
-    mappingStore.ecs, mappingStore.taxaToEcs, mappingStore.children
+const { colorAllTaxa, colorHighlightedTaxa, colorDifferential } = useMapAnnotator(
+    mappingStore.ecs,
+    mappingStore.ecToPeptides,
+    mappingStore.taxaToEcs,
+    mappingStore.peptideToCounts,
+    mappingStore.children
 );
 const { downloadPng } = usePngDownloader();
 
@@ -137,6 +141,11 @@ const legendItems = computed(() => highlightedTaxa.value.map(taxon => ({
 );
 
 const coloredAreas = computed(() => {
+    if (showAbundanceView.value) {
+        return colorDifferential(areas.value, highlightedTaxa.value[0].id, highlightedTaxa.value[1].id);
+    }
+
+
     if (highlightedTaxa.value.length === 0) {
         return colorAllTaxa(areas.value);
     } else {
@@ -187,6 +196,7 @@ watch(pathway, async (pathway: Pathway | undefined) => {
 });
 
 watch(highlightedTaxa, () => {
+    onAbundance(highlightedTaxa.value.length === 2 && showAbundanceView.value)
     abundance.value = highlightedTaxa.value.length !== 2 ? 'disabled' : true;
 });
 </script>

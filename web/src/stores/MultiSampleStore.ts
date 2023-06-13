@@ -1,4 +1,3 @@
-import Pathway from '@/logic/entities/Pathway';
 import { defineStore, Store } from 'pinia';
 
 import { computed, reactive, ref } from 'vue';

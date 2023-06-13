@@ -21,15 +21,18 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
     const peptideToTaxa     = new Map<string, Taxon>();
     const peptideToPathways = new Map<string, Set<string>>();
+    const peptideToCounts   = new Map<string, number>();
 
     const taxaToPathways = new Map<number, Set<string>>();
     const taxaToEcs      = new Map<number, Set<string>>();
+    const taxaToPeptides = new Map<number, Set<string>>();
 
     const pathwaysToEcs  = new Map<string, Set<string>>();
     const pathwaysToTaxa = reactive<Map<string, Set<number>>>(new Map());
     const pathwaysToPeptideCounts = new Map<string, number>();
 
     const ecToPathways = new Map<string, Set<string>>();
+    const ecToPeptides = new Map<string, Set<string>>();
 
     const specificCounts = reactive<Map<string, number>>(new Map());
 
@@ -45,6 +48,8 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         size.value = inputList.length;
 
         const sampleData = await sampleConverter.convert(inputList);
+
+        console.log(sampleData)
 
         if (initialized.value) {
             return;
@@ -93,8 +98,10 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
             }
             ecToPathways.get(object.ec)!.add(pathway);
 
-            for (const peptide of object.peptides.keys()) {
+            for (const [ peptide, count ] of object.peptides) {
                 peptides.add(peptide);
+
+                peptideToCounts.set(peptide, count);
 
                 peptideToTaxa.set(peptide, taxon);
 
@@ -102,6 +109,16 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
                     peptideToPathways.set(peptide, new Set());
                 }
                 peptideToPathways.get(peptide)!.add(pathway);
+
+                if (!taxaToPeptides.has(taxon.id)) {
+                    taxaToPeptides.set(taxon.id, new Set());
+                }
+                taxaToPeptides.get(taxon.id)!.add(peptide);
+
+                if (!ecToPeptides.has(ec)) {
+                    ecToPeptides.set(ec, new Set());
+                }
+                ecToPeptides.get(ec)!.add(peptide);
             }
 
             const key = `${taxon.id}-${ec}`;
@@ -180,7 +197,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
     const download = async (filename: string) => {
         await keggStore.fetchPathwayMapping();
 
-        const header = [ 'peptide', 'taxon id', 'taxon rank', 'taxon name', 'pathways', 'pathway names' ].join(';');
+        const header = [ 'peptide', 'peptide_count', 'taxon id', 'taxon rank', 'taxon name', 'pathways', 'pathway names' ].join(';');
 
         const data = [ ...peptides ].map(peptide => {
             const taxon = peptideToTaxa.get(peptide)!;
@@ -188,6 +205,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
             return [
                 peptide,
+
                 taxon.id,
                 taxon.rank,
                 taxon.name,
@@ -202,15 +220,23 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
     return {
         name,
         size,
+
         taxa,
         pathways,
         ecs,
+
         taxaToPathways,
         taxaToEcs,
+        taxaToPeptides,
+
         pathwaysToEcs,
         pathwaysToTaxa,
-        ecToPathways,
         pathwaysToPeptideCounts,
+
+        ecToPathways,
+        ecToPeptides,
+
+        peptideToCounts,
         taxaTree,
 
         filtered,
