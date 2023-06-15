@@ -78,7 +78,7 @@ import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import useMultiSampleStore from '@/stores/MultiSampleStore';
 import BubblePlot from '@/components/visualisations/BubblePlot.vue';
-import { useCsvDownloader } from '@/composables/useCsvDownloader';
+import { useCsvDownloader } from '@/composables/download/useCsvDownloader';
 
 const { downloadCsv } = useCsvDownloader();
 

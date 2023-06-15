@@ -30,11 +30,11 @@ const visualisationStore = useVisualisationStore();
 
 const pathwayTaxa = computed(() => {
     return [...mappingStore.pathwaysToTaxa.get(visualisationStore.pathway?.id!) ?? []]
-        .filter((taxon: Taxon) => taxon.id !== 1);
+        .filter((taxon: any) => taxon.id !== 1);
 });
 
 const MatchedInputItems = computed(() => {
-    return pathwayTaxa.value.map((taxon: Taxon) => {
+    return pathwayTaxa.value.map((taxon: any) => {
         return {
             taxon_id: taxon.id,
             taxon_name: taxon.name,
@@ -46,7 +46,7 @@ const MatchedInputItems = computed(() => {
 });
 
 const getMatchedAnnotations = (taxon: Taxon) => {
-    const ecNumbers = [...mappingStore.taxaToEcs.get(taxon.id) ?? []].map((ec: EcNumber) => ec.id);
+    const ecNumbers = [...mappingStore.taxaToEcs.get(taxon.id) ?? []].map((ec: any) => ec.id);
     return props.annotations.filter(a => ecNumbers.includes(a))
 }
 </script>

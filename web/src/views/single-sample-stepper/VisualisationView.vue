@@ -103,7 +103,7 @@ import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
 const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
-const { colorAllTaxa, colorHighlightedTaxa, colorDifferential } = useMapAnnotator(
+const { colorAllAreas, colorHighlightedGroups, colorDifferential } = useMapAnnotator(
     mappingStore.ecs,
     mappingStore.ecToPeptides,
     mappingStore.taxaToEcs,
@@ -147,9 +147,9 @@ const coloredAreas = computed(() => {
 
 
     if (highlightedTaxa.value.length === 0) {
-        return colorAllTaxa(areas.value);
+        return colorAllAreas(areas.value);
     } else {
-        return colorHighlightedTaxa(areas.value, highlightedTaxa.value.map((t: Taxon) => t.id));
+        return colorHighlightedGroups(areas.value, highlightedTaxa.value.map((t: Taxon) => t.id));
     }
 });
 

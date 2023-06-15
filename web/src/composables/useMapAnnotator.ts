@@ -5,21 +5,28 @@ import { intersection } from "@/logic/util/SetUtil";
 
 export function useMapAnnotator(
     ecNumbers: Set<string>,
-    ecToPeptides: Map<string, Set<string>>,
-    taxaToEcs: Map<number, Set<string>>,
-    peptideToCounts: Map<string, number>,
-    children: (taxonId: number) => number[],
+    ecToPeptides: Map<string, Set<string>>, // TODO: This is not perfect, because what in case of two different samples with different mappings?
+    // groupToEcToPeptides: Map<number, Map<string, Set<string>>>,
+    groupToEcs: Map<number, Set<string>>,
+    peptideToCounts: Map<string, number>, // TODO: This is not perfect, because what in case of two different samples with different mappings?
+    // groupToPeptideToCounts: Map<number, Map<string, number>>, This will result in some duplication.
+    children?: (taxonId: number) => number[],
 ) {
-    const taxaToEcNumbers = (taxonId: number) => {
-        const ecNumbers = [ ...taxaToEcs.get(taxonId) ?? [] ];
-        const childrenEcNumbers = [ ...children(taxonId) ]
-            .map((child: number) => [ ...taxaToEcs.get(child) ?? []])
+    const groupToEcNumbers = (groupId: number) => {
+        const ecNumbers = [ ...groupToEcs.get(groupId) ?? [] ];
+
+        if (!children) {
+            return new Set(ecNumbers);
+        }
+
+        const childrenEcNumbers = [ ...children(groupId) ]
+            .map((child: number) => [ ...groupToEcs.get(child) ?? []])
             .flat();
 
         return new Set([ ...ecNumbers, ...childrenEcNumbers ]);
     }
 
-    const colorAllTaxa = (areas: any[]) => {
+    const colorAllAreas = (areas: any[]) => {
         return areas.map(area => {
             area.colors = [];
     
@@ -31,27 +38,22 @@ export function useMapAnnotator(
         });
     };
 
-    const colorHighlightedTaxa = (areas: any[], highlightedTaxa: number[]) => {
-        const color = (id: number) => ColorConstants.LEGEND[[ ...highlightedTaxa ].indexOf(id)];
+    const colorHighlightedGroups = (areas: any[], highlightedGroups: number[]) => {
+        const getColor = (id: number) => ColorConstants.LEGEND[[ ...highlightedGroups ].indexOf(id)];
 
-        const taxaToEcNumbers = new Map<number, Set<string>>();
-        for (const taxon of highlightedTaxa) {
-            const ecNumbers = [ ...taxaToEcs.get(taxon) ?? [] ];
-            const childrenEcNumbers = [ ...children(taxon) ]
-                .map((child: number) => [ ...taxaToEcs.get(child) ?? []])
-                .flat();
-
-            taxaToEcNumbers.set(taxon, new Set([ ...ecNumbers, ...childrenEcNumbers ]));
+        const groupsToEcNumbers = new Map<number, Set<string>>();
+        for (const group of highlightedGroups) {
+            groupsToEcNumbers.set(group, groupToEcNumbers(group));
         }
 
         return areas.map(area => {
             area.colors = new Set();
 
-            for (const taxon of highlightedTaxa) {
-                const ecNumbers = [ ...taxaToEcNumbers.get(taxon) ?? [] ];
+            for (const group of highlightedGroups) {
+                const ecNumbers = [ ...groupsToEcNumbers.get(group) ?? [] ];
 
                 if (area.info.ecNumbers.some((ec: EcNumber) => ecNumbers.includes(ec.id))) {
-                    area.colors.add(color(taxon));
+                    area.colors.add(getColor(group));
                 }
             }
 
@@ -64,8 +66,8 @@ export function useMapAnnotator(
     const colorDifferential = (areas: any[], group1: number, group2: number) => {
         const { getColor } = useLinearGradient(ColorConstants.LEGEND[0], ColorConstants.LEGEND[1]);
 
-        const group1EcNumbers = taxaToEcNumbers(group1);
-        const group2EcNumbers = taxaToEcNumbers(group2);
+        const group1EcNumbers = groupToEcNumbers(group1);
+        const group2EcNumbers = groupToEcNumbers(group2);
 
         const range = [ 0, 0 ];
         const differenceAreas = areas.map(area => {
@@ -113,8 +115,8 @@ export function useMapAnnotator(
     };
 
     return {
-        colorAllTaxa,
-        colorHighlightedTaxa,
+        colorAllAreas,
+        colorHighlightedGroups,
         colorDifferential,
     };
 };

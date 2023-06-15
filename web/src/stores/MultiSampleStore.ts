@@ -18,7 +18,7 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
     });
 
     const addSample = (sampleName: string) => {
-        samples.value.push(useSingleSampleStore(`multiSampleStore_sample${_counter++}`, sampleName));
+        samples.value = [ ...samples.value, useSingleSampleStore(`multiSampleStore_sample${_counter++}`, sampleName) ];
         return samples.value.length - 1;
     };
 
@@ -32,7 +32,7 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
 
     const removeSample = (index: number) => {
         // TODO: destroy the store
-        samples.value.splice(index, 1);
+        samples.value = [ ...samples.value.slice(0, index), ...samples.value.slice(index + 1) ]
     };
 
     const reset = () => {
