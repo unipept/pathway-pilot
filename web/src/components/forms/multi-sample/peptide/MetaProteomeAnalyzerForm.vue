@@ -24,8 +24,8 @@
                 </ol>
             </p>
 
-            <peptide-form
-                label="Paste your Max Quant results here"
+            <upload-form
+                label="Paste your Meta Proteome Analyzer results here"
                 :example="example"
                 :loading="loading"
                 @submit="onSubmit"
@@ -35,10 +35,10 @@
 </template>
 
 <script lang="ts" setup>
-import PeptideForm from './PeptideForm.vue';
+import UploadForm from '../UploadForm.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
 
-import example from '../examples/MaxQuantExample';
+import example from '../../examples/peptide/MetaProteomeAnalyzerExample';
 
 export interface Props {
     loading?: boolean;
