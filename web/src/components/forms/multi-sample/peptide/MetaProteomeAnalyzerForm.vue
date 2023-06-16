@@ -1,6 +1,9 @@
 <template>
     <v-card flat>
-        <v-card-text class="pa-0">
+        <v-card-title>
+            Upload a list of PS files
+        </v-card-title>
+        <v-card-text>
             <p class="subtitle">
                 Provide a list of tryptic peptides by either pasting your sequences on the right or selecting a single <span>.txt</span> 
                 file. Each line of input will be interpreted as a single sequence and can't contain any special characters. Have a look 
@@ -21,21 +24,21 @@
                 </ol>
             </p>
 
-            <peptide-form
-                label="Paste your peptide list here"
+            <upload-form
+                label="Paste your Meta Proteome Analyzer results here"
                 :example="example"
                 :loading="loading"
-                @submit="e => $emit('submit', e)"
-                @reset="e => $emit('reset', e)"
+                @submit="onSubmit"
             />
         </v-card-text>
     </v-card>
 </template>
 
-<script setup lang="ts">
-import PeptideForm from './PeptideForm.vue';
+<script lang="ts" setup>
+import UploadForm from '../UploadForm.vue';
+import ResourceLink from '@/components/misc/ResourceLink.vue';
 
-import example from '../examples/PeptideListExample';
+import example from '../../examples/peptide/MetaProteomeAnalyzerExample';
 
 export interface Props {
     loading?: boolean;
@@ -45,5 +48,9 @@ withDefaults(defineProps<Props>(), {
     loading: false,
 });
 
-defineEmits(["submit", "reset"]);
+const emits = defineEmits(["submit"]);
+
+const onSubmit = async (peptideList: string[], sampleName: string) => {
+    emits("submit", peptideList, sampleName);
+};
 </script>

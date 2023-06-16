@@ -1,4 +1,7 @@
 <template>
+    Use the dropdown menu to select the input format that fits your data. Currently we only support peptide input. You can either 
+    provide a raw list of peptides or the output of a few popular tools.
+
     <v-select
         class="mt-3 mb-n5"
         v-model="inputFormat"
@@ -28,7 +31,9 @@ const inputFormats = [
     FileFormat.PEPTIDE_SHAKER,
     FileFormat.MAX_QUANT,
     FileFormat.PROTEOME_DISCOVERER,
-    FileFormat.META_PROTEOME_ANALYZER
+    FileFormat.META_PROTEOME_ANALYZER,
+    
+    FileFormat.PROTEIN_LIST,
 ];
 
 watch(() => props.modelValue, (newVal: FileFormat) => {

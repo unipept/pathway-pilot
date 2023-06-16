@@ -24,8 +24,8 @@
                 </ol>
             </p>
 
-            <peptide-form
-                label="Paste your peptide shaker results here"
+            <upload-form
+                label="Paste your Max Quant results here"
                 :example="example"
                 :loading="loading"
                 @submit="onSubmit"
@@ -35,10 +35,10 @@
 </template>
 
 <script lang="ts" setup>
-import PeptideForm from './PeptideForm.vue';
+import UploadForm from '../UploadForm.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
 
-import example from '../examples/PeptideShakerExample';
+import example from '../../examples/peptide/MaxQuantExample';
 
 export interface Props {
     loading?: boolean;

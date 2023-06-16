@@ -2,7 +2,6 @@
     <div v-if="selectedPathway" class="mt-5">
         <v-row class="mt-5">
             <v-col v-if="selectedTaxa">
-                <h3>Select multiple taxa <span style="font-size: x-small; color: #7a7a7a;">OPTIONAL</span></h3>
                 <p class="subtitle">
                     By default we will highlight all nodes with a match between the selected pathway and your input data. By selecting <b>a maximum of 4</b> taxa, we can narrow 
                     this down to only highlight nodes that are associated with the selected pathway and taxa.

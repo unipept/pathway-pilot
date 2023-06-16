@@ -19,23 +19,26 @@ import ErrorModal from '@/components/modals/ErrorModal.vue';
 import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 import FileFormat from '../FileFormat';
 
-import PeptideListForm from '@/components/forms/single-sample/PeptideListForm.vue';
-import PeptideShakerForm from '@/components/forms/single-sample/PeptideShakerForm.vue';
-import MaxQuantForm from '@/components/forms/single-sample/MaxQuantForm.vue';
-import ProteomeDiscovererForm from '@/components/forms/single-sample/ProteomeDiscovererForm.vue';
-import MetaProteomeAnalyzerForm from '@/components/forms/single-sample/MetaProteomeAnalyzerForm.vue';
+import PeptideListForm from '@/components/forms/single-sample/peptide/PeptideListForm.vue';
+import PeptideShakerForm from '@/components/forms/single-sample/peptide/PeptideShakerForm.vue';
+import MaxQuantForm from '@/components/forms/single-sample/peptide/MaxQuantForm.vue';
+import ProteomeDiscovererForm from '@/components/forms/single-sample/peptide/ProteomeDiscovererForm.vue';
+import MetaProteomeAnalyzerForm from '@/components/forms/single-sample/peptide/MetaProteomeAnalyzerForm.vue';
+import ProteinListForm from '@/components/forms/single-sample/protein/ProteinListForm.vue';
 
-import PeptideListVerifier from '@/logic/verifiers/PeptideListVerifier';
-import PeptideShakerVerifier from '@/logic/verifiers/PeptideShakerVerifier';
-import MaxQuantVerifier from '@/logic/verifiers/MaxQuantVerifier';
-import ProteomeDiscovererVerifier from '@/logic/verifiers/ProteomeDiscovererVerifier';
-import MetaProteomeAnalyzerVerifier from '@/logic/verifiers/MetaProteomeAnalyzerVerifier';
+import PeptideListVerifier from '@/logic/verifiers/peptide/PeptideListVerifier';
+import PeptideShakerVerifier from '@/logic/verifiers/peptide/PeptideShakerVerifier';
+import MaxQuantVerifier from '@/logic/verifiers/peptide/MaxQuantVerifier';
+import ProteomeDiscovererVerifier from '@/logic/verifiers/peptide/ProteomeDiscovererVerifier';
+import MetaProteomeAnalyzerVerifier from '@/logic/verifiers/peptide/MetaProteomeAnalyzerVerifier';
+import ProteinListVerifier from '@/logic/verifiers/protein/ProteinListVerifier';
 
-import PeptideListConverter from '@/logic/converters/PeptideListConverter';
-import PeptideShakerConverter from '@/logic/converters/PeptideShakerConverter';
-import MaxQuantConverter from '@/logic/converters/MaxQuantConverter';
-import ProteomeDiscovererConverter from '@/logic/converters/ProteomeDiscovererConverter';
-import MetaProteomeAnalyzerConverter from '@/logic/converters/MetaProteomeAnalyzerConverter';
+import PeptideListConverter from '@/logic/converters/peptide/PeptideListConverter';
+import PeptideShakerConverter from '@/logic/converters/peptide/PeptideShakerConverter';
+import MaxQuantConverter from '@/logic/converters/peptide/MaxQuantConverter';
+import ProteomeDiscovererConverter from '@/logic/converters/peptide/ProteomeDiscovererConverter';
+import MetaProteomeAnalyzerConverter from '@/logic/converters/peptide/MetaProteomeAnalyzerConverter';
+import ProteinListConverter from '@/logic/converters/protein/ProteinListConverter';
 
 export interface Props {
     fileFormat: FileFormat;
@@ -76,6 +79,12 @@ const formatMap = new Map<FileFormat, { component: any, verifier: any, converter
         component: MetaProteomeAnalyzerForm, 
         verifier: new MetaProteomeAnalyzerVerifier(),
         converter: new MetaProteomeAnalyzerConverter({ onProgressUpdate: () => {} })
+    } ],
+    
+    [ FileFormat.PROTEIN_LIST, {
+        component: ProteinListForm, 
+        verifier: new ProteinListVerifier(),
+        converter: new ProteinListConverter({ onProgressUpdate: () => {} })
     } ],
 ]);
 

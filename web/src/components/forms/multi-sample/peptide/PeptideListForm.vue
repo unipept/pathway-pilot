@@ -1,7 +1,7 @@
 <template>
     <v-card flat>
         <v-card-title>
-            Upload a list of PS files
+            Upload a list of peptides
         </v-card-title>
         <v-card-text>
             <p class="subtitle">
@@ -24,8 +24,8 @@
                 </ol>
             </p>
 
-            <peptide-form
-                label="Paste your Proteome Discoverer results here"
+            <upload-form
+                label="Paste your peptide list here"
                 :example="example"
                 :loading="loading"
                 @submit="onSubmit"
@@ -35,10 +35,10 @@
 </template>
 
 <script lang="ts" setup>
-import PeptideForm from './PeptideForm.vue';
+import UploadForm from '../UploadForm.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
 
-import example from '../examples/ProteomeDiscovererExample';
+import example from '../../examples/peptide/PeptideListExample';
 
 export interface Props {
     loading?: boolean;

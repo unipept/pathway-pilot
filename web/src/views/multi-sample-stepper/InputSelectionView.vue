@@ -28,7 +28,9 @@ const inputFormats = [
     FileFormat.PEPTIDE_SHAKER,
     FileFormat.MAX_QUANT,
     FileFormat.PROTEOME_DISCOVERER,
-    FileFormat.META_PROTEOME_ANALYZER
+    FileFormat.META_PROTEOME_ANALYZER,
+    
+    FileFormat.PROTEIN_LIST,
 ];
 
 watch(() => props.modelValue, (newVal: FileFormat) => {
