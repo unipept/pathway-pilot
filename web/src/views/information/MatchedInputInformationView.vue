@@ -34,19 +34,20 @@ const pathwayTaxa = computed(() => {
 });
 
 const MatchedInputItems = computed(() => {
-    return pathwayTaxa.value.map((taxon: any) => {
-        return {
-            taxon_id: taxon.id,
-            taxon_name: taxon.name,
-            taxon_rank: taxon.rank,
-            node_annotations: props.annotations,
-            matched_annotations: getMatchedAnnotations(taxon)
-        };
-    });
+    return pathwayTaxa.value
+        .map((taxon: number) => mappingStore.taxa.get(taxon)!)
+        .map((taxon: Taxon) => {
+            return {
+                taxon_id: taxon.id,
+                taxon_name: taxon.name,
+                taxon_rank: taxon.rank,
+                node_annotations: props.annotations,
+                matched_annotations: getMatchedAnnotations(taxon)
+            };
+        });
 });
 
 const getMatchedAnnotations = (taxon: Taxon) => {
-    const ecNumbers = [...mappingStore.taxaToEcs.get(taxon.id) ?? []].map((ec: any) => ec.id);
-    return props.annotations.filter(a => ecNumbers.includes(a))
+    return props.annotations.filter(a => mappingStore.taxaToEcs.get(taxon.id)?.has(a))
 }
 </script>
