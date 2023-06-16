@@ -3,7 +3,7 @@
         v-if="items.length <= 0"
         class="mb-4"
     >
-        You have not uploaded a single sample. You can click the button below to start uploading your first sample.
+        It seems that you haven't uploaded any samples yet. To begin, simply click the button below to initiate the upload process for your first sample.
     </warning-alert>
 
     <v-card v-for="item, i of items"

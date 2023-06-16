@@ -27,7 +27,6 @@
             fill-dot
             width="100%"
         >
-            <h4>You can upload and compare a maximum of 4 samples</h4>
             <upload-view :file-format="fileFormat" />
         </v-timeline-item>
 

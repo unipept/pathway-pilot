@@ -3,20 +3,23 @@
         <v-row>
             <v-col cols=5>
                 <p class="subtitle">
-                    Please select a pathway you wish to visualise. You can either use the table below or utilise the bubbleplot visualisation 
-                    on the right. In case of a large amount of pathways, you can always look for the pathway using the ID or name.
+                    Please select the pathway you would like to visualize from either the options presented in the table below or by utilizing the 
+                    interactive bubble plot visualization on the right-hand side. In the case of a large number of pathways, you have the option to 
+                    search for a specific pathway using its ID, name or category.
                 </p>
 
                 <p class="mt-3 subtitle">
-                    Depending on the amount of matches and the Unipept results for your chosen pathway, it might be possible to select 
-                    multiple taxa. This will allow you to visualise the pathway with a more specific coloring.
+                    Upon selecting a bubble or an entry from the table, PathwayPilot will retrieve the corresponding pathway image and generate an 
+                    overlay to generate an interactive result. Based on the number of matches and/or Unipept results, it may be feasible 
+                    to select multiple taxa in the next step. This selection offers a more specific color representation within the pathway, providing 
+                    a more precise visualization.
                 </p>
 
                 <p v-if="pathwayItems.length <= 0" class="mt-3 subtitle">
                     Unfortunately, we were not able to visualise your input data on any pathway.
                 </p>
                 <p v-else class="mt-3 subtitle">
-                    We were able to visualise your input data on <b>{{ pathwayItems.length }}</b> unique pathways.
+                    We have successfully visualized your input data across <b>{{ pathwayItems.length }}</b> distinct pathways.
                 </p>
             </v-col>
 
@@ -29,13 +32,8 @@
             </v-col>
         </v-row>
 
-        <v-row class="mt-5">
+        <v-row>
             <v-col cols=12>
-                <h3>Select your pathway</h3>
-                <p class="subtitle">
-                    The table below list all the pathways that have at least one node in common with your input data. You can either 
-                    scroll through the table or use the search bar to find the specific pathway you wish to visualise.
-                </p>
                 <v-text-field v-if="pathwayItems.length > 0"
                     class="mt-3 mb-n3"
                     v-model="pathwaySearch"
@@ -64,7 +62,7 @@
     </div>
 
     <warning-alert v-else class="mt-5">
-        In order to create your selection, you need to upload the data first.
+        To get started with the selection process, please upload at least one sample.
     </warning-alert>
 </template>
 

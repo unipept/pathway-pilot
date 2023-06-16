@@ -62,7 +62,7 @@
     </div>
 
     <warning-alert v-else-if="!pathway" class="mt-5">
-        No pathway selected. Please select a pathway first.
+        No pathway has been selected yet. Before proceeding, please follow the previous steps to select a pathway.
     </warning-alert>
 
     <div v-else class="loading-container">

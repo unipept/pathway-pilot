@@ -1,5 +1,7 @@
 <template>
-    <div class="mt-5">
+    <div>
+        <h4 class="mb-3">You can upload and compare a maximum of 4 samples</h4>
+
         <sample-table 
             :items="tableItems"
             :max="4"
