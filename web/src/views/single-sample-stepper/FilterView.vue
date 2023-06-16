@@ -8,30 +8,27 @@
             on the selected enzyme.
         </p>
 
-        <v-row>
-            <v-col cols=12>
-                <v-text-field
-                    class="mt-3 mb-n3"
-                    v-model="enzymeSearch"
-                    label="Search for your EC number"
-                    prepend-inner-icon="mdi-magnify"
-                    variant="solo"
-                    density="comfortable"
-                />
-                <enzyme-table
-                    v-model="selectedEnzymes"
-                    :items="enzymeItems"
-                    :search="enzymeSearch"
-                />
-            </v-col>
-        </v-row>
+        <div class="d-flex align-center">
+            <v-text-field
+                class="mt-3 mb-n3"
+                v-model="enzymeSearch"
+                label="Search for your EC number"
+                prepend-inner-icon="mdi-magnify"
+                variant="solo"
+                density="comfortable"
+            />
 
-        <div class="d-flex justify-end mt-3">
-            <v-btn class="ms-3" color="primary" @click="onDownload">
+            <v-btn class="ms-3" color="primary" variant="outlined" @click="onDownload">
                 <v-icon left>mdi-download</v-icon>
                 <span class="ms-1">Download pathway mapping</span>
             </v-btn>
         </div>
+
+        <enzyme-table
+            v-model="selectedEnzymes"
+            :items="enzymeItems"
+            :search="enzymeSearch"
+        />
     </div>
 </template>
 

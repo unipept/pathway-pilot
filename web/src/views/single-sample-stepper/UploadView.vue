@@ -18,6 +18,7 @@ import VerifierError from '@/logic/verifiers/VerifierError';
 import ErrorModal from '@/components/modals/ErrorModal.vue';
 import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 import FileFormat from '../FileFormat';
+import useVisualisationStore from '@/stores/VisualisationStore';
 
 import PeptideListForm from '@/components/forms/single-sample/peptide/PeptideListForm.vue';
 import PeptideShakerForm from '@/components/forms/single-sample/peptide/PeptideShakerForm.vue';
@@ -49,6 +50,7 @@ const props = defineProps<Props>();
 defineEmits(['submit']);
 
 const sampleStore = useSingleSampleStore();
+const visualisationStore = useVisualisationStore();
 
 const processing = ref<boolean>(false);
 
@@ -103,6 +105,7 @@ const onSubmit = async (peptideList: string[]) => {
 
 const onReset = () => {
     sampleStore.reset();
+    visualisationStore.reset();
     errors.value = [];
 };
 </script>

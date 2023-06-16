@@ -1,6 +1,6 @@
 <template>
     <div v-if="initialized" class="mt-5">
-        <v-row>
+        <v-row v-if="pathwayItems.length > 0">
             <v-col cols=5>
                 <p class="subtitle">
                     Please select the pathway you would like to visualize from either the options presented in the table below or by utilizing the 
@@ -32,33 +32,31 @@
             </v-col>
         </v-row>
 
-        <v-row>
-            <v-col cols=12>
-                <v-text-field v-if="pathwayItems.length > 0"
-                    class="mt-3 mb-n3"
-                    v-model="pathwaySearch"
-                    label="Search for an identifier or name"
-                    prepend-inner-icon="mdi-magnify"
-                    variant="solo"
-                    density="comfortable"
-                />
-                <pathway-table v-if="pathwayItems.length > 0"
-                    v-model="selectedPathway"
-                    :items="pathwayItems"
-                    :search="pathwaySearch"
-                >
-                    <template #download>
-                        <v-btn class="ms-3" color="primary" variant="outlined" @click="onDownload">
-                            <v-icon left>mdi-download</v-icon>
-                            <span class="ms-1">Download table</span>
-                        </v-btn>
-                    </template>
-                </pathway-table>
-                <warning-alert v-else class="mt-3">
-                    We were unable to match your input data with any pathways. You can always try to analyse a different input sample.
-                </warning-alert>
-            </v-col>
-        </v-row>
+        <div v-if="pathwayItems.length > 0" class="d-flex align-center">
+            <v-text-field
+                class="mt-3 mb-n3"
+                v-model="pathwaySearch"
+                label="Search for an identifier or name"
+                prepend-inner-icon="mdi-magnify"
+                variant="solo"
+                density="comfortable"
+            />
+
+            <v-btn class="ms-3" color="primary" variant="outlined" @click="onDownload">
+                <v-icon left>mdi-download</v-icon>
+                <span class="ms-1">Download table</span>
+            </v-btn>
+        </div>
+
+        <pathway-table v-if="pathwayItems.length > 0"
+            v-model="selectedPathway"
+            :items="pathwayItems"
+            :search="pathwaySearch"
+        />
+
+        <warning-alert v-else class="mt-3">
+            Unfortunately, we were unable to identify any pathways that correspond to your input data. You may consider analyzing a different input sample to explore pathway associations.
+        </warning-alert>
     </div>
 
     <warning-alert v-else class="mt-5">
