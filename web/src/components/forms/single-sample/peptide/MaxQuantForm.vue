@@ -1,6 +1,8 @@
 <template>
     <v-card flat>
-        <v-card-text class="pa-0">
+        <v-card-text class="information">
+            <h4 class="mb-3">Upload a MaxQuant file</h4>
+
             <upload-form
                 label="Paste your MaxQuant results here"
                 :loading="loading"
@@ -27,3 +29,10 @@ withDefaults(defineProps<Props>(), {
 
 defineEmits(["submit", "reset"]);
 </script>
+
+<style scoped>
+.information {
+    padding: 0;
+    font-size: 16px;
+}
+</style>

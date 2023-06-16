@@ -1,8 +1,8 @@
 <template>
     <div v-if="pngUrl">
         <warning-alert v-if="highlightedTaxa.length === 0" class="mt-3">
-            You selected no taxa during the previous step. Therefore <b>all nodes with at least one match</b> are shown in the same color. You can always update your selection 
-            in the previous step.
+            Based on your previous selection, no taxa were chosen. Consequently, <b>all nodes with at least one match</b> are displayed using a uniform color. 
+            It is possible to modify your selection in the preceding step to refine the visualization.
         </warning-alert>
 
         <v-card class="mt-3" elevation="5">
@@ -67,7 +67,7 @@
     </div>
 
     <warning-alert v-else-if="!pathway" class="mt-5">
-        No pathway selected. Please select a pathway first.
+        No pathway has been selected yet. Before proceeding, please follow the previous steps to select a pathway.
     </warning-alert>
 
     <div v-else class="loading-container">

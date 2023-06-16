@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-5">
+    <div>
         <component 
             :is="formatMap.get(fileFormat)?.component"
             :loading="processing"

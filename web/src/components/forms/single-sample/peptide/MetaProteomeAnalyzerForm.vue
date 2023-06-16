@@ -1,8 +1,10 @@
 <template>
     <v-card flat>
-        <v-card-text class="pa-0">
+        <v-card-text class="information">
+            <h4 class="mb-3">Upload a MetaProteome Analyzer file</h4>
+
             <upload-form
-                label="Paste your Meta Proteome Analyzer results here"
+                label="Paste your MetaProteome Analyzer results here"
                 :loading="loading"
                 :example="example"
                 @submit="$emit('submit', $event)"
@@ -27,3 +29,10 @@ withDefaults(defineProps<Props>(), {
 
 defineEmits(["submit", "reset"]);
 </script>
+
+<style scoped>
+.information {
+    padding: 0;
+    font-size: 16px;
+}
+</style>

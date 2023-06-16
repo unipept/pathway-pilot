@@ -106,6 +106,7 @@
 <script setup lang="ts">
 import useKeggStore from '@/stores/KeggStore';
 import { computed, onBeforeMount, ref } from 'vue';
+import Tooltip from '../misc/Tooltip.vue';
 
 export interface Props {
     areas: any[];
@@ -116,8 +117,6 @@ export interface Props {
 };
 
 const props = defineProps<Props>();
-
-const l = console.log;
 
 const keggStore = useKeggStore();
 

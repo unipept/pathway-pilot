@@ -27,7 +27,6 @@
             fill-dot
             width="100%"
         >
-            <h4>Upload a list of peptides</h4>
             <upload-view :file-format="fileFormat" @submit="resetVisualisationStore"/>
         </v-timeline-item>
 

@@ -1,8 +1,10 @@
 <template>
     <v-card flat>
-        <v-card-text class="pa-0">
+        <v-card-text class="information">
+            <h4 class="mb-3">Upload a ProteomeDiscoverer file</h4>
+
             <upload-form
-                label="Paste your Proteome Discoverer results here"
+                label="Paste your ProteomeDiscoverer results here"
                 :loading="loading"
                 :example="example"
                 @submit="$emit('submit', $event)"
@@ -27,3 +29,10 @@ withDefaults(defineProps<Props>(), {
 
 defineEmits(["submit", "reset"]);
 </script>
+
+<style scoped>
+.information {
+    padding: 0;
+    font-size: 16px;
+}
+</style>

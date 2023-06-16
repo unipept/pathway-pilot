@@ -1,5 +1,13 @@
 <template>
-    <div v-if="initialized">
+    <div v-if="initialized" class="mt-3">
+        <p class="mb-2">
+            The table below presents all the Enzyme Commission (EC) numbers identified in your dataset through the use of 
+            <resource-link url="https://unipept.ugent.be/">Unipept</resource-link>. By selecting one or more entries from this table, 
+            you can apply specific filters on the pathways. For instance, if you choose EC 1.1.1.1, only the pathways containing this 
+            particular EC number, and found within your input data will be displayed. This allows for targeted pathway exploration based 
+            on the selected enzyme.
+        </p>
+
         <v-row>
             <v-col cols=12>
                 <v-text-field
@@ -25,10 +33,6 @@
             </v-btn>
         </div>
     </div>
-
-    <warning-alert v-else class="mt-5">
-        In order to create your selection, you need to upload the data first.
-    </warning-alert>
 </template>
 
 <script lang="ts" setup>
@@ -36,9 +40,9 @@ import { computed, onMounted, ref } from 'vue';
 import useSingleSampleStore from '@/stores/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import useKeggStore from '@/stores/KeggStore';
-import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import EnzymeTable from '@/components/tables/selection/EnzymeTable.vue';
 import { watch } from 'vue';
+import ResourceLink from '@/components/misc/ResourceLink.vue';
 
 const sampleStore = useSingleSampleStore();
 const keggStore = useKeggStore();

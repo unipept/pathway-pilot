@@ -1,10 +1,11 @@
 <template>
-    <div v-if="selectedPathway" class="mt-5">
-        <v-row class="mt-5">
+    <div v-if="selectedPathway" class="mt-3">
+        <v-row>
             <v-col v-if="selectedTaxa">
-                <p class="subtitle">
-                    By default we will highlight all nodes with a match between the selected pathway and your input data. By selecting <b>a maximum of 4</b> taxa, we can narrow 
-                    this down to only highlight nodes that are associated with the selected pathway and taxa.
+                <p class="subtitle mb-2">
+                    By default, PathwayPilot highlights all nodes that correspond to a match between the selected pathway and your input data. However, to further refine the 
+                    visualization, you have the option to select a <b>maximum of four taxa</b>. By doing so, the highlighting will be limited to nodes that are specifically 
+                    associated with the selected pathway and the chosen taxa. This allows for a more focused and relevant representation of the pathway.
                 </p>
 
                 <div class="d-flex">
