@@ -10,7 +10,8 @@ const RANKS = [
     'order',
     'family',
     'genus',
-    'species'
+    'species',
+    'strain'
 ]
 
 export function useTaxonomyTree() {    
