@@ -136,10 +136,6 @@ watch(() => props.modelValue, (newValue) => {
     selectedItems.value = newValue;
     itemSelected.value = newValue.some(item => item.id === props.node.id);
 });
-
-watch(() => props.node, (newValue) => {
-    console.log(newValue);
-});
 </script>
 
 <style scoped>

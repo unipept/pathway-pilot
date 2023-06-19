@@ -79,7 +79,7 @@ import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 import { useTaxonomyTree } from '@/composables/useTaxonomyTree';
 
 const { downloadCsv } = useCsvDownloader();
-const { fetchTaxonomyTree } = useTaxonomyTree();
+const { compressRankTree, fetchTaxonomyTree } = useTaxonomyTree();
 
 const mappingStore = useSingleSampleStore();
 const keggStore = useKeggStore();
@@ -121,9 +121,11 @@ watch(selectedPathway, async (pathway: Pathway | undefined) => {
     visualisationStore.setHighlightedTaxa([]);
 
     if (pathway) {
-        const tree = await fetchTaxonomyTree(Array.from(mappingStore.pathwaysToTaxa.get(pathway?.id)!), true);
+        const taxa = Array.from(mappingStore.pathwaysToTaxa.get(pathway?.id)!);
+        const tree = await fetchTaxonomyTree(taxa);
 
         mappingStore.setTree(tree);
+        mappingStore.setCompressedTree(compressRankTree(tree, taxa, true));
     }
 });
 

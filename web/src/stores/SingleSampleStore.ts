@@ -4,6 +4,7 @@ import Taxon from "@/logic/entities/Taxon";
 import { reactive, ref } from 'vue';
 import { useCsvDownloader } from '@/composables/download/useCsvDownloader';
 import useKeggStore from './KeggStore';
+import { TreeviewItem } from '@/components/visualisations/TreeviewItem';
 
 const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
     const keggStore = useKeggStore();
@@ -36,7 +37,9 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
     const specificCounts = reactive<Map<string, number>>(new Map());
 
-    const taxaTree = ref<any>(undefined);
+    const defaultNode = { id: 1, name: "Organism", nameExtra: "no rank", highlighted: false, children: [] };
+    const taxaTree           = ref<TreeviewItem>(defaultNode);
+    const compressedTaxaTree = ref<TreeviewItem>(defaultNode);
 
     const initialized = ref<boolean>(false);
 
@@ -48,8 +51,6 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         size.value = inputList.length;
 
         const sampleData = await sampleConverter.convert(inputList);
-
-        console.log(sampleData)
 
         if (initialized.value) {
             return;
@@ -130,8 +131,12 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         initialized.value = true;
     }
 
-    const setTree = async (tree: any) => {
+    const setTree = (tree: TreeviewItem) => {
         taxaTree.value = tree;
+    }
+
+    const setCompressedTree = (tree: TreeviewItem) => {
+        compressedTaxaTree.value = tree;
     }
 
     const children = (taxonId: number) => {
@@ -154,7 +159,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
         const nodes = [ taxaTree.value ];
         while (nodes.length > 0) {
-            const node = nodes.pop();
+            const node = nodes.pop()!;
 
             if (node.id === taxonId) {
                 return collectChildren(node);
@@ -238,6 +243,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
         peptideToCounts,
         taxaTree,
+        compressedTaxaTree,
 
         filtered,
         filteredPathways,
@@ -246,6 +252,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
         initialize,
         setTree,
+        setCompressedTree,
         reset,
         children,
 
