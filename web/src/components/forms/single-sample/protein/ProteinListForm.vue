@@ -1,7 +1,7 @@
 <template>
     <v-card flat>
         <v-card-text class="information">
-            <h4 class="mb-3">Upload a list of proteins</h4>
+            <h4 class="mb-3">Upload your list of proteins</h4>
 
             <p class="subtitle">
                 Please input a list of proteins by either pasting the <resource-link url="https://www.uniprot.org/">UniProt</resource-link> accession 

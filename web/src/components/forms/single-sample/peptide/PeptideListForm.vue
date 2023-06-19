@@ -1,7 +1,7 @@
 <template>
     <v-card flat>
         <v-card-text class="information">
-            <h4 class="mb-3">Upload a list of peptides</h4>
+            <h4 class="mb-3">Upload your list of peptides</h4>
             
             <p class="subtitle">
                 Please input a list of tryptic peptides by either pasting the peptide sequences on the right-hand side or selecting a single 

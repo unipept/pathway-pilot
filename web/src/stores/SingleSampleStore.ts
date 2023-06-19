@@ -98,7 +98,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
             }
             ecToPathways.get(object.ec)!.add(pathway);
 
-            for (const [ peptide, count ] of object.peptides) {
+            for (const [ peptide, count ] of object.peptides) { // TODO: fix this for proteins
                 peptides.add(peptide);
 
                 peptideToCounts.set(peptide, count);

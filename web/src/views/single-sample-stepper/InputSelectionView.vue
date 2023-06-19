@@ -8,6 +8,7 @@
             v-model="inputFormat"
             label="Select your input format"
             density="comfortable"
+            variant="outlined"
             :items="inputFormats"
             @update:model-value="e => $emit('update:model-value', e)"
         />
@@ -21,6 +22,8 @@ import FileFormat from '../FileFormat';
 export interface Props {
     modelValue: FileFormat;
 }
+
+const l = console.log;
 
 const props = defineProps<Props>();
 
@@ -42,3 +45,9 @@ watch(() => props.modelValue, (newVal: FileFormat) => {
     inputFormat.value = newVal;
 });
 </script>
+
+<style scoped>
+.list-item:hover {
+    background-color: red;
+}
+</style>

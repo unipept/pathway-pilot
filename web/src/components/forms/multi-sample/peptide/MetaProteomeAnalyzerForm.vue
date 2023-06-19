@@ -1,31 +1,37 @@
 <template>
     <v-card flat>
         <v-card-title>
-            Upload a list of PS files
+            Upload your MetaProteomeAnalyzer file
         </v-card-title>
         <v-card-text>
             <p class="subtitle">
-                Provide a list of tryptic peptides by either pasting your sequences on the right or selecting a single <span>.txt</span> 
-                file. Each line of input will be interpreted as a single sequence and can't contain any special characters. Have a look 
-                at the example below to get a feel about the input format.
+                Please input a valid <resource-link url="https://github.com/compomics/meta-proteome-analyzer">MetaProteomeAnalyzer</resource-link> file by either pasting the file contents 
+                on the right-hand side or selecting a single <span>.tsv</span> file. The file should <b>never</b> start with a header row. Each line of input should 
+                contain a valid peptide sequence in the <b>third</b> column. This sequence should only contain valid amino acids and must not include any special 
+                characters. Please refer to the example below for guidance on the expected input format.
             </p>
 
             <p class="subtitle mt-3">
-                Two processing steps will happen whenever you upload your data:
+                After uploading your data, it will undergo two seperate processing steps as follows:
+
                 <ol class="ms-5">
-                    <li class="ms-5">
-                        Each input line will be analyzed with <resource-link url="https://unipept.ugent.be/">Unipept</resource-link>. 
-                        this results is list of functional annotations and taxa per sequence.  <b>Note: Unipept works with peptides of 
-                        length 5 - 50. Shorter and longer peptides will be ignored</b>.
+                    <li class="ms-5 mt-1">
+                        <b>Analysis by the Unipept peptinfo endpoint:</b> Each peptide in 
+                        the dataset will be analysed using the <resource-link url="https://unipept.ugent.be/apidocs/peptinfo">Unipept peptinfo</resource-link> endpoint. 
+                        This analysis will result in a list of functional annotations and assign a taxon (LCA) to each peptide sequence. It is important to note that 
+                        <resource-link url="https://unipept.ugent.be/">Unipept</resource-link> is designed to process peptides with a length ranging from 5 to 50 amino acids. 
+                        Peptides that are shorter or longer  will be disregarded during the analysis.
                     </li>
-                    <li class="ms-5">
-                        Each functional annotation gets mapped onto zero or more <resource-link url="https://www.genome.jp/kegg/pathway.html">Kegg pathways</resource-link>.
+                    <li class="ms-5 mt-1">
+                        <b>Mapping of functional annotations to Kegg pathways:</b> Each functional annotation obtained from the previous step will be further mapped onto one 
+                        or more <resource-link url="https://www.genome.jp/kegg/pathway.html">Kegg pathways</resource-link>. This step helps to establish associations between 
+                        the functional properties of peptides and the relevant pathways in the Kegg database.
                     </li>
                 </ol>
             </p>
 
             <upload-form
-                label="Paste your Meta Proteome Analyzer results here"
+                label="Paste your MetaProteomeAnalyzer results here"
                 :example="example"
                 :loading="loading"
                 @submit="onSubmit"

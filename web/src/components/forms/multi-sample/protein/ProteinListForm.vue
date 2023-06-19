@@ -1,7 +1,7 @@
 <template>
     <v-card flat>
         <v-card-title>
-            Upload a list of proteins
+            Upload your list of proteins
         </v-card-title>
         <v-card-text>
             <p class="subtitle">

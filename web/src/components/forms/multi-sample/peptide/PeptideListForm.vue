@@ -1,7 +1,7 @@
 <template>
     <v-card flat>
         <v-card-title>
-            Upload a list of peptides
+            Upload your list of peptides
         </v-card-title>
         <v-card-text>
             <p class="subtitle">

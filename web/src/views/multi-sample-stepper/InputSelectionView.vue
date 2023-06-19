@@ -8,6 +8,7 @@
             v-model="inputFormat"
             label="Select your input format"
             density="comfortable"
+            variant="outlined"
             :items="inputFormats"
             @update:model-value="e => $emit('update:model-value', e)"
         />
