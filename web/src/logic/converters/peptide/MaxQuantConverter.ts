@@ -1,10 +1,15 @@
 import ProgressListener from "../ProgressListener";
 import PeptideListConverter from "./PeptideListConverter";
+import Converter from "../Converter";
 
-export default class MaxQuantConverter {
+export default class MaxQuantConverter implements Converter {
     constructor(
         private readonly progressListener: ProgressListener
     ) {}
+
+    public isPeptide() {
+        return true;
+    }
 
     public async convert(maxQuantResult: string[]) {
         const sequenceIndex = maxQuantResult[0]

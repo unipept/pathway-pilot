@@ -1,8 +1,9 @@
 import KeggCommunicator from "../../communicators/KEGGCommunicator";
 import UnipeptCommunicator from "../../communicators/UnipeptCommunicator";
 import ProgressListener from "../ProgressListener";
+import Converter from "../Converter";
 
-export default class PeptideListConverter {
+export default class PeptideListConverter implements Converter {
     private unipeptCommunicator: UnipeptCommunicator;
     private keggCommunicator: KeggCommunicator;
 
@@ -11,6 +12,10 @@ export default class PeptideListConverter {
     ) {
         this.unipeptCommunicator = new UnipeptCommunicator();
         this.keggCommunicator = new KeggCommunicator();
+    }
+
+    public isPeptide() {
+        return true;
     }
 
     public async convert(peptideList: string[]) {
@@ -36,7 +41,7 @@ export default class PeptideListConverter {
 
                     if (!entry) {
                         entry = {
-                            peptides: new Map<String, number>(),
+                            items: new Map<String, number>(),
                             taxon_id: info.taxon_id,
                             taxon_name: info.taxon_name,
                             taxon_rank: info.taxon_rank,
@@ -47,10 +52,10 @@ export default class PeptideListConverter {
                         };
                     }
 
-                    if (!entry.peptides.has(info.peptide)) {
-                        entry.peptides.set(info.peptide, 0);
+                    if (!entry.items.has(info.peptide)) {
+                        entry.items.set(info.peptide, 0);
                     }
-                    entry.peptides.set(info.peptide, entry.peptides.get(info.peptide) + 1);
+                    entry.items.set(info.peptide, entry.items.get(info.peptide) + 1);
 
                     entry.count += 1;
 

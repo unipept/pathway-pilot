@@ -1,10 +1,15 @@
 import ProgressListener from "../ProgressListener";
 import PeptideListConverter from "./PeptideListConverter";
+import Converter from "../Converter";
 
-export default class ProteomeDiscovererConverter {
+export default class ProteomeDiscovererConverter implements Converter {
     constructor(
         private readonly progressListener: ProgressListener
     ) {}
+
+    public isPeptide() {
+        return true;
+    }
 
     public async convert(proteomeDiscovererResult: string[]) {
         const sequenceIndex = proteomeDiscovererResult[0]

@@ -10,8 +10,8 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
     const { downloadCsv } = useCsvDownloader();
 
-    const name    = ref<string>(sampleName);
-    const size    = ref<number>(0);
+    const name = ref<string>(sampleName);
+    const size = ref<number>(0);
 
     // Mappings containing all matched entities
     const peptides = new Set<string>();
@@ -98,7 +98,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
             }
             ecToPathways.get(object.ec)!.add(pathway);
 
-            for (const [ peptide, count ] of object.peptides) { // TODO: fix this for proteins
+            for (const [ peptide, count ] of object.items) {
                 peptides.add(peptide);
 
                 peptideToCounts.set(peptide, count);
