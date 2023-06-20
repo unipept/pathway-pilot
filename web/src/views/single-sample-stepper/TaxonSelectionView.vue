@@ -25,7 +25,7 @@
                     v-model="selectedItems"
                     :node="tree"
                     :max="4"
-                    expanded
+                    :expanded="expandTree"
                 />
 
                 <warning-alert v-else class="mt-3">
@@ -61,20 +61,25 @@ const tree = ref<TreeviewItem>(compressedTaxaTree.value);
 const taxaSearch = ref<string>("");
 const selectedItems = ref<TreeviewItem[]>([]);
 
+const expandTree = ref<number>(2);
+
 watch(() => taxaTree.value, () => {
     tree.value = compressedTaxaTree.value;
     taxaSearch.value = "";
+    expandTree.value = 2;
 });
 
 watch(() => taxaSearch.value, (val) => {
     tree.value = filterTree(compressedTaxaTree.value, val);
+    expandTree.value = val === '' ? 2 : expandTree.value + 10;
 });
 
 watch(() => selectedPathway.value, () => {
-    taxaSearch.value = "";
-    selectedItems.value = [];
-    tree.value = compressedTaxaTree.value;
     visualisationStore.setHighlightedTaxa([]);
+    tree.value = compressedTaxaTree.value;
+    selectedItems.value = [];
+    taxaSearch.value = "";
+    expandTree.value = 2;
 });
 
 watch(() => selectedItems.value, () => {

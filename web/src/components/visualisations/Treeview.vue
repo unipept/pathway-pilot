@@ -57,6 +57,7 @@
                 :node="child"
                 :lines="depth > 0 ? [ ...lines, !last ] : lines"
                 :depth="depth + 1"
+                :expanded="expanded"
                 :size="size"
                 :first="i === 0"
                 :last="i === amountOfChildren - 1"
@@ -88,7 +89,7 @@ export interface Props {
     lines?: boolean[]
 
     depth?: number
-    expanded?: boolean
+    expanded?: boolean | number
     size?: Size
     first?: boolean
     last?: boolean
@@ -110,7 +111,9 @@ const emits = defineEmits(['update:modelValue']);
 
 const selectedItems = ref<TreeviewItem[]>(props.modelValue);
 
-const isExpanded = ref<boolean>(props.expanded);
+const isExpanded = ref<boolean>(
+    Number.isInteger(props.expanded) ? props.expanded as number > props.depth : props.expanded as boolean
+);
 const itemSelected = ref<boolean>(props.modelValue.some(item => item.id === props.node.id));
 
 const selectable = computed(() => props.max > 0);
@@ -118,6 +121,8 @@ const selectable = computed(() => props.max > 0);
 const amountOfChildren = computed(() => props.node.children.length)
 
 const hasChildren = computed(() => amountOfChildren.value > 0);
+
+console.log(isExpanded.value, props.expanded, props.depth);
 
 const onClick = () => {
     isExpanded.value = !isExpanded.value;
@@ -135,6 +140,10 @@ watch(() => itemSelected.value, (newValue) => {
 watch(() => props.modelValue, (newValue) => {
     selectedItems.value = newValue;
     itemSelected.value = newValue.some(item => item.id === props.node.id);
+});
+
+watch(() => props.expanded, (newValue) => {
+    isExpanded.value = Number.isInteger(newValue) ? newValue as number > props.depth : newValue as boolean;
 });
 </script>
 
