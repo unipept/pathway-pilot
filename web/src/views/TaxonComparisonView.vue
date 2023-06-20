@@ -35,15 +35,6 @@
             width="100%"
         >
             <template v-slot:icon>2</template>
-            <h2>Filter your data <span style="font-size: small; color: #7a7a7a;">OPTIONAL</span></h2>
-            <filter-view />
-        </v-timeline-item>
-
-        <v-timeline-item
-            dot-color="primary"
-            width="100%"
-        >
-            <template v-slot:icon>3</template>
             <h2>Select your pathway</h2>
             <pathway-selection-view />
         </v-timeline-item>
@@ -52,7 +43,7 @@
             dot-color="primary"
             width="100%"
         >
-            <template v-slot:icon>4</template>
+            <template v-slot:icon>3</template>
             <h2>Select your taxa <span style="font-size: small; color: #7a7a7a;">OPTIONAL</span></h2>
             <taxon-selection-view />
         </v-timeline-item>
@@ -61,7 +52,7 @@
             dot-color="primary"
             width="100%"
         >
-            <template v-slot:icon>5</template>
+            <template v-slot:icon>4</template>
             <h2>Analyse your pathway</h2>
             <visualisation-view />
         </v-timeline-item>
