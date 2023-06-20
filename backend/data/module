@@ -258,6 +258,7 @@ M00616	Sulfate-sulfur assimilation
 M00617	Methanogen
 M00618	Acetogen
 M00620	Incomplete reductive citrate cycle, acetyl-CoA => oxoglutarate
+M00621	Glycine cleavage system
 M00622	Nicotinate degradation, nicotinate => fumarate
 M00623	Phthalate degradation, phthalate => protocatechuate
 M00624	Terephthalate degradation, terephthalate => 3,4-dihydroxybenzoate
@@ -471,3 +472,7 @@ M00965	Vindoline biosynthesis, tabersonine => vindoline
 M00966	Equol biosynthesis, daidzein => equol
 M00967	Flavone degradation, luteolin/apigenin => DHCA/phloretate
 M00968	Pentose bisphosphate pathway (nucleoside degradation), archaea, nucleoside/NMP => 3-PGA/glycerone phosphate
+M00969	Fumagillin biosynthesis, farnesyl-PP => fumagillin
+M00970	Proline degradation, proline => glutamate
+M00971	QS-7 biosynthesis, 2,3-epoxysqualene => QS-7
+M00972	Proline metabolism

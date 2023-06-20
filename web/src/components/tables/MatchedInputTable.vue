@@ -59,8 +59,6 @@ const props = defineProps<Props>();
 
 const hasItems = computed(() => props.items.length > 0);
 
-const l = console.log;
-
 const headers = [
     {
         title: "Taxon id",

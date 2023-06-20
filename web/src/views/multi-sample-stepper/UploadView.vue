@@ -78,8 +78,6 @@ const formatMap = new Map<FileFormat, { converter: any }>([
 const onSubmit = async (peptideList: string[], sampleName: string) => {
     processing.value = true;
 
-    console.log(sampleName)
-
     const sample = sampleStore.addSample(sampleName);
     await sampleStore.initializeSample(
         sample,

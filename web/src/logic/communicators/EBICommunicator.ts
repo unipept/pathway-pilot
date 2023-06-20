@@ -13,8 +13,6 @@ export default class EBICommunicator {
                 .then(data => result.push(data));
         }
 
-        console.log(result);
-
         return result;
     }
 };

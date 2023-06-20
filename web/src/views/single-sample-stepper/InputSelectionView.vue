@@ -23,8 +23,6 @@ export interface Props {
     modelValue: FileFormat;
 }
 
-const l = console.log;
-
 const props = defineProps<Props>();
 
 defineEmits(['update:model-value']);

@@ -122,8 +122,6 @@ const amountOfChildren = computed(() => props.node.children.length)
 
 const hasChildren = computed(() => amountOfChildren.value > 0);
 
-console.log(isExpanded.value, props.expanded, props.depth);
-
 const onClick = () => {
     isExpanded.value = !isExpanded.value;
 }

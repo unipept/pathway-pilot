@@ -256,7 +256,6 @@ watch(pathway, async (pathway: Pathway | undefined) => {
 });
 
 watch(samples, () => {
-    console.log(samples.value.length)
     onAbundance(samples.value.length === 2 && showAbundanceView.value)
     abundance.value = samples.value.length !== 2 ? 'disabled' : true;
 });

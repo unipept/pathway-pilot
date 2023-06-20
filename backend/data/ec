@@ -721,7 +721,7 @@
 1.2.99.10	4,4'-diapolycopenoate synthase; crtNc; 4,4'-diapolycopenealdehyde oxidase (misleading)
 1.3.1.1	dihydropyrimidine dehydrogenase (NAD+); dihydropyrimidine dehydrogenase; dihydrothymine dehydrogenase; pyrimidine reductase; thymine reductase; uracil reductase; dihydrouracil dehydrogenase (NAD+)
 1.3.1.2	dihydropyrimidine dehydrogenase (NADP+); dihydrothymine dehydrogenase; dihydrouracil dehydrogenase (NADP+); 4,5-dihydrothymine: oxidoreductase; DPD; DHPDH; dehydrogenase, dihydrouracil (nicotinamide adenine dinucleotide phosphate); DHU dehydrogenase; hydropyrimidine dehydrogenase; dihydropyrimidine dehydrogenase (NADP)
-1.3.1.3	Delta4-3-oxosteroid 5beta-reductase; 3-oxo-Delta4-steroid 5beta-reductase; 5beta-reductase; androstenedione 5beta-reductase; cholestenone 5beta-reductase; cortisone 5beta-reductase; cortisone beta-reductase; cortisone Delta4-5beta-reductase; steroid 5beta-reductase; testosterone 5beta-reductase; Delta4-3-ketosteroid 5beta-reductase; Delta4-5beta-reductase; Delta4-hydrogenase; 4,5beta-dihydrocortisone:NADP+ Delta4-oxidoreductase; 3-oxo-5beta-steroid:NADP+ Delta4-oxidoreductase
+1.3.1.3	Delta4-3-oxosteroid 5beta-reductase; 3-oxo-Delta4-steroid 5beta-reductase; 5beta-reductase; androstenedione 5beta-reductase; cholestenone 5beta-reductase; cortisone 5beta-reductase; cortisone beta-reductase; cortisone Delta4-5beta-reductase; steroid 5beta-reductase; testosterone 5beta-reductase; Delta4-3-ketosteroid 5beta-reductase; Delta4-5beta-reductase; Delta4-hydrogenase; 4,5beta-dihydrocortisone:NADP+ Delta4-oxidoreductase; 3-oxo-5beta-steroid:NADP+ Delta4-oxidoreductase; 5beta-cholestan-3-one:NADP+ 4,5-oxidoreductase
 1.3.1.4	Transferred to 1.3.1.4 and 1.3.1.22
 1.3.1.5	cucurbitacin Delta23-reductase; NAD(P)H: cucurbitacin B Delta23-oxidoreductase
 1.3.1.6	fumarate reductase (NADH); NADH-fumarate reductase; NADH-dependent fumarate reductase; fumarate reductase (NADH)
@@ -760,7 +760,7 @@
 1.3.1.39	enoyl-[acyl-carrier-protein] reductase (NADPH, Re-specific); acyl-ACP dehydrogenase; enoyl-[acyl carrier protein] (reduced nicotinamide adenine dinucleotide phosphate) reductase; NADPH 2-enoyl Co A reductase; enoyl-ACp reductase; enoyl-[acyl-carrier-protein] reductase (NADPH2, A-specific); acyl-[acyl-carrier-protein]:NADP+ oxidoreductase (A-specific); enoyl-[acyl-carrier-protein] reductase (NADPH, A-specific); acyl-[acyl-carrier protein]:NADP+ oxidoreductase (A-specific)
 1.3.1.40	2-hydroxy-6-oxo-6-phenylhexa-2,4-dienoate reductase; 2-hydroxy-6-oxo-phenylhexa-2,4-dienoate (reduced nicotinamide adenine dinucleotide phosphate) reductase
 1.3.1.41	xanthommatin reductase
-1.3.1.42	12-oxophytodienoate reductase; 12-oxo-phytodienoic acid reductase; 8-[(1R,2R)-3-oxo-2-{(Z)-pent-2-enyl}cyclopentyl]octanoate:NADP+ 4-oxidoreductase
+1.3.1.42	12-oxophytodienoate reductase; 12-oxo-phytodienoic acid reductase; 8-[(1R,2R)-3-oxo-2-{(Z)-pent-2-enyl}cyclopentyl]octanoate:NADP+ 4-oxidoreductase; (9S,13S)-10,11-dihydro-12-oxo-15-phytoenoate:NADP+ 4-oxidoreductase; (9S,13S)-12-oxophyto-15-enoate:NADP+ 10-oxidoreductase
 1.3.1.43	arogenate dehydrogenase; arogenic dehydrogenase (ambiguous); cyclohexadienyl dehydrogenase (ambiguous); pretyrosine dehydrogenase (ambiguous); L-arogenate:NAD+ oxidoreductase; arogenate dehydrogenase (NAD+)
 1.3.1.44	trans-2-enoyl-CoA reductase (NAD+); trans-2-enoyl-CoA reductase (NAD+)
 1.3.1.45	2'-hydroxyisoflavone reductase; NADPH:2'-hydroxyisoflavone oxidoreductase; isoflavone reductase; 2',7-dihydroxy-4',5'-methylenedioxyisoflavone reductase
@@ -2079,7 +2079,7 @@
 1.14.14.163	(S)-1-hydroxy-N-methylcanadine 13-hydroxylase; CYP82X2 (gene name)
 1.14.14.164	fraxetin 5-hydroxylase; CYP82C4; fraxetin 5-monooxygenase
 1.14.14.165	indole-3-carbonyl nitrile 4-hydroxylase; CYP82C2
-1.14.14.166	(S)-N-methylcanadine 1-hydroxylase; CYP82Y1 (gene name)
+1.14.14.166	(S)-N-methylcanadine 1-hydroxylase; CYP82Y1 (gene name); (S)-N-methylcanadine,[reduced NADPH---hemoprotein reductase]:oxygen oxidoreductase (1-hydroxylating)
 1.14.14.167	(13S,14R)-13-O-acetyl-1-hydroxy-N-methylcanadine 8-hydroxylase; CYP82X1 (gene name)
 1.14.14.168	germacrene A acid 8beta-hydroxylase; HaG8H; CYP71BL1; CYP71BL6
 1.14.14.169	eupatolide synthase; CYP71DD6; HaES
@@ -5215,7 +5215,7 @@
 3.1.26.10	ribonuclease IX; poly(U)- and poly(C)-specific endoribonuclease
 3.1.26.11	tRNase Z; 3 tRNase; tRNA 3 endonuclease; RNase Z; 3' tRNase
 3.1.26.12	ribonuclease E; endoribonuclease E; RNase E; Rne protein
-3.1.26.13	retroviral ribonuclease H; RT/RNase H; retroviral reverse transcriptase RNaseH; HIV RNase H
+3.1.26.13	retroviral ribonuclease H; RT/RNase H; retroviral reverse transcriptase RNaseH (gene name); HIV RNase H
 3.1.27.1	Transferred to 4.6.1.19
 3.1.27.2	Transferred to 4.6.1.22
 3.1.27.3	Transferred to 4.6.1.24
@@ -5396,7 +5396,7 @@
 3.2.1.165	exo-1,4-beta-D-glucosaminidase; CsxA; GlcNase; exochitosanase; GlmA; exo-beta-D-glucosaminidase; chitosan exo-1,4-beta-D-glucosaminidase
 3.2.1.166	heparanase; Hpa1 heparanase; Hpa1; heparanase 1; heparanase-1; C1A heparanase; HPSE
 3.2.1.167	baicalin-beta-D-glucuronidase; baicalinase
-3.2.1.168	hesperidin 6-O-alpha-L-rhamnosyl-beta-D-glucosidase
+3.2.1.168	hesperidin 6-O-alpha-L-rhamnosyl-beta-D-glucosidase; AnRut; rutinosidase
 3.2.1.169	protein O-GlcNAcase; OGA; glycoside hydrolase O-GlcNAcase; O-GlcNAcase; BtGH84; O-GlcNAc hydrolase
 3.2.1.170	mannosylglycerate hydrolase; MgH
 3.2.1.171	rhamnogalacturonan hydrolase; rhamnogalacturonase A; RGase A; RG-hydrolase
@@ -5641,14 +5641,14 @@
 3.4.17.14	zinc D-Ala-D-Ala carboxypeptidase; Zn2+ G peptidase; D-alanyl-D-alanine hydrolase; D-alanyl-D-alanine-cleaving carboxypeptidase; DD-carboxypeptidase; G enzyme; DD-carboxypeptidase-transpeptidase
 3.4.17.15	carboxypeptidase A2; CPA2
 3.4.17.16	membrane Pro-Xaa carboxypeptidase; carboxypeptidase P; microsomal carboxypeptidase; membrane Pro-X carboxypeptidase
-3.4.17.17	tubulinyl-Tyr carboxypeptidase; carboxypeptidase-tubulin; soluble carboxypeptidase; tubulin-tyrosine carboxypeptidase; tubulin carboxypeptidase; tubulinyltyrosine carboxypeptidase; tyrosinotubulin carboxypeptidase; tyrosyltubulin carboxypeptidase; TTCPase; brain I carboxypeptidase
+3.4.17.17	tubulinyl-Tyr carboxypeptidase; carboxypeptidase-tubulin; soluble carboxypeptidase; tubulin-tyrosine carboxypeptidase; tubulin carboxypeptidase; tubulinyltyrosine carboxypeptidase; tyrosinotubulin carboxypeptidase; tyrosyltubulin carboxypeptidase; TTCPase; brain I carboxypeptidase; carboxypeptidase 1; CCP1
 3.4.17.18	carboxypeptidase T; CPT (ambiguous)
 3.4.17.19	carboxypeptidase Taq
 3.4.17.20	carboxypeptidase U; arginine carboxypeptidase; carboxypeptidase R; plasma carboxypeptidase B (misleading, since the term carboxypeptidase B is used for other enzymes); thrombin-activatable fibrinolysis inhibitor
 3.4.17.21	glutamate carboxypeptidase II; N-acetylated-gamma-linked-acidic dipeptidase (NAALADase); folate hydrolase; prostate-specific membrane antigen; pteroylpoly-gamma-glutamate carboxypeptidase; microsomal gamma-glutamyl carboxypeptidase; pteroylpolyglutamate hydrolase; folylpolyglutamate hydrolase; pteroylpoly-gamma-glutamate hydrolase; pteroylpolygammaglutamyl hydrolase; pteroylpolyglutamic acid hydrolase; PSM antigen; acetylaspartylglutamate dipeptidase; NAALA dipeptidase; rat NAAG peptidase; mGCP; membrane glutamate carboxypeptidase; N-acetylated-alpha-linked-amino dipeptidase; prostrate-specific membrane antigen; N-Acetylated alpha-linked acidic dipeptidase; PSMA
 3.4.17.22	metallocarboxypeptidase D; carboxypeptidase D (cattle, human, mouse, rat); gp180 (duck)
 3.4.17.23	angiotensin-converting enzyme 2; ACE-2; ACE2; hACE2; angiotensin converting enzyme 2; angiotensin converting enzyme-2; Tmem27
-3.4.17.24	tubulin-glutamate carboxypeptidase; cytosolic carboxypeptidase 1; cytosolic carboxypeptidase 5; CCP1; CCP5; Agtpbp1 (gene name); AGBL5 (gene name)
+3.4.17.24	tubulin-glutamate carboxypeptidase; cytosolic carboxypeptidase 5; CCP5; Agtpbp1 (gene name); AGBL5 (gene name)
 3.4.17.25	glutathione-S-conjugate glycine hydrolase; PCS1 (gene name); PRC1 (gene name); CPC (gene name); ATG42 (gene name); alr0975 (locus name)
 3.4.18.1	cathepsin X; cathepsin B2; cysteine-type carboxypeptidase; cathepsin IV; cathepsin Z; acid carboxypeptidase; lysosomal carboxypeptidase B
 3.4.19.1	acylaminoacyl-peptidase; acylamino-acid-releasing enzyme; N-acylpeptide hydrolase; N-formylmethionine (fMet) aminopeptidase; alpha-N-acylpeptide hydrolase
