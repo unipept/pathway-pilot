@@ -17,7 +17,6 @@
             fill-dot
             width="100%"
         >
-            <h4>Select your input format</h4>
             <input-selection-view v-model="fileFormat" />
         </v-timeline-item>
 
@@ -69,16 +68,16 @@
 </template>
 
 <script setup lang="ts">
-import UploadView from './single-sample-stepper/UploadView.vue';
-import PathwaySelectionView from './single-sample-stepper/PathwaySelectionView.vue';
-import TaxonSelectionView from './single-sample-stepper/TaxonSelectionView.vue';
-import VisualisationView from './single-sample-stepper/VisualisationView.vue';
-import InputSelectionView from './single-sample-stepper/InputSelectionView.vue';
+import UploadView from './sample-stepper/single-sample-stepper/UploadView.vue';
+import PathwaySelectionView from './sample-stepper/single-sample-stepper/PathwaySelectionView.vue';
+import TaxonSelectionView from './sample-stepper/single-sample-stepper/TaxonSelectionView.vue';
+import VisualisationView from './sample-stepper/single-sample-stepper/VisualisationView.vue';
+import InputSelectionView from './sample-stepper/InputSelectionView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import useSingleSampleStore from '@/stores/SingleSampleStore';
-import FileFormat from './FileFormat';
+import FileFormat from './sample-stepper/FileFormat';
 import { ref, watch } from 'vue';
-import FilterView from './single-sample-stepper/FilterView.vue';
+import FilterView from './sample-stepper/single-sample-stepper/FilterView.vue';
 
 const { reset: resetSingleSampleStore } = useSingleSampleStore();
 const { reset: resetVisualisationStore } = useVisualisationStore();

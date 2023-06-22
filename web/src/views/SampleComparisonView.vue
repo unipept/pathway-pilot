@@ -17,7 +17,6 @@
             fill-dot
             width="100%"
         >
-            <h4>Select your input format</h4>
             <input-selection-view v-model="fileFormat" />
         </v-timeline-item>
 
@@ -51,14 +50,14 @@
 </template>
 
 <script setup lang="ts">
-import PathwaySelectionView from './multi-sample-stepper/PathwaySelectionView.vue';
+import PathwaySelectionView from './sample-stepper/multi-sample-stepper/PathwaySelectionView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
-import VisualisationView from './multi-sample-stepper/VisualisationView.vue';
+import VisualisationView from './sample-stepper/multi-sample-stepper/VisualisationView.vue';
 import useMultiSampleStore from '@/stores/MultiSampleStore';
-import InputSelectionView from './multi-sample-stepper/InputSelectionView.vue';
-import UploadView from './multi-sample-stepper/UploadView.vue';
+import InputSelectionView from './sample-stepper/InputSelectionView.vue';
+import UploadView from './sample-stepper/multi-sample-stepper/UploadView.vue';
 import { ref, watch } from 'vue';
-import FileFormat from './FileFormat';
+import FileFormat from './sample-stepper/FileFormat';
 
 const { reset: resetMultiSampleStore } = useMultiSampleStore();
 const { reset: resetVisualisationStore } = useVisualisationStore();
