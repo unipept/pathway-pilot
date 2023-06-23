@@ -20,7 +20,7 @@
             fill-dot
             width="100%"
         >
-            <upload-view :file-format="fileFormat" @submit="resetVisualisationStore"/>
+            <upload-view :file-format="fileFormat" />
         </v-timeline-item>
 
         <v-timeline-item dot-color="primary" width="100%">
@@ -30,13 +30,11 @@
 
         <v-timeline-item dot-color="primary" width="100%">
             <template v-slot:icon>3</template>
-            <h2>Select your taxa <span style="font-size: small; color: #7a7a7a;">OPTIONAL</span></h2>
             <taxon-selection-view />
         </v-timeline-item>
 
         <v-timeline-item dot-color="primary" width="100%">
             <template v-slot:icon>4</template>
-            <h2>Analyse your pathway</h2>
             <visualisation-view />
         </v-timeline-item>
     </v-timeline>
@@ -61,7 +59,7 @@ const fileFormat = ref<FileFormat>(FileFormat.PEPTIDE_LIST);
 resetSingleSampleStore();
 resetVisualisationStore();
 
-watch(() => fileFormat.value, (newVal: FileFormat) => {
+watch(() => fileFormat.value, () => {
     resetSingleSampleStore();
     resetVisualisationStore();
 });

@@ -1,4 +1,6 @@
 <template>
+    <h2>Analyse your pathway</h2>
+
     <div v-if="pngUrl">
         <warning-alert v-if="highlightedTaxa.length === 0" class="mt-3">
             Based on your previous selection, no taxa were chosen. Consequently, <b>all nodes with at least one match</b> are displayed using a uniform color. 
@@ -76,7 +78,7 @@
             width="5"
             color="primary"
             indeterminate
-        ></v-progress-circular>
+        />
     </div>
 </template>
 
@@ -145,7 +147,6 @@ const coloredAreas = computed(() => {
         return colorDifferential(areas.value, highlightedTaxa.value[0].id, highlightedTaxa.value[1].id);
     }
 
-
     if (highlightedTaxa.value.length === 0) {
         return colorAllAreas(areas.value);
     } else {
@@ -170,7 +171,7 @@ const onClickCompound = (compound: any) => {
     compoundModalOpen.value = true;
 }
 
-const onDownload = async () => {
+const onDownload = () => {
     if (image.value) {
         downloadPng(image.value, 'pathway.png');
     }
@@ -185,7 +186,7 @@ const onAbundance = (value: boolean) => {
     showAbundanceView.value = value;
 }
 
-watch(pathway, async (pathway: Pathway | undefined) => {
+watch(pathway, async () => {
     pngUrl.value = undefined;
     
     // Fetch data from the store when loaded

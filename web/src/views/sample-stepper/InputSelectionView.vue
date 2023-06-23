@@ -76,10 +76,10 @@ const proteinInputFormats = [
 
 const shortDescriptions = new Map<FileFormat, string>([
     [FileFormat.PEPTIDE_LIST, 'A list of peptides, a single sequence per line'],
-    [FileFormat.PEPTIDE_SHAKER, 'The output of PeptideShaker'],
-    [FileFormat.MAX_QUANT, 'The output of MaxQuant'],
-    [FileFormat.PROTEOME_DISCOVERER, 'The output of Proteome Discoverer'],
-    [FileFormat.META_PROTEOME_ANALYZER, 'The output of MetaProteomeAnalyzer'],
+    [FileFormat.PEPTIDE_SHAKER, 'The output of PeptideShaker in a tsv format'],
+    [FileFormat.MAX_QUANT, 'The output of MaxQuant in a tsv format'],
+    [FileFormat.PROTEOME_DISCOVERER, 'The output of Proteome Discoverer in a tsv format'],
+    [FileFormat.META_PROTEOME_ANALYZER, 'The output of MetaProteomeAnalyzer in a tsv format'],
     [FileFormat.PROTEIN_LIST, 'A list of proteins, a single UniProt id per line'],
 ]); 
 

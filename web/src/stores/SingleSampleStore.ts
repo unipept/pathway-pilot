@@ -4,7 +4,7 @@ import Taxon from "@/logic/entities/Taxon";
 import { reactive, ref } from 'vue';
 import { useCsvDownloader } from '@/composables/download/useCsvDownloader';
 import useKeggStore from './KeggStore';
-import { TreeviewItem } from '@/components/visualisations/TreeviewItem';
+import { TreeviewItem, defaultTreeviewItem } from '@/components/visualisations/TreeviewItem';
 
 const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
     const keggStore = useKeggStore();
@@ -37,9 +37,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
     const specificCounts = reactive<Map<string, number>>(new Map());
 
-    const defaultNode = { id: 1, name: "Organism", nameExtra: "no rank", highlighted: false, children: [] };
-    const taxaTree           = ref<TreeviewItem>(defaultNode);
-    const compressedTaxaTree = ref<TreeviewItem>(defaultNode);
+    const taxaTree = ref<TreeviewItem>(defaultTreeviewItem);
 
     const initialized = ref<boolean>(false);
 
@@ -127,12 +125,8 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         initialized.value = true;
     }
 
-    const setTree = (tree: TreeviewItem) => {
+    const updateTree = (tree: TreeviewItem) => {
         taxaTree.value = tree;
-    }
-
-    const setCompressedTree = (tree: TreeviewItem) => {
-        compressedTaxaTree.value = tree;
     }
 
     const children = (taxonId: number) => {
@@ -229,13 +223,11 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
         peptideToCounts,
         taxaTree,
-        compressedTaxaTree,
 
         initialized,
 
         initialize,
-        setTree,
-        setCompressedTree,
+        updateTree,
         reset,
         children,
 

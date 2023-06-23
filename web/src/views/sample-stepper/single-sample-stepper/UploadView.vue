@@ -47,8 +47,6 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-defineEmits(['submit']);
-
 const sampleStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
@@ -103,7 +101,7 @@ const onSubmit = async (peptideList: string[]) => {
 
     if (errors.value.length <= 0) {
         await sampleStore.initialize(peptideList, formatMap.get(props.fileFormat)?.converter);
-        sampleStore.setTree(await new UnipeptCommunicator().fetchTaxonomy(Array.from(sampleStore.taxa.keys())))
+        sampleStore.updateTree(await new UnipeptCommunicator().fetchTaxonomy(Array.from(sampleStore.taxa.keys())))
     }
 
     processing.value = false;

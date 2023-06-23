@@ -1,6 +1,6 @@
 <template>
     <h2>Select your pathway</h2>
-    
+
     <div v-if="initialized" class="mt-3">
         <div v-if="pathwayItems.length > 0">
             <v-row>
@@ -71,19 +71,16 @@ import useVisualisationStore from '@/stores/VisualisationStore';
 import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import BubblePlot from '@/components/visualisations/BubblePlot.vue';
-import { useTaxonomyTree } from '@/composables/useTaxonomyTree';
 import SearchFilter from '@/components/inputs/SearchFilter.vue';
 import FilterView from './FilterView.vue';
 
-const { compressRankTree, fetchTaxonomyTree } = useTaxonomyTree();
-
-const keggStore = useKeggStore();
-const mappingStore = useSingleSampleStore(); 
+const keggStore          = useKeggStore();
+const mappingStore       = useSingleSampleStore(); 
 const visualisationStore = useVisualisationStore();
 
-const { initialized, pathways } = storeToRefs(mappingStore);
+const { initialized, pathways }    = storeToRefs(mappingStore);
 const { pathway: selectedPathway } = storeToRefs(visualisationStore);
-const { pathwayMapping } = storeToRefs(keggStore);
+const { pathwayMapping }           = storeToRefs(keggStore);
 
 const pathwaySearch = ref<string>("");
 const pathwayFilter = ref<string[]>([]);
@@ -106,24 +103,12 @@ const pathwayItems = computed(() => [ ...(isFiltered.value ? filteredPathways.va
     )
 );
 
-const onBubblePlotClick = (pathway: Pathway) => {
+const onBubblePlotClick = (pathway: Pathway | undefined) => {
     visualisationStore.setPathway(pathway);
     visualisationStore.setHighlightedTaxa([]);
 };
 
-// TODO: Should be in taxon selection step
-watch(selectedPathway, async (pathway: Pathway | undefined) => {
-    visualisationStore.setPathway(pathway);
-    visualisationStore.setHighlightedTaxa([]);
-
-    if (pathway) {
-        const taxa = Array.from(mappingStore.pathwaysToTaxa.get(pathway?.id)!);
-        const tree = await fetchTaxonomyTree(taxa);
-
-        mappingStore.setTree(tree);
-        mappingStore.setCompressedTree(compressRankTree(tree, taxa, true));
-    }
-});
+watch(selectedPathway, onBubblePlotClick);
 
 onMounted(async () => {
     await keggStore.fetchPathwayMapping();
