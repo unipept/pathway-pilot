@@ -1,42 +1,33 @@
 <template>
-    <AbundanceLegend :top-item="{ label: 'organism 1', color: '#75B9BE' }" :bottom-item="{ label: 'organism 2', color: '#ED9390' }" />
-
-    <div v-for="color of colors">
-        <div class="swatch" :style="{ backgroundColor: color }"></div>
-    </div>
+    <SearchFilter 
+        v-model:search="search" 
+        v-model:filter="filter"
+        search-label="Search for an identifier or name"
+        filter-label="Apply filters"
+        @click:filter="onClickFilter"
+    />
 </template>
 
 <script lang="ts" setup>
-import Treeview from '@/components/visualisations/Treeview.vue';
-import { TreeviewItem } from '@/components/visualisations/TreeviewItem';
-import { ref } from 'vue';
-import { useTaxonomyTree } from '@/composables/useTaxonomyTree';
-import { computed } from 'vue';
-import { watch } from 'vue';
-import Tooltip from '@/components/misc/Tooltip.vue';
-import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
-import { useLinearGradient } from '@/composables/useLinearGradient';
+import { ref, watch } from 'vue';
+import SearchFilter from '@/components/inputs/SearchFilter.vue';
 
-const { getColor } = useLinearGradient('#75B9BE', '#ED9390');
+const search = ref<string>("");
+const filter = ref<string[]>(["test1", "test2", "test2", "test2", "test2", "test2"]);
 
-const colors = computed(() => [
-    getColor(0.0),
-    getColor(0.1),
-    getColor(0.2),
-    getColor(0.3),
-    getColor(0.4),
-    getColor(0.5),
-    getColor(0.6),
-    getColor(0.7),
-    getColor(0.8),
-    getColor(0.9),
-    getColor(1.0)
-]);
+const onClickFilter = () => {
+    console.log("clicked filter");
+}
+
+watch(search, (newValue) => {
+    console.log(newValue);
+})
+
+watch(filter, (newValue) => {
+    console.log(filter);
+})
 </script>
 
 <style scoped>
-.swatch {
-    width: 1.5em;
-    height: 1.5em;
-}
+
 </style>

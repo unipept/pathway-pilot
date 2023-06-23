@@ -63,7 +63,7 @@ const pageOptions = ref({
     pageCount: 1
 });
 
-const selected = ref<string[]>([]);
+const selected = ref<string[]>(props.modelValue);
 
 const onRowClicked = (e: any, i: any) => {
     if (selected.value.includes(i.item.raw.name)) {

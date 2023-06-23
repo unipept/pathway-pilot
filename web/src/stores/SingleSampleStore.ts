@@ -43,10 +43,6 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
     const initialized = ref<boolean>(false);
 
-    // Mapping filters
-    const filtered = ref<boolean>(false);
-    const filteredPathways = reactive<Set<string>>(new Set());
-
     const initialize = async (inputList: any[], sampleConverter: any) => {
         size.value = inputList.length;
 
@@ -189,16 +185,6 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         ecToPathways.clear();
     }
 
-    const updateFilter = (pathways: string[]) => {
-        filteredPathways.clear();
-
-        for (const pathway of pathways) {
-            filteredPathways.add(pathway);
-        }
-
-        filtered.value = filteredPathways.size > 0;
-    }
-
     const download = async (filename: string) => {
         await keggStore.fetchPathwayMapping();
 
@@ -245,9 +231,6 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         taxaTree,
         compressedTaxaTree,
 
-        filtered,
-        filteredPathways,
-
         initialized,
 
         initialize,
@@ -255,8 +238,6 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         setCompressedTree,
         reset,
         children,
-
-        updateFilter,
 
         download
     };

@@ -1,6 +1,6 @@
-import { defineStore, Store } from 'pinia';
+import { defineStore } from 'pinia';
 
-import { computed, reactive, ref } from 'vue';
+import { computed, ref } from 'vue';
 import useSingleSampleStore from './SingleSampleStore';
 
 const useMultiSampleStore = defineStore('multiSampleStore', () => {
@@ -11,10 +11,6 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
 
     const initialized = computed(() => {
         return samples.value.length > 0 && samples.value.some(sample => sample.initialized);
-    });
-
-    const filtered = computed(() => {
-        return samples.value.length > 0 && samples.value.some(sample => sample.filtered);
     });
 
     const addSample = (sampleName: string) => {
@@ -50,16 +46,6 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
         return pathways;
     });
 
-    const filteredPathways = computed(() => {
-        const pathways = new Set<string>();
-
-        samples.value.forEach(sample =>
-            sample.filteredPathways.forEach((pathway: string) => pathways.add(pathway))
-        );
-
-        return pathways;
-    });
-
     const pathwaysToPeptideCounts = computed(() => {
         const pathwaysToPeptideCounts = new Map<string, number>();
 
@@ -79,14 +65,12 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
     return {
         samples,
         initialized,
-        filtered,
         addSample,
         initializeSample,
         resetSample,
         removeSample,
         reset,
         pathways,
-        filteredPathways,
         pathwaysToPeptideCounts
     };
 });
