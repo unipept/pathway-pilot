@@ -52,46 +52,52 @@ defineEmits(['submit']);
 const sampleStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
-const processing = ref<boolean>(false);
+const processing = ref<boolean | number>(false);
 
 const errors = ref<VerifierError[]>([]);
+
+const unipeptCommunicator = new UnipeptCommunicator({
+    onProgressUpdate: (progress: number) => {
+        processing.value = Math.round(progress * 100);
+    }
+});
 
 const formatMap = new Map<FileFormat, { component: any, verifier: any, converter: any }>([
     [ FileFormat.PEPTIDE_LIST, { 
         component: PeptideListForm, 
         verifier: new PeptideListVerifier(), 
-        converter: new PeptideListConverter({ onProgressUpdate: () => {} })
+        converter: new PeptideListConverter(unipeptCommunicator)
     } ],
     [ FileFormat.PEPTIDE_SHAKER, { 
         component: PeptideShakerForm, 
         verifier: new PeptideShakerVerifier(),
-        converter: new PeptideShakerConverter({ onProgressUpdate: () => {} })
+        converter: new PeptideShakerConverter(unipeptCommunicator)
     } ],
     [ FileFormat.MAX_QUANT, {
         component: MaxQuantForm, 
         verifier: new MaxQuantVerifier(),
-        converter: new MaxQuantConverter({ onProgressUpdate: () => {} })
+        converter: new MaxQuantConverter(unipeptCommunicator)
     } ],
     [ FileFormat.PROTEOME_DISCOVERER, { 
         component: ProteomeDiscovererForm, 
         verifier: new ProteomeDiscovererVerifier(),
-        converter: new ProteomeDiscovererConverter({ onProgressUpdate: () => {} })
+        converter: new ProteomeDiscovererConverter(unipeptCommunicator)
     } ],
     [ FileFormat.META_PROTEOME_ANALYZER, { 
         component: MetaProteomeAnalyzerForm, 
         verifier: new MetaProteomeAnalyzerVerifier(),
-        converter: new MetaProteomeAnalyzerConverter({ onProgressUpdate: () => {} })
+        converter: new MetaProteomeAnalyzerConverter(unipeptCommunicator)
     } ],
     
     [ FileFormat.PROTEIN_LIST, {
         component: ProteinListForm, 
         verifier: new ProteinListVerifier(),
-        converter: new ProteinListConverter({ onProgressUpdate: () => {} })
+        converter: new ProteinListConverter(unipeptCommunicator)
     } ],
 ]);
 
 const onSubmit = async (peptideList: string[]) => {
-    processing.value = true;
+    processing.value = 0;
 
     errors.value = formatMap.get(props.fileFormat)?.verifier.verify(peptideList);
 
@@ -109,9 +115,3 @@ const onReset = () => {
     errors.value = [];
 };
 </script>
-
-<style scoped>
-.subtitle {
-    color: #454545;
-}
-</style>

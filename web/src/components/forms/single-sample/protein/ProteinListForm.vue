@@ -1,8 +1,16 @@
 <template>
-    <v-card flat>
-        <v-card-text class="information">
-            <h4 class="mb-3">Upload your list of proteins</h4>
+    <upload-form
+        label="Paste your protein list here"
+        :example="example"
+        :loading="loading"
+        @submit="$emit('submit', $event)"
+        @reset="$emit('reset', $event)"
+    >
+        <template #header>
+            <h4>Upload your list of proteins</h4>
+        </template>
 
+        <template #information>    
             <p class="subtitle">
                 Please input a list of proteins by either pasting the <resource-link url="https://www.uniprot.org/">UniProt</resource-link> accession 
                 identifiers on the right-hand side or selecting a single <span>.txt</span> file. Each line of input will be treated as an individual 
@@ -25,16 +33,8 @@
                     </li>
                 </ol>
             </p>
-
-            <upload-form
-                label="Paste your protein list here"
-                :loading="loading"
-                :example="example"
-                @submit="$emit('submit', $event)"
-                @reset="$emit('reset', $event)"
-            />
-        </v-card-text>
-    </v-card>
+        </template>
+    </upload-form>
 </template>
 
 <script setup lang="ts">
@@ -44,7 +44,7 @@ import ResourceLink from '@/components/misc/ResourceLink.vue';
 import example from '../../examples/protein/ProteinListExample';
 
 export interface Props {
-    loading?: boolean;
+    loading?: false | number;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -53,10 +53,3 @@ withDefaults(defineProps<Props>(), {
 
 defineEmits(["submit", "reset"]);
 </script>
-
-<style scoped>
-.information {
-    padding: 0;
-    font-size: 16px;
-}
-</style>

@@ -1,18 +1,14 @@
 import KeggCommunicator from "../../communicators/KEGGCommunicator";
 import UnipeptCommunicator from "../../communicators/UnipeptCommunicator";
-import ProgressListener from "../ProgressListener";
+import { defaultProgressListener, ProgressListener } from "@/logic/ProgressListener";
 import Converter from "../Converter";
 
 export default class ProteinListConverter implements Converter {
-    private unipeptCommunicator: UnipeptCommunicator;
-    private keggCommunicator: KeggCommunicator;
-
     constructor(
-        private readonly progressListener: ProgressListener
-    ) {
-        this.unipeptCommunicator = new UnipeptCommunicator();
-        this.keggCommunicator = new KeggCommunicator();
-    }
+        private readonly unipeptCommunicator: UnipeptCommunicator,
+        private readonly keggCommunicator: KeggCommunicator = new KeggCommunicator(),
+        private readonly progressListener: ProgressListener = defaultProgressListener
+    ) {}
 
     public isPeptide() {
         return false;

@@ -1,8 +1,16 @@
 <template>
-    <v-card flat>
-        <v-card-text class="information">
-            <h4 class="mb-3">Upload your ProteomeDiscoverer file</h4>
+    <upload-form
+        label="Paste your ProteomeDiscoverer results here"
+        :example="example"
+        :loading="loading"
+        @submit="$emit('submit', $event)"
+        @reset="$emit('reset', $event)"
+    >
+        <template #header>
+            <h4>Upload your ProteomeDiscoverer file</h4>
+        </template>
 
+        <template #information>    
             <p class="subtitle">
                 Please input a valid <resource-link url="https://www.thermofisher.com/be/en/home/industrial/mass-spectrometry/liquid-chromatography-mass-spectrometry-lc-ms/lc-ms-software/multi-omics-data-analysis/proteome-discoverer-software.html?gclid=CjwKCAjw-b-kBhB-EiwA4fvKrAQ2vZWVpURBymCxmBsAO1aOZUe-oz-73kU5FCSlSV_hm3c-K79u_RoCjwgQAvD_BwE&cid=E.23CMD.DL103.12911.01&ef_id=CjwKCAjw-b-kBhB-EiwA4fvKrAQ2vZWVpURBymCxmBsAO1aOZUe-oz-73kU5FCSlSV_hm3c-K79u_RoCjwgQAvD_BwE:G:s&s_kwcid=AL!3652!3!334040549172!p!!g!!proteome%20discoverer&gad=1">ProteomeDiscoverer</resource-link> file by either pasting the file contents 
                 on the right-hand side or selecting a single <span>.tsv</span> file. The file should <b>always</b> start with a header row, and should contain 
@@ -29,16 +37,8 @@
                     </li>
                 </ol>
             </p>
-
-            <upload-form
-                label="Paste your ProteomeDiscoverer results here"
-                :loading="loading"
-                :example="example"
-                @submit="$emit('submit', $event)"
-                @reset="$emit('reset', $event)"
-            />
-        </v-card-text>
-    </v-card>
+        </template>
+    </upload-form>
 </template>
 
 <script setup lang="ts">
@@ -48,7 +48,7 @@ import ResourceLink from '@/components/misc/ResourceLink.vue';
 import example from '../../examples/peptide/ProteomeDiscovererExample';
 
 export interface Props {
-    loading?: boolean;
+    loading?: false | number;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -57,10 +57,3 @@ withDefaults(defineProps<Props>(), {
 
 defineEmits(["submit", "reset"]);
 </script>
-
-<style scoped>
-.information {
-    padding: 0;
-    font-size: 16px;
-}
-</style>

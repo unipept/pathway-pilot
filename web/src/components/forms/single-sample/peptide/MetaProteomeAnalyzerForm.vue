@@ -1,8 +1,16 @@
 <template>
-    <v-card flat>
-        <v-card-text class="information">
-            <h4 class="mb-3">Upload your MetaProteomeAnalyzer file</h4>
+    <upload-form
+        label="Paste your MetaProteomeAnalyzer results here"
+        :example="example"
+        :loading="loading"
+        @submit="$emit('submit', $event)"
+        @reset="$emit('reset', $event)"
+    >
+        <template #header>
+            <h4>Upload your MetaProteomeAnalyzer file</h4>
+        </template>
 
+        <template #information>    
             <p class="subtitle">
                 Please input a valid <resource-link url="https://github.com/compomics/meta-proteome-analyzer">MetaProteomeAnalyzer</resource-link> file by either pasting the file contents 
                 on the right-hand side or selecting a single <span>.tsv</span> file. The file should <b>never</b> start with a header row. Each line of input should 
@@ -28,16 +36,8 @@
                     </li>
                 </ol>
             </p>
-
-            <upload-form
-                label="Paste your MetaProteomeAnalyzer results here"
-                :loading="loading"
-                :example="example"
-                @submit="$emit('submit', $event)"
-                @reset="$emit('reset', $event)"
-            />
-        </v-card-text>
-    </v-card>
+        </template>
+    </upload-form>
 </template>
 
 <script setup lang="ts">
@@ -47,7 +47,7 @@ import ResourceLink from '@/components/misc/ResourceLink.vue';
 import example from '../../examples/peptide/MetaProteomeAnalyzerExample';
 
 export interface Props {
-    loading?: boolean;
+    loading?: false | number;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -56,10 +56,3 @@ withDefaults(defineProps<Props>(), {
 
 defineEmits(["submit", "reset"]);
 </script>
-
-<style scoped>
-.information {
-    padding: 0;
-    font-size: 16px;
-}
-</style>

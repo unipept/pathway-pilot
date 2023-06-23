@@ -39,6 +39,7 @@ import MaxQuantConverter from '@/logic/converters/peptide/MaxQuantConverter';
 import ProteomeDiscovererConverter from '@/logic/converters/peptide/ProteomeDiscovererConverter';
 import MetaProteomeAnalyzerConverter from '@/logic/converters/peptide/MetaProteomeAnalyzerConverter';
 import ProteinListConverter from '@/logic/converters/protein/ProteinListConverter';
+import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 
 export interface Props {
     fileFormat: FileFormat;
@@ -66,20 +67,22 @@ const deleteModalName = ref<string>("");
 
 const processing = ref<boolean>(false);
 
+const unipeptCommunicator = new UnipeptCommunicator();
+
 const formatMap = new Map<FileFormat, { converter: any }>([
-    [ FileFormat.PEPTIDE_LIST, { converter: new PeptideListConverter({ onProgressUpdate: () => {} }) } ],
-    [ FileFormat.PEPTIDE_SHAKER, { converter: new PeptideShakerConverter({ onProgressUpdate: () => {} }) } ],
-    [ FileFormat.MAX_QUANT, { converter: new MaxQuantConverter({ onProgressUpdate: () => {} }) } ],
-    [ FileFormat.PROTEOME_DISCOVERER, { converter: new ProteomeDiscovererConverter({ onProgressUpdate: () => {} }) } ],
-    [ FileFormat.META_PROTEOME_ANALYZER, { converter: new MetaProteomeAnalyzerConverter({ onProgressUpdate: () => {} }) } ],
-    [ FileFormat.PROTEIN_LIST, { converter: new ProteinListConverter({ onProgressUpdate: () => {} }) } ],
+    [ FileFormat.PEPTIDE_LIST, { converter: new PeptideListConverter(unipeptCommunicator) } ],
+    [ FileFormat.PEPTIDE_SHAKER, { converter: new PeptideShakerConverter(unipeptCommunicator) } ],
+    [ FileFormat.MAX_QUANT, { converter: new MaxQuantConverter(unipeptCommunicator) } ],
+    [ FileFormat.PROTEOME_DISCOVERER, { converter: new ProteomeDiscovererConverter(unipeptCommunicator) } ],
+    [ FileFormat.META_PROTEOME_ANALYZER, { converter: new MetaProteomeAnalyzerConverter(unipeptCommunicator) } ],
+    [ FileFormat.PROTEIN_LIST, { converter: new ProteinListConverter(unipeptCommunicator) } ],
 ]);
 
 const onSubmit = async (peptideList: string[], sampleName: string) => {
     processing.value = true;
 
     const sample = sampleStore.addSample(sampleName);
-    await sampleStore.initializeSample(
+    sampleStore.initializeSample(
         sample,
         peptideList,
         formatMap.get(props.fileFormat)?.converter

@@ -1,8 +1,16 @@
 <template>
-    <v-card flat>
-        <v-card-text class="information">
-            <h4 class="mb-3">Upload your list of peptides</h4>
-            
+    <upload-form
+        label="Paste your peptide list here"
+        :example="example"
+        :loading="loading"
+        @submit="$emit('submit', $event)"
+        @reset="$emit('reset', $event)"
+    >
+        <template #header>
+            <h4>Upload your list of peptides</h4>
+        </template>
+
+        <template #information>    
             <p class="subtitle">
                 Please input a list of tryptic peptides by either pasting the peptide sequences on the right-hand side or selecting a single 
                 <span>.txt</span> file. Each line of input will be treated as an individual peptide sequence, and it should only contain valid 
@@ -27,16 +35,8 @@
                     </li>
                 </ol>
             </p>
-
-            <upload-form
-                label="Paste your peptide list here"
-                :example="example"
-                :loading="loading"
-                @submit="$emit('submit', $event)"
-                @reset="$emit('reset', $event)"
-            />
-        </v-card-text>
-    </v-card>
+        </template>
+    </upload-form>
 </template>
 
 <script setup lang="ts">
@@ -46,7 +46,7 @@ import ResourceLink from '@/components/misc/ResourceLink.vue';
 import example from '../../examples/peptide/PeptideListExample';
 
 export interface Props {
-    loading?: boolean;
+    loading?: false | number;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -55,10 +55,3 @@ withDefaults(defineProps<Props>(), {
 
 defineEmits(["submit", "reset"]);
 </script>
-
-<style scoped>
-.information {
-    padding: 0;
-    font-size: 16px;
-}
-</style>

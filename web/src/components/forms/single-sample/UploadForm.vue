@@ -1,5 +1,13 @@
 <template>
     <v-card flat>
+        <v-card-text class="information mb-3">
+            <slot name="header"></slot>
+        </v-card-text>
+
+        <v-card-text class="information">
+            <slot name="information"></slot>
+        </v-card-text>
+
         <v-card-text class="pa-0">
             <v-row class="mt-5 input-container">
                 <v-col :class="{ 'loading': loading }">
@@ -24,25 +32,19 @@
                     />
                 </v-col>
 
-                <v-progress-circular v-if="loading"
-                    class="loading-spinner"
-                    size="50"
-                    width="5"
-                    color="primary"
-                    indeterminate
-                />
+                <progress-loader v-if="isLoading" :loading="loading"/>
             </v-row>
 
             <div class="d-flex justify-end mt-3">
-                <v-btn color="error" @click="onClear" variant="outlined" :disabled="!hasList || loading">
+                <v-btn color="error" @click="onClear" variant="outlined" :disabled="!hasList || isLoading">
                     <v-icon class="me-2">mdi-delete-outline</v-icon> Clear input
                 </v-btn>
 
-                <v-btn class="ms-3" color="primary" variant="outlined" :disabled="loading" @click="onLoadExample">
+                <v-btn class="ms-3" color="primary" variant="outlined" :disabled="isLoading" @click="onLoadExample">
                     Load example
                 </v-btn>
 
-                <v-btn class="ms-3" color="primary" :disabled="!hasList || loading" @click="onSubmit">
+                <v-btn class="ms-3" color="primary" :disabled="!hasList || isLoading" @click="onSubmit">
                     Upload
                 </v-btn>
             </div>
@@ -54,15 +56,16 @@
 import { computed, ref } from 'vue';
 import FileInput from '../../inputs/FileInput.vue';
 import { useFileReader } from '@/composables/useFileReader';
+import ProgressLoader from '@/components/misc/ProgressLoader.vue';
 
 export interface Props {
     label: string
     example: string[]
-    loading?: boolean
+    loading?: false | number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    loading: false
+    loading: false,
 });
 
 const emits = defineEmits(["submit", "reset"]);
@@ -75,6 +78,8 @@ const peptideFile = ref<File | undefined>(undefined);
 const peptidesList = computed(() => {
     return peptides.value.split("\n").filter((peptide) => peptide.length > 0);
 });
+
+const isLoading = computed(() => !!props.loading);
 
 const hasList = computed(() => peptidesList.value.length > 0);
 
@@ -110,20 +115,13 @@ const onLoadExample = () => {
     cursor: default;
 }
 
-.loading-spinner {
-    position: absolute;
-    top: calc(50% - 10px);
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.subtitle {
-    font-size: 16px;
-    color: #454545;
-}
-
 :deep(textarea) {
     font-family: monospace;
     white-space: nowrap;
+}
+
+.information {
+    padding: 0;
+    font-size: 16px;
 }
 </style>

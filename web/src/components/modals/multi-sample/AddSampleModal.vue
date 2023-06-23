@@ -17,7 +17,7 @@
 import VerifierError from '@/logic/verifiers/VerifierError';
 import ErrorModal from '@/components/modals/ErrorModal.vue';
 import { ref, watch } from 'vue';
-import FileFormat from '@/views/FileFormat';
+import FileFormat from '@/views/sample-stepper/FileFormat';
 
 import PeptideListForm from '@/components/forms/multi-sample/peptide/PeptideListForm.vue';
 import PeptideShakerForm from '@/components/forms/multi-sample/peptide/PeptideShakerForm.vue';
