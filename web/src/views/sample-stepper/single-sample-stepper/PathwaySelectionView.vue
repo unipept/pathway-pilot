@@ -74,13 +74,13 @@ import BubblePlot from '@/components/visualisations/BubblePlot.vue';
 import SearchFilter from '@/components/inputs/SearchFilter.vue';
 import FilterView from './FilterView.vue';
 
-const keggStore          = useKeggStore();
-const mappingStore       = useSingleSampleStore(); 
+const keggStore = useKeggStore();
+const mappingStore = useSingleSampleStore(); 
 const visualisationStore = useVisualisationStore();
 
-const { initialized, pathways }    = storeToRefs(mappingStore);
+const { initialized, pathways } = storeToRefs(mappingStore);
 const { pathway: selectedPathway } = storeToRefs(visualisationStore);
-const { pathwayMapping }           = storeToRefs(keggStore);
+const { pathwayMapping } = storeToRefs(keggStore);
 
 const pathwaySearch = ref<string>("");
 const pathwayFilter = ref<string[]>([]);

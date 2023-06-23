@@ -62,6 +62,27 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
         return pathwaysToPeptideCounts;
     });
 
+    // TODO: provide functions using interface to access maps
+    const ecs = computed(() => {
+        const ecs = new Set<string>();
+
+        samples.value.forEach(sample =>
+            sample.ecs.forEach((ec: string) => ecs.add(ec))
+        );
+
+        return ecs;
+    });
+
+    const ecToPathways = (ec: string) => {
+        const pathways = new Set<string>();
+
+        samples.value.forEach(sample =>
+            sample.ecToPathways.get(ec).forEach((pathway: string) => pathways.add(pathway))
+        );
+
+        return pathways;
+    };
+
     return {
         samples,
         initialized,
@@ -71,7 +92,11 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
         removeSample,
         reset,
         pathways,
-        pathwaysToPeptideCounts
+        pathwaysToPeptideCounts,
+
+
+        ecs,
+        ecToPathways
     };
 });
 
