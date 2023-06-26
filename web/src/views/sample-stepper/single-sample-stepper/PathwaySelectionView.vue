@@ -74,6 +74,8 @@ import BubblePlot from '@/components/visualisations/BubblePlot.vue';
 import SearchFilter from '@/components/inputs/SearchFilter.vue';
 import FilterView from './FilterView.vue';
 
+const emits = defineEmits(["filtered"]);
+
 const keggStore = useKeggStore();
 const mappingStore = useSingleSampleStore(); 
 const visualisationStore = useVisualisationStore();
@@ -109,6 +111,10 @@ const onBubblePlotClick = (pathway: Pathway | undefined) => {
 };
 
 watch(selectedPathway, onBubblePlotClick);
+
+watch(pathwayItems, (items: Pathway[]) => {
+    emits("filtered", items);
+});
 
 onMounted(async () => {
     await keggStore.fetchPathwayMapping();

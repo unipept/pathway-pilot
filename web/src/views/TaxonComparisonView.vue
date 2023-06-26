@@ -25,7 +25,7 @@
 
         <v-timeline-item dot-color="primary" width="100%">
             <template v-slot:icon>2</template>
-            <pathway-selection-view />
+            <pathway-selection-view @filtered="onPathwaysFiltered" />
         </v-timeline-item>
 
         <v-timeline-item dot-color="primary" width="100%">
@@ -37,6 +37,11 @@
             <template v-slot:icon>4</template>
             <visualisation-view />
         </v-timeline-item>
+
+        <v-timeline-item dot-color="primary" width="100%">
+            <template v-slot:icon>5</template>
+            <export-view :pathways="filteredPathways" />
+        </v-timeline-item>
     </v-timeline>
 </template>
 
@@ -46,6 +51,7 @@ import PathwaySelectionView from './sample-stepper/single-sample-stepper/Pathway
 import TaxonSelectionView from './sample-stepper/single-sample-stepper/TaxonSelectionView.vue';
 import VisualisationView from './sample-stepper/single-sample-stepper/VisualisationView.vue';
 import InputSelectionView from './sample-stepper/InputSelectionView.vue';
+import ExportView from './sample-stepper/single-sample-stepper/ExportView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import useSingleSampleStore from '@/stores/SingleSampleStore';
 import FileFormat from './sample-stepper/FileFormat';
@@ -55,9 +61,14 @@ const { reset: resetSingleSampleStore } = useSingleSampleStore();
 const { reset: resetVisualisationStore } = useVisualisationStore();
 
 const fileFormat = ref<FileFormat>(FileFormat.PEPTIDE_LIST);
+const filteredPathways = ref<any[]>([]);
 
 resetSingleSampleStore();
 resetVisualisationStore();
+
+const onPathwaysFiltered = (pathways: any[]) => {
+    filteredPathways.value = pathways;
+};
 
 watch(() => fileFormat.value, () => {
     resetSingleSampleStore();

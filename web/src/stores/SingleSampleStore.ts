@@ -2,15 +2,9 @@ import { defineStore } from 'pinia';
 
 import Taxon from "@/logic/entities/Taxon";
 import { reactive, ref } from 'vue';
-import { useCsvDownloader } from '@/composables/download/useCsvDownloader';
-import useKeggStore from './KeggStore';
 import { TreeviewItem, defaultTreeviewItem } from '@/components/visualisations/TreeviewItem';
 
 const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
-    const keggStore = useKeggStore();
-
-    const { downloadCsv } = useCsvDownloader();
-
     const name = ref<string>(sampleName);
     const size = ref<number>(0);
 
@@ -179,36 +173,18 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         ecToPathways.clear();
     }
 
-    const download = async (filename: string) => {
-        await keggStore.fetchPathwayMapping();
-
-        const header = [ 'peptide', 'peptide_count', 'taxon id', 'taxon rank', 'taxon name', 'pathways', 'pathway names' ].join(';');
-
-        const data = [ ...peptides ].map(peptide => {
-            const taxon = peptideToTaxa.get(peptide)!;
-            const pathways = [ ...peptideToPathways.get(peptide) ?? [] ].join(',');
-
-            return [
-                peptide,
-
-                taxon.id,
-                taxon.rank,
-                taxon.name,
-                pathways,
-                '""' + pathways.split(',').map(pathway => `"${keggStore.pathwayMapping.get(pathway).name}"` ?? "Unknown").join(',')
-            ].join(';')
-        });
-
-        downloadCsv(data, filename, header);
-    }
-
     return {
         name,
         size,
 
+        peptides,
         taxa,
         pathways,
         ecs,
+
+        peptideToTaxa,
+        peptideToPathways,
+        peptideToCounts,
 
         taxaToPathways,
         taxaToEcs,
@@ -221,7 +197,6 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         ecToPathways,
         ecToPeptides,
 
-        peptideToCounts,
         taxaTree,
 
         initialized,
@@ -229,9 +204,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         initialize,
         updateTree,
         reset,
-        children,
-
-        download
+        children
     };
 })();
 
