@@ -1,5 +1,5 @@
 <template>
-    <v-card v-for="group in items" class="mb-3">
+    <v-card v-for="group, i in items" class="mb-3">
         <v-card-text>
             <v-card
                 class="mb-2"
@@ -17,7 +17,7 @@
                     />
 
                     <tooltip message="Remove this group and samples">
-                        <v-icon color="error" @click="">mdi-delete</v-icon>
+                        <v-icon color="error" @click="() => onRemoveGroup(i)">mdi-delete</v-icon>
                     </tooltip>
                 </v-card-text>
             </v-card>
@@ -26,12 +26,13 @@
                 class="ms-10"
                 :items="group.items"
                 :max="max"
-                @add="() => onAddSample(group.name)"
+                @add="() => onAddSample(i)"
+                @remove="(sampleIndex) => onRemoveSample(i, sampleIndex)"
             />
         </v-card-text>
     </v-card>
 
-    <v-btn class="me-3" variant="outlined" color="primary">
+    <v-btn v-if="canAddGroup" class="me-3" variant="outlined" color="primary" @click="onAddGroup">
         <v-icon>mdi-plus</v-icon>
         <span class="ms-1">Add another group</span>
     </v-btn>
@@ -41,19 +42,34 @@
 import Tooltip from '@/components/misc/Tooltip.vue';
 import { GroupTableItem } from './GroupTableItem';
 import SampleTable from './SampleTable.vue';
+import { computed } from 'vue';
 
 export interface Props {
     items: GroupTableItem[]
     max: number
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     max: 4
 });
 
-const emits = defineEmits(['add:group', 'add:sample']);
+const emits = defineEmits(['add:group', 'add:sample', 'remove:group', 'remove:sample']);
 
-const onAddSample = (group: string) => {
-    emits('add:sample', group);
+const canAddGroup = computed(() => props.items.length < props.max);
+
+const onAddSample = (groupIndex: number) => {
+    emits('add:sample', groupIndex);
+}
+
+const onAddGroup = () => {
+    emits('add:group');
+}
+
+const onRemoveSample = (groupIndex: number, sampleIndex: number) => {
+    emits('remove:sample', groupIndex, sampleIndex);
+}
+
+const onRemoveGroup = (groupIndex: number) => {
+    emits('remove:group', groupIndex);
 }
 </script>

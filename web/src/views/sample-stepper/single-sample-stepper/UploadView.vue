@@ -91,7 +91,7 @@ const formatMap = new Map<FileFormat, { component: any, verifier: any, converter
         component: ProteinListForm, 
         verifier: new ProteinListVerifier(),
         converter: new ProteinListConverter(unipeptCommunicator)
-    } ],
+    } ]
 ]);
 
 const onSubmit = async (peptideList: string[]) => {

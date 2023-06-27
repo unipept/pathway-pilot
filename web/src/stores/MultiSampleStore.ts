@@ -3,10 +3,11 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import useSingleSampleStore from './SingleSampleStore';
 
-const useMultiSampleStore = (sampleId: string = 'multi-sample', groupName: string = 'Group 1') => defineStore(`multiSampleStore/${sampleId}`, () => {
-    // This variable ensures that we only create UNIQUE stores
-    let _counter = 0;
+// This variable ensures that we only create UNIQUE stores
+// This variable NEEDS to be global to the sample store, otherwise we will get duplicate stores
+let _counter = 0;
 
+const useMultiSampleStore = (sampleId: string = 'multi-sample', groupName: string = 'Group 1') => defineStore(`multiSampleStore/${sampleId}`, () => {
     const name = ref<string>(groupName);
 
     const samples = ref<any[]>([]);
@@ -37,6 +38,10 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', groupName: strin
         samples.value.forEach(sample => sample.reset());
         samples.value = [];
     }
+
+    const updateName = (newName: string) => {
+        name.value = newName;
+    };
 
     const pathways = computed(() => {
         const pathways = new Set<string>();
@@ -86,6 +91,7 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', groupName: strin
     };
 
     return {
+        name,
         samples,
         initialized,
         addSample,
@@ -96,9 +102,10 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', groupName: strin
         pathways,
         pathwaysToPeptideCounts,
 
-
         ecs,
-        ecToPathways
+        ecToPathways,
+
+        updateName
     };
 })();
 

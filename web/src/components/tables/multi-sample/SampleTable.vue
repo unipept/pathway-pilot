@@ -6,36 +6,48 @@
             item-value="raw_input"
             density="compact"
         >
-            <template #item.loading="{ item }">
-                <v-progress-circular v-if="item.value.loading"
-                    class="me-2"
-                    indeterminate
-                    color="primary"
-                    size="30"
-                    width="3"
-                />
+            <template #item="{ index, item }">
+                <tr>
+                    <td>
+                        <v-progress-circular v-if="item.value.loading"
+                            class="me-2"
+                            indeterminate
+                            color="primary"
+                            size="30"
+                            width="3"
+                        />
 
-                <v-icon v-else
-                    class="me-2" 
-                    color="green"
-                    size="30"
-                >
-                    mdi-check-circle-outline
-                </v-icon>
-            </template>
+                        <v-icon v-else
+                            class="me-2" 
+                            color="green"
+                            size="30"
+                        >
+                            mdi-check-circle-outline
+                        </v-icon>
+                    </td>
 
-            <template #item.sample_name="{ item }">
-                <v-text-field
-                    v-model="item.value.sample_name"
-                    class="mt-n5 me-2"
-                    variant="underlined"
-                    placeholder="Name this sample"
-                    hide-details
-                />
-            </template>
+                    <td>
+                        <span>{{ item.value.sample_name }}</span>
+                    </td>
 
-            <template #item.remove>
-                <v-icon class="me-3" color="error">mdi-delete</v-icon>
+                    <td>
+                        <span>{{ item.value.count }}</span>
+                    </td>
+
+                    <td>
+                        <v-text-field
+                            v-model="item.value.sample_name"
+                            class="mt-n5 me-2"
+                            variant="underlined"
+                            placeholder="Name this sample"
+                            hide-details
+                        />
+                    </td>
+
+                    <td>
+                        <v-icon class="me-3" color="error" @click="() => onRemoveSample(index)">mdi-delete</v-icon>
+                    </td>
+                </tr>
             </template>
 
             <template #bottom>
@@ -55,10 +67,8 @@
 </template>
 
 <script setup lang="ts">
-import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { SampleTableItem } from './SampleTableItem';
 import { computed } from 'vue';
-import { load } from 'webfontloader';
 
 export interface Props {
     items: SampleTableItem[]
@@ -69,7 +79,7 @@ const props = withDefaults(defineProps<Props>(), {
     max: 4
 })
 
-defineEmits(['edit', 'remove', 'add']);
+const emits = defineEmits(['edit', 'remove', 'add']);
 
 const l = console.log;
 
@@ -81,6 +91,10 @@ const tableItems = computed(() => [ ...props.items ]
         loading: item.loading
     }))
 );
+
+const onRemoveSample = (sampleIndex: number) => {
+    emits('remove', sampleIndex);
+}
 
 const headers = [
     {
