@@ -43,6 +43,10 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', groupName: strin
         name.value = newName;
     };
 
+    const updateSampleName = (index: number, newName: string) => {
+        samples.value[index].updateName(newName);
+    };
+
     const pathways = computed(() => {
         const pathways = new Set<string>();
 
@@ -105,7 +109,8 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', groupName: strin
         ecs,
         ecToPathways,
 
-        updateName
+        updateName,
+        updateSampleName
     };
 })();
 

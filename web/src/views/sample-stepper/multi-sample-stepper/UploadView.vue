@@ -16,6 +16,8 @@
             @add:group="onAddGroup"
             @remove:sample="onRemoveSample"
             @remove:group="onRemoveGroup"
+            @update:group:name="onUpdateGroupName"
+            @update:sample:name="onUpdateSampleName"
         />
 
         <v-dialog v-model="addModalOpen">
@@ -79,6 +81,7 @@ const { groups } = storeToRefs(sampleStore);
 const tableItems = computed(() => groups.value.map(group => ({
     name: group.name,
     items: group.samples.map((sample: any) => ({
+        uploadName: sample.uploadName,
         name: sample.name,
         size: `${sample.size} peptides`,
         loading: !sample.initialized
@@ -170,5 +173,13 @@ const onRemoveSampleConfirm = () => {
 
 const onRemoveGroup = (groupIndex: number) => {
     sampleStore.removeGroup(groupIndex);
+};
+
+const onUpdateGroupName = (groupIndex: number, name: string) => {
+    groups.value[groupIndex].updateName(name);
+};
+
+const onUpdateSampleName = (groupIndex: number, sampleIndex: number, name: string) => {
+    groups.value[groupIndex].updateSampleName(sampleIndex, name);
 };
 </script>

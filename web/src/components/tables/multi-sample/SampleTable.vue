@@ -6,48 +6,24 @@
             item-value="raw_input"
             density="compact"
         >
-            <template #item="{ index, item }">
+            <template #no-data>
                 <tr>
-                    <td>
-                        <v-progress-circular v-if="item.value.loading"
-                            class="me-2"
-                            indeterminate
-                            color="primary"
-                            size="30"
-                            width="3"
-                        />
-
-                        <v-icon v-else
-                            class="me-2" 
-                            color="green"
-                            size="30"
-                        >
-                            mdi-check-circle-outline
-                        </v-icon>
-                    </td>
-
-                    <td>
-                        <span>{{ item.value.sample_name }}</span>
-                    </td>
-
-                    <td>
-                        <span>{{ item.value.count }}</span>
-                    </td>
-
-                    <td>
-                        <v-text-field
-                            v-model="item.value.sample_name"
-                            class="mt-n5 me-2"
-                            variant="underlined"
-                            placeholder="Name this sample"
-                            hide-details
-                        />
-                    </td>
-
-                    <td>
-                        <v-icon class="me-3" color="error" @click="() => onRemoveSample(index)">mdi-delete</v-icon>
+                    <td colspan="5">
+                        <b class="d-flex justify-center">Use the options below to start uploading samples</b>
                     </td>
                 </tr>
+            </template>
+
+            <template #item="{ index, item }">
+                <sample-table-row 
+                    :loading="item.value.loading"
+                    :upload-name="item.value.upload_name"
+                    :name="item.value.sample_name"
+                    :size="item.value.count"
+                    :index="index"
+                    @remove="onRemoveSample"
+                    @update="onUpdateSampleName"
+                />
             </template>
 
             <template #bottom>
@@ -69,6 +45,7 @@
 <script setup lang="ts">
 import { SampleTableItem } from './SampleTableItem';
 import { computed } from 'vue';
+import SampleTableRow from './SampleTableRow.vue';
 
 export interface Props {
     items: SampleTableItem[]
@@ -79,15 +56,13 @@ const props = withDefaults(defineProps<Props>(), {
     max: 4
 })
 
-const emits = defineEmits(['edit', 'remove', 'add']);
-
-const l = console.log;
+const emits = defineEmits([ 'remove', 'add', 'update:sample' ]);
 
 const tableItems = computed(() => [ ...props.items ]
     .map((item: SampleTableItem) => ({
-        count: item.size,
+        upload_name: item.uploadName,
         sample_name: item.name,
-        filename: item.name,
+        count: item.size,
         loading: item.loading
     }))
 );
@@ -96,17 +71,21 @@ const onRemoveSample = (sampleIndex: number) => {
     emits('remove', sampleIndex);
 }
 
+const onUpdateSampleName = (sampleIndex: number, name: string) => {
+    emits('update:sample', sampleIndex, name);
+}
+
 const headers = [
     {
-        title: "",
-        align: "start",
+        title: "status",
+        align: "center",
         key: "loading",
         width: "50px"
     },
     {
         title: "filename",
         align: "start",
-        key: "filename",
+        key: "upload_name",
     },
     {
         title: "peptide count",

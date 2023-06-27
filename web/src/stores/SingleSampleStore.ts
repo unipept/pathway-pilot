@@ -5,6 +5,7 @@ import { reactive, ref } from 'vue';
 import { TreeviewItem, defaultTreeviewItem } from '@/components/visualisations/TreeviewItem';
 
 const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
+    const uploadName = ref<string>(sampleName);
     const name = ref<string>(sampleName);
     const size = ref<number>(0);
 
@@ -119,6 +120,10 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         initialized.value = true;
     }
 
+    const updateName = (newName: string) => {
+        name.value = newName;
+    }
+
     const updateTree = (tree: TreeviewItem) => {
         taxaTree.value = tree;
     }
@@ -174,6 +179,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
     }
 
     return {
+        uploadName,
         name,
         size,
 
@@ -202,6 +208,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         initialized,
 
         initialize,
+        updateName,
         updateTree,
         reset,
         children

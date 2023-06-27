@@ -14,6 +14,7 @@
                         class="mt-n5 me-2"
                         variant="underlined"
                         hide-details
+                        @update:model-value="onUpdateGroupName(i, $event)"
                     />
 
                     <tooltip message="Remove this group and samples">
@@ -28,6 +29,7 @@
                 :max="max"
                 @add="() => onAddSample(i)"
                 @remove="(sampleIndex) => onRemoveSample(i, sampleIndex)"
+                @update:sample="(sampleIndex, name) => onUpdateSampleName(i, sampleIndex, name)"
             />
         </v-card-text>
     </v-card>
@@ -42,7 +44,7 @@
 import Tooltip from '@/components/misc/Tooltip.vue';
 import { GroupTableItem } from './GroupTableItem';
 import SampleTable from './SampleTable.vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 export interface Props {
     items: GroupTableItem[]
@@ -53,7 +55,14 @@ const props = withDefaults(defineProps<Props>(), {
     max: 4
 });
 
-const emits = defineEmits(['add:group', 'add:sample', 'remove:group', 'remove:sample']);
+const emits = defineEmits([
+    'add:group',
+    'add:sample', 
+    'remove:group',
+    'remove:sample',
+    'update:group:name',
+    'update:sample:name'
+]);
 
 const canAddGroup = computed(() => props.items.length < props.max);
 
@@ -71,5 +80,13 @@ const onRemoveSample = (groupIndex: number, sampleIndex: number) => {
 
 const onRemoveGroup = (groupIndex: number) => {
     emits('remove:group', groupIndex);
+}
+
+const onUpdateGroupName = (groupIndex: number, name: string) => {
+    emits('update:group:name', groupIndex, name);
+}
+
+const onUpdateSampleName = (groupIndex: number, sampleIndex: number, name: string) => {
+    emits('update:sample:name', groupIndex, sampleIndex, name);
 }
 </script>
