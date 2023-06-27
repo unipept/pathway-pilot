@@ -2,10 +2,17 @@
     <div>
         <h4 class="mb-3">You can upload and compare a maximum of 4 samples</h4>
 
-        <sample-table 
+        <warning-alert
+            v-if="samples.length <= 0"
+            class="mb-4"
+        >
+            It seems that you haven't uploaded any samples yet. To begin, simply click the button below to initiate the upload process for your first sample.
+        </warning-alert>
+
+        <group-table 
             :items="tableItems"
             :max="4"
-            @add="addModalOpen = true"
+            @add:sample="addModalOpen = true"
             @remove="onRemove"
         />
 
@@ -28,7 +35,8 @@
 import useMultiSampleStore from '@/stores/MultiSampleStore';
 import AddSampleModal from '@/components/modals/multi-sample/AddSampleModal.vue';
 import DeleteSampleModal from '@/components/modals/multi-sample/DeleteSampleModal.vue';
-import SampleTable from '@/components/tables/multi-sample/SampleTable.vue';
+import GroupTable from '@/components/tables/multi-sample/GroupTable.vue';
+import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import FileFormat from '../FileFormat';
@@ -51,13 +59,14 @@ const sampleStore = useMultiSampleStore();
 
 const { samples } = storeToRefs(sampleStore);
 
-const tableItems = computed(() => 
-    samples.value.map(sample => ({
+const tableItems = computed(() => [{
+    name: 'group 1',
+    items: samples.value.map(sample => ({
         name: sample.name,
         size: `${sample.size} peptides`,
-        loading: !sample.initialized,
+        loading: !sample.initialized
     }))
-);
+}]);
 
 const addModalOpen = ref<boolean>(false);
 

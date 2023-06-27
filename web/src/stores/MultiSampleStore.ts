@@ -3,9 +3,11 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import useSingleSampleStore from './SingleSampleStore';
 
-const useMultiSampleStore = defineStore('multiSampleStore', () => {
+const useMultiSampleStore = (sampleId: string = 'multi-sample', groupName: string = 'Group 1') => defineStore(`multiSampleStore/${sampleId}`, () => {
     // This variable ensures that we only create UNIQUE stores
     let _counter = 0;
+
+    const name = ref<string>(groupName);
 
     const samples = ref<any[]>([]);
 
@@ -98,6 +100,6 @@ const useMultiSampleStore = defineStore('multiSampleStore', () => {
         ecs,
         ecToPathways
     };
-});
+})();
 
 export default useMultiSampleStore;
