@@ -1,13 +1,35 @@
 import { defineStore } from 'pinia';
 
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import useMultiSampleStore from './MultiSampleStore';
 
 const useGroupSampleStore = defineStore('groupSampleStore', () => {
     // This variable ensures that we only create UNIQUE stores
     let _counter = 0;
 
+    // ===============================================================
+    // ======================== REFERENCES ===========================
+    // ===============================================================
+
     const groups = ref<any[]>([]);
+
+    // ===============================================================
+    // ========================= COMPUTED ============================
+    // ===============================================================
+
+    const initialized = computed(() => groups.value.some(group => group.initialized));
+
+    const pathways = computed(() =>
+        new Set(groups.value.map(group => [ ...group.pathways ]).flat())
+    );
+
+    const ecs = computed(() =>
+        new Set(groups.value.map(group => [ ...group.ecs ]).flat())
+    );
+
+    // ===============================================================
+    // ========================== METHODS ============================
+    // ===============================================================
 
     const addGroup = () => {
         groups.value = [ ...groups.value, useMultiSampleStore(`groupSampleStore_group${_counter++}`, `Group ${_counter}`) ];
@@ -30,13 +52,28 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
         groups.value[groupIndex].removeSample(sampleIndex);
     };
 
+    const ecToPathways = (ec: string) => {
+        return new Set(groups.value.map(group => [ ...group.ecToPathways(ec) ]).flat());
+    };
+
+    const pathwayToPeptideCounts = (pathway: string) => {
+        return groups.value.map(group => group.pathwayToPeptideCounts(pathway)).reduce((a, b) => a + b, 0);
+    };
+
     return {
         groups,
+        initialized,
+        pathways,
+        ecs,
+
         addGroup,
         removeGroup,
         addSample,
         initializeSample,
         removeSample,
+
+        ecToPathways,
+        pathwayToPeptideCounts
     };
 });
 

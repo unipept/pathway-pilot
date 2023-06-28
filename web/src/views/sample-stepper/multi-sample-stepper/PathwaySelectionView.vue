@@ -73,11 +73,12 @@ import useMultiSampleStore from '@/stores/MultiSampleStore';
 import BubblePlot from '@/components/visualisations/BubblePlot.vue';
 import SearchFilter from '@/components/inputs/SearchFilter.vue';
 import FilterView from './FilterView.vue';
+import useGroupSampleStore from '@/stores/GroupSampleStore';
 
 const emits = defineEmits(["filtered"]);
 
 const keggStore = useKeggStore();
-const mappingStore = useMultiSampleStore(); 
+const mappingStore = useGroupSampleStore(); 
 const visualisationStore = useVisualisationStore();
 
 const { initialized, pathways } = storeToRefs(mappingStore);
@@ -100,7 +101,7 @@ const pathwayItems = computed(() => [ ...(isFiltered.value ? filteredPathways.va
             name: pathwayMapping.value.get(pathway)?.name ?? "",
             category: pathwayMapping.value.get(pathway)?.category ?? "",
             subCategory: pathwayMapping.value.get(pathway)?.subCategory ?? "",
-            count: mappingStore.pathwaysToPeptideCounts.get(pathway)!
+            count: mappingStore.pathwayToPeptideCounts(pathway)
         })
     )
 );

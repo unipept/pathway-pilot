@@ -88,7 +88,6 @@ import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import Pathway from '@/logic/entities/Pathway';
-import useMultiSampleStore from '@/stores/MultiSampleStore';
 import ImageControls, { ToggleButtonValue } from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
 import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
@@ -96,8 +95,9 @@ import { useMapAnnotator } from '@/composables/useMapAnnotator';
 import { useLinearGradient } from '@/composables/useLinearGradient';
 import EcNumber from '@/logic/entities/EcNumber';
 import { intersection } from 'd3';
+import useGroupSampleStore from '@/stores/GroupSampleStore';
 
-const sampleStore = useMultiSampleStore();
+const sampleStore = useGroupSampleStore();
 const visualisationStore = useVisualisationStore();
 
 // const { colorAllTaxa, colorHighlightedTaxa, colorDifferential } = useMapAnnotator(
@@ -127,14 +127,14 @@ const scale = ref<number>(1);
 const translate = ref<{ x: number, y: number }>({ x: 0, y: 0 });
 
 const { pathway } = storeToRefs(visualisationStore);
-const { samples } = storeToRefs(sampleStore);
+const { groups } = storeToRefs(sampleStore);
 
 const abundance = ref<ToggleButtonValue>('disabled');
 const showAbundanceView = ref<boolean>(false);
 
-const legendItems = computed(() => samples.value.map((sample, i) => ({
+const legendItems = computed(() => groups.value.map((group, i) => ({
     color: ColorConstants.LEGEND[i],
-    label: sample.name,
+    label: group.name,
 })));
 
 const coloredAreas = computed(() => {
@@ -151,8 +151,8 @@ const colorAll = (areas: any[]) => {
         area.colors = [];
         for (const ecNumber of area.info.ecNumbers) {
             let i = 0;
-            for (const sample of samples.value) {
-                if (sample.ecs.has(ecNumber.id) && !area.colors.includes(ColorConstants.LEGEND[i])) {
+            for (const group of groups.value) {
+                if (group.ecs.has(ecNumber.id) && !area.colors.includes(ColorConstants.LEGEND[i])) {
                     area.colors.push(ColorConstants.LEGEND[i++]);
                 }
             }
@@ -165,8 +165,8 @@ const colorAll = (areas: any[]) => {
 const colorDifferential = (areas: any[]) => {
     const { getColor } = useLinearGradient(ColorConstants.LEGEND[0], ColorConstants.LEGEND[1]);
 
-    const group1EcNumbers = samples.value[0].ecs;
-    const group2EcNumbers = samples.value[1].ecs;
+    const group1EcNumbers = groups.value[0].ecs;
+    const group2EcNumbers = groups.value[1].ecs;
 
     const range = [ 0, 0 ];
     const differenceAreas = areas.map(area => {
@@ -175,11 +175,11 @@ const colorDifferential = (areas: any[]) => {
         const group1EcInArea: Set<string> = intersection(group1EcNumbers, new Set(area.info.ecNumbers.map((ec: EcNumber) => ec.id)));
         const group2EcInArea: Set<string> = intersection(group2EcNumbers, new Set(area.info.ecNumbers.map((ec: EcNumber) => ec.id)));
 
-        const group1Peptides = new Set([ ...group1EcInArea ].map(ec => [ ...samples.value[0].ecToPeptides.get(ec)?.keys() ?? [] ]).flat());
-        const group2Peptides = new Set([ ...group2EcInArea ].map(ec => [ ...samples.value[1].ecToPeptides.get(ec)?.keys() ?? [] ]).flat());
+        const group1Peptides = new Set([ ...group1EcInArea ].map(ec => [ ...groups.value[0].ecToPeptides(ec) ]).flat());
+        const group2Peptides = new Set([ ...group2EcInArea ].map(ec => [ ...groups.value[1].ecToPeptides(ec) ]).flat());
         
-        const group1PeptideCount = [ ...group1Peptides ].map(peptide => samples.value[0].peptideToCounts.get(peptide) ?? 0).reduce((a, b) => a + b, 0);
-        const group2PeptideCount = [ ...group2Peptides ].map(peptide => samples.value[1].peptideToCounts.get(peptide) ?? 0).reduce((a, b) => a + b, 0);
+        const group1PeptideCount = [ ...group1Peptides ].map(peptide => groups.value[0].peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
+        const group2PeptideCount = [ ...group2Peptides ].map(peptide => groups.value[1].peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
 
         if (group1PeptideCount > 0 || group2PeptideCount > 0) {
             const difference = group2PeptideCount - group1PeptideCount;
@@ -255,9 +255,9 @@ watch(pathway, async (pathway: Pathway | undefined) => {
     areas.value  = data?.nodes ?? [];
 });
 
-watch(samples, () => {
-    onAbundance(samples.value.length === 2 && showAbundanceView.value)
-    abundance.value = samples.value.length !== 2 ? 'disabled' : true;
+watch(groups, () => {
+    onAbundance(groups.value.length === 2 && showAbundanceView.value)
+    abundance.value = groups.value.length !== 2 ? 'disabled' : true;
 });
 </script>
 

@@ -8,13 +8,31 @@ import useSingleSampleStore from './SingleSampleStore';
 let _counter = 0;
 
 const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: string = '') => defineStore(`multiSampleStore/${sampleId}`, () => {
+    // ===============================================================
+    // ======================== REFERENCES ===========================
+    // ===============================================================
+
     const name = ref<string>(sampleName);
 
     const samples = ref<any[]>([]);
 
-    const initialized = computed(() => {
-        return samples.value.length > 0 && samples.value.some(sample => sample.initialized);
-    });
+    // ===============================================================
+    // ========================= COMPUTED ============================
+    // ===============================================================
+
+    const initialized = computed(() => samples.value.some(sample => sample.initialized));
+
+    const pathways = computed(() =>
+        new Set(samples.value.map(sample => [ ...sample.pathways ]).flat())
+    );
+
+    const ecs = computed(() => 
+        new Set(samples.value.map(sample => [ ...sample.ecs ]).flat())
+    );
+
+    // ===============================================================
+    // ========================== METHODS ============================
+    // ===============================================================
 
     const addSample = (sampleName: string) => {
         samples.value = [ ...samples.value, useSingleSampleStore(`multiSampleStore_sample${_counter++}`, sampleName) ];
@@ -25,13 +43,13 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         samples.value[index].initialize(inputList, sampleConverter);
     };
 
-    const resetSample = (index: number) => {
-        samples.value[index].reset();
-    };
-
     const removeSample = (index: number) => {
         // TODO: destroy the store
         samples.value = [ ...samples.value.slice(0, index), ...samples.value.slice(index + 1) ]
+    };
+
+    const resetSample = (index: number) => {
+        samples.value[index].reset();
     };
 
     const reset = () => {
@@ -47,67 +65,39 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         samples.value[index].updateName(newName);
     };
 
-    const pathways = computed(() => {
-        const pathways = new Set<string>();
-
-        samples.value.forEach(sample =>
-            sample.pathways.forEach((pathway: string) => pathways.add(pathway))
-        );
-
-        return pathways;
-    });
-
-    const pathwaysToPeptideCounts = computed(() => {
-        const pathwaysToPeptideCounts = new Map<string, number>();
-
-        samples.value.forEach(sample =>
-            sample.pathwaysToPeptideCounts.forEach((count: number, pathway: string) => {
-                if (pathwaysToPeptideCounts.has(pathway)) {
-                    pathwaysToPeptideCounts.set(pathway, pathwaysToPeptideCounts.get(pathway)! + count);
-                } else {
-                    pathwaysToPeptideCounts.set(pathway, count);
-                }
-            })
-        );
-
-        return pathwaysToPeptideCounts;
-    });
-
-    // TODO: provide functions using interface to access maps
-    const ecs = computed(() => {
-        const ecs = new Set<string>();
-
-        samples.value.forEach(sample =>
-            sample.ecs.forEach((ec: string) => ecs.add(ec))
-        );
-
-        return ecs;
-    });
-
     const ecToPathways = (ec: string) => {
-        const pathways = new Set<string>();
+        return new Set(samples.value.map(sample => [ ...(sample.ecToPathways.get(ec) ?? []) ]).flat());
+    };
 
-        samples.value.forEach(sample =>
-            sample.ecToPathways.get(ec).forEach((pathway: string) => pathways.add(pathway))
-        );
+    const ecToPeptides = (ec: string) => {
+        return new Set(samples.value.map(sample => [ ...(sample.ecToPeptides.get(ec) ?? []) ]).flat());
+    };
 
-        return pathways;
+    const pathwayToPeptideCounts = (pathway: string) => {
+        return samples.value.map(sample => sample.pathwaysToPeptideCounts.get(pathway) ?? 0).reduce((a, b) => a + b, 0);
+    };
+
+    const peptideToCounts = (peptide: string) => {
+        return samples.value.map(sample => sample.peptideToCounts.get(peptide) ?? 0).reduce((a, b) => a + b, 0);
     };
 
     return {
         name,
         samples,
         initialized,
+        pathways,
+        ecs,
+
         addSample,
         initializeSample,
-        resetSample,
         removeSample,
+        resetSample,
         reset,
-        pathways,
-        pathwaysToPeptideCounts,
 
-        ecs,
         ecToPathways,
+        ecToPeptides,
+        pathwayToPeptideCounts,
+        peptideToCounts,
 
         updateName,
         updateSampleName

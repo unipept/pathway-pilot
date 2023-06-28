@@ -33,7 +33,7 @@ import { storeToRefs } from 'pinia';
 import useKeggStore from '@/stores/KeggStore';
 import EnzymeTable from '@/components/tables/selection/EnzymeTable.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
-import useMultiSampleStore from '@/stores/MultiSampleStore';
+import useGroupSampleStore from '@/stores/GroupSampleStore';
 
 export interface Props {
     enzymes: string[]
@@ -43,7 +43,7 @@ const props = defineProps<Props>();
 
 const emits = defineEmits(['update:enzymes']);
 
-const sampleStore = useMultiSampleStore();
+const sampleStore = useGroupSampleStore();
 const keggStore   = useKeggStore();
 
 const { ecs }       = storeToRefs(sampleStore);
