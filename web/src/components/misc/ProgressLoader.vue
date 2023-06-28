@@ -2,11 +2,11 @@
     <v-progress-circular
         v-model="loadingProgress"
         class="loading-spinner"
-        size="100"
-        width="10"
-        color="primary"
+        :size="size"
+        :width="width"
+        :color="color"
     >
-        <div class="loading-spinner-value">{{ loadingProgress }} %</div>
+        <div v-if="label" class="loading-spinner-value">{{ loadingProgress }} %</div>
     </v-progress-circular>
 </template>
 
@@ -15,13 +15,21 @@ import { ref, watch } from 'vue';
 
 export interface Props {
     loading?: false | number;
+    size?: number;
+    width?: number;
+    color?: string;
+    label?: boolean;
 };
 
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
+    size: 100,
+    width: 10,
+    color: 'primary',
+    label: true
 });
 
-const loadingProgress = ref<number>(props.loading || 100);
+const loadingProgress = ref<number>(props.loading === false ? 0 : props.loading);
 
 watch(() => props.loading, (value) => {
     loadingProgress.value = value || 100;
@@ -30,10 +38,6 @@ watch(() => props.loading, (value) => {
 
 <style scoped>
 .loading-spinner {
-    position: absolute;
-    top: calc(50% - 10px);
-    left: 50%;
-    transform: translate(-50%, -50%);
     font-weight: 600;
     font-size: 18px;
 }

@@ -1,12 +1,13 @@
 <template>
     <tr>
         <td>
-            <v-progress-circular v-if="loading"
+            <progress-loader v-if="isLoading"
                 class="me-2"
-                indeterminate
+                :loading="loading"
+                :size="30"
+                :width="3"
                 color="primary"
-                size="30"
-                width="3"
+                :label="false"
             />
 
             <v-icon v-else
@@ -39,10 +40,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+import ProgressLoader from '@/components/misc/ProgressLoader.vue';
 
 export interface Props {
-    loading: boolean
+    loading: number | false
     uploadName: string
     name: string
     size: string
@@ -54,6 +56,10 @@ const props = defineProps<Props>();
 const emits = defineEmits([ 'remove', 'update' ]);
 
 const sampleName = ref<string>(props.name);
+
+const isLoading = computed(() => {
+    return props.loading !== false;
+});
 
 const onRemoveRow = (rowIndex: number) => {
     emits('remove', rowIndex);

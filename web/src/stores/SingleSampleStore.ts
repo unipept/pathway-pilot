@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 
 import Taxon from "@/logic/entities/Taxon";
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { TreeviewItem, defaultTreeviewItem } from '@/components/visualisations/TreeviewItem';
 
 const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
@@ -34,12 +34,18 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
     const taxaTree = ref<TreeviewItem>(defaultTreeviewItem);
 
-    const initialized = ref<boolean>(false);
+    const processing = ref<number | false>(0);
+
+    const initialized = computed(() => processing.value === false);
 
     const initialize = async (inputList: any[], sampleConverter: any) => {
         size.value = inputList.length;
 
-        const sampleData = await sampleConverter.convert(inputList);
+        const sampleData = await new sampleConverter({
+            onProgressUpdate: (progress: number) => {
+                processing.value = Math.round(progress * 100);
+            }
+        }).convert(inputList);
 
         if (initialized.value) {
             return;
@@ -117,7 +123,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
             }
         }
 
-        initialized.value = true;
+        processing.value = false;
     }
 
     const updateName = (newName: string) => {
@@ -161,7 +167,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
     }
 
     const reset = () => {
-        initialized.value = false;
+        processing.value = 0;
 
         taxa.clear();
 
@@ -205,6 +211,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
         taxaTree,
 
+        processing,
         initialized,
 
         initialize,

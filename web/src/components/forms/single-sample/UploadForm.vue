@@ -32,7 +32,7 @@
                     />
                 </v-col>
 
-                <progress-loader v-if="isLoading" :loading="loading"/>
+                <progress-loader v-if="isLoading" class="loader" :loading="loading"/>
             </v-row>
 
             <div class="d-flex justify-end mt-3">
@@ -123,5 +123,12 @@ const onLoadExample = () => {
 .information {
     padding: 0;
     font-size: 16px;
+}
+
+.loader {
+    position: absolute;
+    top: calc(50% - 10px);
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 </style>

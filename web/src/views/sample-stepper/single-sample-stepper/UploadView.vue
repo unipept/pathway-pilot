@@ -2,7 +2,7 @@
     <div>
         <component 
             :is="formatMap.get(fileFormat)?.component"
-            :loading="processing"
+            :loading="sampleStore.processing"
             @submit="onSubmit"
             @reset="onReset"
         />
@@ -50,61 +50,51 @@ const props = defineProps<Props>();
 const sampleStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
-const processing = ref<boolean | number>(false);
-
 const errors = ref<VerifierError[]>([]);
 
-const unipeptCommunicator = new UnipeptCommunicator({
-    onProgressUpdate: (progress: number) => {
-        processing.value = Math.round(progress * 100);
-    }
-});
+console.log('upload', sampleStore.initialized, sampleStore.processing);
 
 const formatMap = new Map<FileFormat, { component: any, verifier: any, converter: any }>([
     [ FileFormat.PEPTIDE_LIST, { 
         component: PeptideListForm, 
         verifier: new PeptideListVerifier(), 
-        converter: new PeptideListConverter(unipeptCommunicator)
+        converter: PeptideListConverter
     } ],
     [ FileFormat.PEPTIDE_SHAKER, { 
         component: PeptideShakerForm, 
         verifier: new PeptideShakerVerifier(),
-        converter: new PeptideShakerConverter(unipeptCommunicator)
+        converter: PeptideShakerConverter
     } ],
     [ FileFormat.MAX_QUANT, {
         component: MaxQuantForm, 
         verifier: new MaxQuantVerifier(),
-        converter: new MaxQuantConverter(unipeptCommunicator)
+        converter: MaxQuantConverter
     } ],
     [ FileFormat.PROTEOME_DISCOVERER, { 
         component: ProteomeDiscovererForm, 
         verifier: new ProteomeDiscovererVerifier(),
-        converter: new ProteomeDiscovererConverter(unipeptCommunicator)
+        converter: ProteomeDiscovererConverter
     } ],
     [ FileFormat.META_PROTEOME_ANALYZER, { 
         component: MetaProteomeAnalyzerForm, 
         verifier: new MetaProteomeAnalyzerVerifier(),
-        converter: new MetaProteomeAnalyzerConverter(unipeptCommunicator)
+        converter: MetaProteomeAnalyzerConverter
     } ],
     
     [ FileFormat.PROTEIN_LIST, {
         component: ProteinListForm, 
         verifier: new ProteinListVerifier(),
-        converter: new ProteinListConverter(unipeptCommunicator)
+        converter: ProteinListConverter
     } ]
 ]);
 
 const onSubmit = async (peptideList: string[]) => {
-    processing.value = 0;
-
     errors.value = formatMap.get(props.fileFormat)?.verifier.verify(peptideList);
 
     if (errors.value.length <= 0) {
         await sampleStore.initialize(peptideList, formatMap.get(props.fileFormat)?.converter);
         sampleStore.updateTree(await new UnipeptCommunicator().fetchTaxonomy(Array.from(sampleStore.taxa.keys())))
     }
-
-    processing.value = false;
 };
 
 const onReset = () => {

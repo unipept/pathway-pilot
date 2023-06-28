@@ -4,11 +4,15 @@ import { defaultProgressListener, ProgressListener } from "@/logic/ProgressListe
 import Converter from "../Converter";
 
 export default class ProteinListConverter implements Converter {
+    private readonly unipeptCommunicator: UnipeptCommunicator;
+    private readonly keggCommunicator: KeggCommunicator;
+
     constructor(
-        private readonly unipeptCommunicator: UnipeptCommunicator,
-        private readonly keggCommunicator: KeggCommunicator = new KeggCommunicator(),
         private readonly progressListener: ProgressListener = defaultProgressListener
-    ) {}
+    ) {
+        this.unipeptCommunicator = new UnipeptCommunicator(this.progressListener);
+        this.keggCommunicator = new KeggCommunicator();
+    }
 
     public isPeptide() {
         return false;
@@ -59,7 +63,7 @@ export default class ProteinListConverter implements Converter {
                 }
             }
 
-            this.progressListener.onProgressUpdate((i + 1) / proteinInfoLength);
+            //this.progressListener.onProgressUpdate((i + 1) / proteinInfoLength);
         }
 
         return Array.from(resultMapping.values());

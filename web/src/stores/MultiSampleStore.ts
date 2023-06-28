@@ -7,8 +7,8 @@ import useSingleSampleStore from './SingleSampleStore';
 // This variable NEEDS to be global to the sample store, otherwise we will get duplicate stores
 let _counter = 0;
 
-const useMultiSampleStore = (sampleId: string = 'multi-sample', groupName: string = 'Group 1') => defineStore(`multiSampleStore/${sampleId}`, () => {
-    const name = ref<string>(groupName);
+const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: string = '') => defineStore(`multiSampleStore/${sampleId}`, () => {
+    const name = ref<string>(sampleName);
 
     const samples = ref<any[]>([]);
 

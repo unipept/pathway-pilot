@@ -9,8 +9,8 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
 
     const groups = ref<any[]>([]);
 
-    const addGroup = (groupName: string) => {
-        groups.value = [ ...groups.value, useMultiSampleStore(`groupSampleStore_group${_counter++}`, groupName) ];
+    const addGroup = () => {
+        groups.value = [ ...groups.value, useMultiSampleStore(`groupSampleStore_group${_counter++}`, `Group ${_counter}`) ];
         return groups.value.length - 1;
     };
 

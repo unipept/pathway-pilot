@@ -6,8 +6,6 @@ import UnipeptCommunicator from "@/logic/communicators/UnipeptCommunicator";
 
 export default class MetaProteomeAnalyzerConverter implements Converter {
     constructor(
-        private readonly unipeptCommunicator: UnipeptCommunicator,
-        private readonly keggCommunicator: KeggCommunicator = new KeggCommunicator(),
         private readonly progressListener: ProgressListener = defaultProgressListener
     ) {}
 
@@ -18,8 +16,6 @@ export default class MetaProteomeAnalyzerConverter implements Converter {
     public async convert(mpaResult: string[]) {
         const peptideList = mpaResult.map(s => s.split('\t')[2]);
 
-        return await new PeptideListConverter(
-            this.unipeptCommunicator, this.keggCommunicator, this.progressListener
-        ).convert(peptideList);
+        return await new PeptideListConverter(this.progressListener).convert(peptideList);
     }
 }

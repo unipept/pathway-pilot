@@ -42,7 +42,6 @@ import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import FileFormat from '../FileFormat';
-import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 import useGroupSampleStore from '@/stores/GroupSampleStore';
 import VerifierError from '@/logic/verifiers/VerifierError';
 import ErrorModal from '@/components/modals/ErrorModal.vue';
@@ -84,7 +83,7 @@ const tableItems = computed(() => groups.value.map(group => ({
         uploadName: sample.uploadName,
         name: sample.name,
         size: `${sample.size} peptides`,
-        loading: !sample.initialized
+        loading: sample.processing
     }))
 })));
 
@@ -96,49 +95,43 @@ const deleteModalGroupIndex = ref<number>(-1);
 const deleteModalSampleIndex = ref<number>(-1);
 const deleteModalSampleName = ref<string>("");
 
-const processing = ref<boolean>(false);
-
 const errors = ref<VerifierError[]>([]);
-
-const unipeptCommunicator = new UnipeptCommunicator();
 
 const formatMap = new Map<FileFormat, { component: any, verifier: any, converter: any }>([
     [ FileFormat.PEPTIDE_LIST, { 
         component: PeptideListForm, 
         verifier: new PeptideListVerifier(),
-        converter: new PeptideListConverter(unipeptCommunicator) 
+        converter: PeptideListConverter 
     } ],
     [ FileFormat.PEPTIDE_SHAKER, { 
         component: PeptideShakerForm, 
         verifier: new PeptideShakerVerifier(),
-        converter: new PeptideShakerConverter(unipeptCommunicator) 
+        converter: PeptideShakerConverter 
     } ],
     [ FileFormat.MAX_QUANT, { 
         component: MaxQuantForm, 
         verifier: new MaxQuantVerifier(),
-        converter: new MaxQuantConverter(unipeptCommunicator) 
+        converter: MaxQuantConverter 
     } ],
     [ FileFormat.PROTEOME_DISCOVERER, { 
         component: ProteomeDiscovererForm, 
         verifier: new ProteomeDiscovererVerifier(),
-        converter: new ProteomeDiscovererConverter(unipeptCommunicator) 
+        converter: ProteomeDiscovererConverter 
     } ],
     [ FileFormat.META_PROTEOME_ANALYZER, { 
         component: MetaProteomeAnalyzerForm, 
         verifier: new MetaProteomeAnalyzerVerifier(),
-        converter: new MetaProteomeAnalyzerConverter(unipeptCommunicator) 
+        converter: MetaProteomeAnalyzerConverter 
     } ],
 
     [ FileFormat.PROTEIN_LIST, { 
         component: ProteinListForm, 
         verifier: new ProteinListVerifier(),
-        converter: new ProteinListConverter(unipeptCommunicator) 
+        converter: ProteinListConverter 
     } ]
 ]);
 
 const onSubmit = (peptideList: string[], sampleName: string) => {
-    processing.value = true;
-
     errors.value = formatMap.get(props.fileFormat)?.verifier.verify(peptideList);
 
     if (errors.value.length <= 0) {
@@ -147,8 +140,6 @@ const onSubmit = (peptideList: string[], sampleName: string) => {
         const [ group, sample ] = sampleStore.addSample(addModalGroup.value, sampleName);
         sampleStore.initializeSample(group, sample, peptideList, formatMap.get(props.fileFormat)?.converter);
     }
-
-    processing.value = false;
 };
 
 const onAddSample = (groupIndex: number) => {
@@ -157,7 +148,7 @@ const onAddSample = (groupIndex: number) => {
 };
 
 const onAddGroup = () => {
-    sampleStore.addGroup('');
+    sampleStore.addGroup();
 };
 
 const onRemoveSample = (groupIndex: number, sampleIndex: number) => {
