@@ -42,7 +42,7 @@ import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import FileFormat from '../FileFormat';
-import useGroupSampleStore from '@/stores/GroupSampleStore';
+import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 import VerifierError from '@/logic/verifiers/VerifierError';
 import ErrorModal from '@/components/modals/ErrorModal.vue';
 

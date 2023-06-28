@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { useCsvDownloader } from '@/composables/download/useCsvDownloader';
 import useKeggStore from '@/stores/KeggStore';
-import useSingleSampleStore from '@/stores/SingleSampleStore';
+import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 import { watch } from 'vue';
@@ -38,9 +38,9 @@ const { initialized } = storeToRefs(sampleStore);
 const onDownloadStore = () => {
         const csvHeader = [ 'peptide', 'peptide_count', 'taxon id', 'taxon rank', 'taxon name', 'pathways', 'pathway names' ].join(';');
 
-        const csvData = [ ...sampleStore.peptides ].map(peptide => {
-            const taxon = sampleStore.peptideToTaxa.get(peptide)!;
-            const pathways = [ ...sampleStore.peptideToPathways.get(peptide) ?? [] ]
+        const csvData = sampleStore.peptides().map(peptide => {
+            const taxon = sampleStore.peptideToTaxon(peptide)!;
+            const pathways = sampleStore.peptideToPathways(peptide)
                 .filter(p => props.pathways.map(pp => pp.id).includes(p)).join(',');
             const pathwayNames = pathways.length === 0 ? "" : pathways
                 .split(',')
@@ -49,7 +49,7 @@ const onDownloadStore = () => {
 
             return [
                 peptide,
-                sampleStore.peptideToCounts.get(peptide),
+                sampleStore.peptideToCounts(peptide),
                 taxon.id,
                 taxon.rank,
                 taxon.name,

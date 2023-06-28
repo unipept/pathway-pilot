@@ -90,7 +90,7 @@ import { computed, ref, watch } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
 import TaxonLegend from '@/components/legends/TaxonLegend.vue';
 import AreaModal from '@/components/modals/AreaModal.vue';
-import useSingleSampleStore from '@/stores/SingleSampleStore';
+import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import CompoundModal from '@/components/modals/CompoundModal.vue';
 import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
@@ -108,7 +108,7 @@ const visualisationStore = useVisualisationStore();
 const { colorAllAreas, colorHighlightedGroups, colorDifferential } = useMapAnnotator(
     mappingStore.ecs,
     mappingStore.ecToPeptides,
-    mappingStore.taxaToEcs,
+    mappingStore.taxonToEcs,
     mappingStore.peptideToCounts,
     mappingStore.children
 );

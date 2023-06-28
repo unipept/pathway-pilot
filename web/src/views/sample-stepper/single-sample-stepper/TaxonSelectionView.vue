@@ -38,7 +38,7 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import Taxon from '@/logic/entities/Taxon';
-import useSingleSampleStore from '@/stores/SingleSampleStore';
+import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
@@ -55,7 +55,7 @@ const { fetchTaxonomyTree, compressRankTree, filterTree } = useTaxonomyTree();
 const { taxaTree } = storeToRefs(mappingStore);
 const { pathway: selectedPathway, highlightedTaxa: selectedTaxa } = storeToRefs(visualisationStore);
 
-const taxa = computed(() => Array.from(mappingStore.pathwaysToTaxa.get(selectedPathway.value?.id!) ?? []));
+const taxa = computed(() => mappingStore.pathwayToTaxa(selectedPathway.value?.id!));
 
 const compressedTaxaTree = computed(() => compressRankTree(taxaTree.value, taxa.value, true));
 const filteredTaxaTree = ref<TreeviewItem>(compressedTaxaTree.value);

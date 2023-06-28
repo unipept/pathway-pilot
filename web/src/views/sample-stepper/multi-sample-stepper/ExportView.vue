@@ -17,10 +17,9 @@
 <script setup lang="ts">
 import { useCsvDownloader } from '@/composables/download/useCsvDownloader';
 import useKeggStore from '@/stores/KeggStore';
-import useMultiSampleStore from '@/stores/MultiSampleStore';
+import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
-import { watch } from 'vue';
 
 export interface Props {
     pathways: any[];
@@ -28,7 +27,7 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const sampleStore = useMultiSampleStore();
+const sampleStore = useGroupSampleStore();
 const keggStore = useKeggStore();
 
 const { downloadCsv } = useCsvDownloader();
@@ -36,30 +35,33 @@ const { downloadCsv } = useCsvDownloader();
 const { initialized } = storeToRefs(sampleStore);
 
 const onDownloadStore = () => {
-        const csvHeader = [ 'sample', 'peptide', 'peptide_count', 'taxon id', 'taxon rank', 'taxon name', 'pathways', 'pathway names' ].join(';');
+        const csvHeader = [ 'group', 'sample', 'peptide', 'peptide_count', 'taxon id', 'taxon rank', 'taxon name', 'pathways', 'pathway names' ].join(';');
 
-        const csvData = [ ...sampleStore.samples ].map(sample => {
-            return [ ...sample.peptides ].map(peptide => {
-                const taxon = sample.peptideToTaxa.get(peptide)!;
-                const pathways = [ ...sample.peptideToPathways.get(peptide) ?? [] ]
-                    .filter(p => props.pathways.map(pp => pp.id).includes(p)).join(',');
-                const pathwayNames = pathways.length === 0 ? "" : pathways
-                    .split(',')
-                    .map(pathway => keggStore.pathwayMapping.get(pathway)?.name ?? "Unknown")
-                    .join(',');
+        const csvData = [ ...sampleStore.groups ].map(group =>
+            [ ...group.samples ].map(sample =>
+                sample.peptides().map((peptide: string) => {
+                    const taxon = sample.peptideToTaxon(peptide)!;
+                    const pathways = sample.peptideToPathways(peptide)
+                        .filter((p: string) => props.pathways.map(pp => pp.id).includes(p)).join(',');
+                    const pathwayNames = pathways.length === 0 ? "" : pathways
+                        .split(',')
+                        .map((pathway: string) => keggStore.pathwayMapping.get(pathway)?.name ?? "Unknown")
+                        .join(',');
 
-                return [
-                    sample.name,
-                    peptide,
-                    sample.peptideToCounts.get(peptide),
-                    taxon.id,
-                    taxon.rank,
-                    taxon.name,
-                    pathways,
-                    pathwayNames
-                ].join(';')
-            })
-        }).flat();
+                    return [
+                        group.name,
+                        sample.name,
+                        peptide,
+                        sample.peptideToCounts(peptide),
+                        taxon.id,
+                        taxon.rank,
+                        taxon.name,
+                        pathways,
+                        pathwayNames
+                    ].join(';')
+                })
+            ).flat()
+        ).flat();
 
         downloadCsv(csvData, 'store.csv', csvHeader);
 };

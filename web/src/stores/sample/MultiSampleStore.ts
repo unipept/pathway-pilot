@@ -34,6 +34,14 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
     // ========================== METHODS ============================
     // ===============================================================
 
+    const updateName = (newName: string) => {
+        name.value = newName;
+    };
+
+    const updateSampleName = (index: number, newName: string) => {
+        samples.value[index].updateName(newName);
+    };
+    
     const addSample = (sampleName: string) => {
         samples.value = [ ...samples.value, useSingleSampleStore(`multiSampleStore_sample${_counter++}`, sampleName) ];
         return samples.value.length - 1;
@@ -44,7 +52,7 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
     };
 
     const removeSample = (index: number) => {
-        // TODO: destroy the store
+        resetSample(index);
         samples.value = [ ...samples.value.slice(0, index), ...samples.value.slice(index + 1) ]
     };
 
@@ -57,28 +65,20 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         samples.value = [];
     }
 
-    const updateName = (newName: string) => {
-        name.value = newName;
-    };
-
-    const updateSampleName = (index: number, newName: string) => {
-        samples.value[index].updateName(newName);
-    };
-
     const ecToPathways = (ec: string) => {
-        return new Set(samples.value.map(sample => [ ...(sample.ecToPathways.get(ec) ?? []) ]).flat());
+        return new Set(samples.value.map(sample => sample.ecToPathways(ec)).flat());
     };
 
     const ecToPeptides = (ec: string) => {
-        return new Set(samples.value.map(sample => [ ...(sample.ecToPeptides.get(ec) ?? []) ]).flat());
+        return new Set(samples.value.map(sample => sample.ecToPeptides(ec)).flat());
     };
 
     const pathwayToPeptideCounts = (pathway: string) => {
-        return samples.value.map(sample => sample.pathwaysToPeptideCounts.get(pathway) ?? 0).reduce((a, b) => a + b, 0);
+        return samples.value.map(sample => sample.pathwayToPeptideCounts(pathway)).reduce((a, b) => a + b, 0);
     };
 
     const peptideToCounts = (peptide: string) => {
-        return samples.value.map(sample => sample.peptideToCounts.get(peptide) ?? 0).reduce((a, b) => a + b, 0);
+        return samples.value.map(sample => sample.peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
     };
 
     return {
@@ -88,6 +88,8 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         pathways,
         ecs,
 
+        updateName,
+        updateSampleName,
         addSample,
         initializeSample,
         removeSample,
@@ -97,10 +99,7 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         ecToPathways,
         ecToPeptides,
         pathwayToPeptideCounts,
-        peptideToCounts,
-
-        updateName,
-        updateSampleName
+        peptideToCounts
     };
 })();
 

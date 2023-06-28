@@ -69,11 +69,10 @@ import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import useKeggStore from '@/stores/KeggStore';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
-import useMultiSampleStore from '@/stores/MultiSampleStore';
 import BubblePlot from '@/components/visualisations/BubblePlot.vue';
 import SearchFilter from '@/components/inputs/SearchFilter.vue';
 import FilterView from './FilterView.vue';
-import useGroupSampleStore from '@/stores/GroupSampleStore';
+import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 
 const emits = defineEmits(["filtered"]);
 

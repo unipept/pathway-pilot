@@ -13,7 +13,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import useSingleSampleStore from '@/stores/SingleSampleStore';
+import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import VerifierError from '@/logic/verifiers/VerifierError';
 import ErrorModal from '@/components/modals/ErrorModal.vue';
 import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
@@ -51,8 +51,6 @@ const sampleStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
 const errors = ref<VerifierError[]>([]);
-
-console.log('upload', sampleStore.initialized, sampleStore.processing);
 
 const formatMap = new Map<FileFormat, { component: any, verifier: any, converter: any }>([
     [ FileFormat.PEPTIDE_LIST, { 
@@ -93,7 +91,7 @@ const onSubmit = async (peptideList: string[]) => {
 
     if (errors.value.length <= 0) {
         await sampleStore.initialize(peptideList, formatMap.get(props.fileFormat)?.converter);
-        sampleStore.updateTree(await new UnipeptCommunicator().fetchTaxonomy(Array.from(sampleStore.taxa.keys())))
+        sampleStore.updateTree(await new UnipeptCommunicator().fetchTaxonomy(sampleStore.taxa()))
     }
 };
 

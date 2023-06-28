@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
-import useSingleSampleStore from '@/stores/SingleSampleStore';
+import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import useKeggStore from '@/stores/KeggStore';
 import EnzymeTable from '@/components/tables/selection/EnzymeTable.vue';

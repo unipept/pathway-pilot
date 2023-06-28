@@ -5,22 +5,20 @@ import { intersection } from "@/logic/util/SetUtil";
 
 export function useMapAnnotator(
     ecNumbers: Set<string>,
-    ecToPeptides: Map<string, Set<string>>, // TODO: This is not perfect, because what in case of two different samples with different mappings?
-    // groupToEcToPeptides: Map<number, Map<string, Set<string>>>,
-    groupToEcs: Map<number, Set<string>>,
-    peptideToCounts: Map<string, number>, // TODO: This is not perfect, because what in case of two different samples with different mappings?
-    // groupToPeptideToCounts: Map<number, Map<string, number>>, This will result in some duplication.
+    ecToPeptides: (ec: string) => string[], 
+    groupToEcs: (group: number) => string[],
+    peptideToCount: (peptide: string) => number, 
     children?: (taxonId: number) => number[],
 ) {
     const groupToEcNumbers = (groupId: number) => {
-        const ecNumbers = [ ...groupToEcs.get(groupId) ?? [] ];
+        const ecNumbers = groupToEcs(groupId);
 
         if (!children) {
             return new Set(ecNumbers);
         }
 
         const childrenEcNumbers = [ ...children(groupId) ]
-            .map((child: number) => [ ...groupToEcs.get(child) ?? []])
+            .map((child: number) => groupToEcs(child))
             .flat();
 
         return new Set([ ...ecNumbers, ...childrenEcNumbers ]);
@@ -76,11 +74,11 @@ export function useMapAnnotator(
             const group1EcInArea: Set<string> = intersection(group1EcNumbers, new Set(area.info.ecNumbers.map((ec: EcNumber) => ec.id)));
             const group2EcInArea: Set<string> = intersection(group2EcNumbers, new Set(area.info.ecNumbers.map((ec: EcNumber) => ec.id)));
 
-            const group1Peptides = new Set([ ...group1EcInArea ].map(ec => [...ecToPeptides.get(ec)?.keys() ?? []]).flat());
-            const group2Peptides = new Set([ ...group2EcInArea ].map(ec => [...ecToPeptides.get(ec)?.keys() ?? []]).flat());
+            const group1Peptides = new Set([ ...group1EcInArea ].map(ec => ecToPeptides(ec)).flat());
+            const group2Peptides = new Set([ ...group2EcInArea ].map(ec => ecToPeptides(ec)).flat());
             
-            const group1PeptideCount = [ ...group1Peptides ].map(peptide => peptideToCounts.get(peptide) ?? 0).reduce((a, b) => a + b, 0);
-            const group2PeptideCount = [ ...group2Peptides ].map(peptide => peptideToCounts.get(peptide) ?? 0).reduce((a, b) => a + b, 0);
+            const group1PeptideCount = [ ...group1Peptides ].map(peptide => peptideToCount(peptide)).reduce((a, b) => a + b, 0);
+            const group2PeptideCount = [ ...group2Peptides ].map(peptide => peptideToCount(peptide)).reduce((a, b) => a + b, 0);
 
             if (group1PeptideCount > 0 || group2PeptideCount > 0) {
                 const difference = group2PeptideCount - group1PeptideCount;

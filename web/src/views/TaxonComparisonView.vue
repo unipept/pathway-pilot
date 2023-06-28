@@ -53,7 +53,7 @@ import VisualisationView from './sample-stepper/single-sample-stepper/Visualisat
 import InputSelectionView from './sample-stepper/InputSelectionView.vue';
 import ExportView from './sample-stepper/single-sample-stepper/ExportView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
-import useSingleSampleStore from '@/stores/SingleSampleStore';
+import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import FileFormat from './sample-stepper/FileFormat';
 import { ref, watch } from 'vue';
 

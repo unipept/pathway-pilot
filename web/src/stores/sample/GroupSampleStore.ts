@@ -52,6 +52,15 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
         groups.value[groupIndex].removeSample(sampleIndex);
     };
 
+    const resetGroup = (index: number) => {
+        groups.value[index].reset();
+    };
+
+    const reset = () => {
+        groups.value.forEach(group => group.reset());
+        groups.value = [];
+    }
+
     const ecToPathways = (ec: string) => {
         return new Set(groups.value.map(group => [ ...group.ecToPathways(ec) ]).flat());
     };
@@ -71,6 +80,8 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
         addSample,
         initializeSample,
         removeSample,
+        resetGroup,
+        reset,
 
         ecToPathways,
         pathwayToPeptideCounts

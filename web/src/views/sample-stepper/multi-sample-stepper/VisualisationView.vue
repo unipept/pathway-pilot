@@ -91,11 +91,10 @@ import Pathway from '@/logic/entities/Pathway';
 import ImageControls, { ToggleButtonValue } from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
 import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
-import { useMapAnnotator } from '@/composables/useMapAnnotator';
 import { useLinearGradient } from '@/composables/useLinearGradient';
 import EcNumber from '@/logic/entities/EcNumber';
 import { intersection } from 'd3';
-import useGroupSampleStore from '@/stores/GroupSampleStore';
+import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 
 const sampleStore = useGroupSampleStore();
 const visualisationStore = useVisualisationStore();

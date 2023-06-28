@@ -57,20 +57,20 @@
 import PathwaySelectionView from './sample-stepper/multi-sample-stepper/PathwaySelectionView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import VisualisationView from './sample-stepper/multi-sample-stepper/VisualisationView.vue';
-import useMultiSampleStore from '@/stores/MultiSampleStore';
 import InputSelectionView from './sample-stepper/InputSelectionView.vue';
 import UploadView from './sample-stepper/multi-sample-stepper/UploadView.vue';
 import ExportView from './sample-stepper/multi-sample-stepper/ExportView.vue';
 import { ref, watch } from 'vue';
 import FileFormat from './sample-stepper/FileFormat';
+import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 
-const { reset: resetMultiSampleStore } = useMultiSampleStore();
+const { reset: resetGroupSampleStore } = useGroupSampleStore();
 const { reset: resetVisualisationStore } = useVisualisationStore();
 
 const fileFormat = ref<FileFormat>(FileFormat.PEPTIDE_LIST);
 const filteredPathways = ref<any[]>([]);
 
-resetMultiSampleStore();
+resetGroupSampleStore();
 resetVisualisationStore();
 
 const onPathwaysFiltered = (pathways: any[]) => {
@@ -78,7 +78,7 @@ const onPathwaysFiltered = (pathways: any[]) => {
 };
 
 watch(() => fileFormat.value, () => {
-    resetMultiSampleStore();
+    resetGroupSampleStore();
     resetVisualisationStore();
 });
 </script>

@@ -33,7 +33,7 @@ import { storeToRefs } from 'pinia';
 import useKeggStore from '@/stores/KeggStore';
 import EnzymeTable from '@/components/tables/selection/EnzymeTable.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
-import useGroupSampleStore from '@/stores/GroupSampleStore';
+import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 
 export interface Props {
     enzymes: string[]

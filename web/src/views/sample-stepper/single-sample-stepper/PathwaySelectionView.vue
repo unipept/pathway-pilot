@@ -65,7 +65,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import PathwayTable from '@/components/tables/selection/PathwayTable.vue';
 import Pathway from '@/logic/entities/Pathway';
-import useSingleSampleStore from '@/stores/SingleSampleStore';
+import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import useKeggStore from '@/stores/KeggStore';
@@ -90,7 +90,7 @@ const pathwayFilter = ref<string[]>([]);
 const filterOpen = ref<boolean>(false);
 
 const filteredPathways = computed(() => [ ...pathwayFilter.value ]
-    .map((ec: string) => [ ...mappingStore.ecToPathways.get(ec)! ]).flat());
+    .map((ec: string) => mappingStore.ecToPathways(ec)).flat());
 
 const isFiltered = computed(() => pathwayFilter.value.length > 0);
 
@@ -100,7 +100,7 @@ const pathwayItems = computed(() => [ ...(isFiltered.value ? filteredPathways.va
             name: pathwayMapping.value.get(pathway)?.name ?? "",
             category: pathwayMapping.value.get(pathway)?.category ?? "",
             subCategory: pathwayMapping.value.get(pathway)?.subCategory ?? "",
-            count: mappingStore.pathwaysToPeptideCounts.get(pathway)!
+            count: mappingStore.pathwayToPeptideCounts(pathway)
         })
     )
 );

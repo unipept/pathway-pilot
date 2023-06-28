@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import MatchedInputTable from '@/components/tables/MatchedInputTable.vue';
-import useSingleSampleStore from '@/stores/SingleSampleStore';
+import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import Taxon from '@/logic/entities/Taxon';
 import EcNumber from '@/logic/entities/EcNumber';
 import useVisualisationStore from '@/stores/VisualisationStore';
@@ -29,13 +29,13 @@ const mappingStore = useSingleSampleStore('single-sample');
 const visualisationStore = useVisualisationStore();
 
 const pathwayTaxa = computed(() => {
-    return [...mappingStore.pathwaysToTaxa.get(visualisationStore.pathway?.id!) ?? []]
+    return mappingStore.pathwayToTaxa(visualisationStore.pathway?.id!)
         .filter((taxon: any) => taxon.id !== 1);
 });
 
 const MatchedInputItems = computed(() => {
     return pathwayTaxa.value
-        .map((taxon: number) => mappingStore.taxa.get(taxon)!)
+        .map((taxon: number) => mappingStore.taxon(taxon)!)
         .map((taxon: Taxon) => {
             return {
                 taxon_id: taxon.id,
@@ -48,6 +48,6 @@ const MatchedInputItems = computed(() => {
 });
 
 const getMatchedAnnotations = (taxon: Taxon) => {
-    return props.annotations.filter(a => mappingStore.taxaToEcs.get(taxon.id)?.has(a))
+    return props.annotations.filter(a => mappingStore.taxonToEcs(taxon.id)?.includes(a))
 }
 </script>
