@@ -3,8 +3,9 @@
         label="Paste your ProteomeDiscoverer results here"
         :example="example"
         :loading="loading"
-        @submit="$emit('submit', $event)"
-        @reset="$emit('reset', $event)"
+        :multi="multi"
+        @submit="onSubmit"
+        @reset="onReset"
     >
         <template #header>
             <h4>Upload your ProteomeDiscoverer file</h4>
@@ -48,12 +49,22 @@ import ResourceLink from '@/components/misc/ResourceLink.vue';
 import example from '../../examples/peptide/ProteomeDiscovererExample';
 
 export interface Props {
-    loading?: false | number;
+    loading?: false | number
+    multi?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
     loading: false,
+    multi: false
 });
 
-defineEmits(["submit", "reset"]);
+const emits = defineEmits(["submit", "reset"]);
+
+const onSubmit = (inputList: string[], sampleName: string) => {
+    emits("submit", inputList, sampleName);
+};
+
+const onReset = () => {
+    emits("reset");
+};
 </script>
