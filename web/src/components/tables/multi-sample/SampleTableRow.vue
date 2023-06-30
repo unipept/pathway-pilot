@@ -26,8 +26,9 @@
         <td>
             <v-text-field
                 v-model="sampleName"
-                class="mt-n5 me-2"
+                class="pb-1 mt-n2 me-2"
                 variant="underlined"
+                density="compact"
                 placeholder="Name this sample"
                 hide-details
             />
@@ -67,5 +68,9 @@ const onRemoveRow = (rowIndex: number) => {
 
 watch(sampleName, (newName) => {
     emits('update', props.index, newName);
+});
+
+watch(() => props.name, (newName) => {
+    sampleName.value = newName;
 });
 </script>
