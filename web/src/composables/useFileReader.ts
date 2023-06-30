@@ -1,7 +1,7 @@
 export function useFileReader() {
-    const reader = new FileReader();
-
     const readTextFile = (file: File) => {
+        const reader = new FileReader();
+        
         return new Promise<string>((resolve, reject) => {
             reader.onload = () => {
                 resolve(reader.result as string);

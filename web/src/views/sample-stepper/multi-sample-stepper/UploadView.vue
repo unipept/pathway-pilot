@@ -13,6 +13,7 @@
             :items="tableItems"
             :max="4"
             @add:sample="onAddSample"
+            @add:samples="onAddSamples"
             @add:group="onAddGroup"
             @remove:sample="onRemoveSample"
             @remove:group="onRemoveGroup"
@@ -20,7 +21,7 @@
             @update:sample:name="onUpdateSampleName"
         />
 
-        <v-dialog v-model="addModalOpen">
+        <v-dialog v-model="addModalOpen" max-width="75%">
             <component :is="formatMap.get(fileFormat)?.component" @submit="onSubmit" />
         </v-dialog>
 
@@ -45,6 +46,7 @@ import FileFormat from '../FileFormat';
 import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 import VerifierError from '@/logic/verifiers/VerifierError';
 import ErrorModal from '@/components/modals/ErrorModal.vue';
+import { useFileReader } from '@/composables/useFileReader';
 
 import PeptideListForm from '@/components/forms/multi-sample/peptide/PeptideListForm.vue';
 import PeptideShakerForm from '@/components/forms/multi-sample/peptide/PeptideShakerForm.vue';
@@ -74,6 +76,8 @@ export interface Props {
 const props = defineProps<Props>();
 
 const sampleStore = useGroupSampleStore();
+
+const { readTextFile } = useFileReader();
 
 const { groups } = storeToRefs(sampleStore);
 
@@ -131,20 +135,36 @@ const formatMap = new Map<FileFormat, { component: any, verifier: any, converter
     } ]
 ]);
 
-const onSubmit = (peptideList: string[], sampleName: string) => {
-    errors.value = formatMap.get(props.fileFormat)?.verifier.verify(peptideList);
+const onSubmit = (inputList: string[], sampleName: string) => {
+    errors.value = formatMap.get(props.fileFormat)?.verifier.verify(inputList);
 
     if (errors.value.length <= 0) {
         addModalOpen.value = false;
 
         const [ group, sample ] = sampleStore.addSample(addModalGroup.value, sampleName);
-        sampleStore.initializeSample(group, sample, peptideList, formatMap.get(props.fileFormat)?.converter);
+        sampleStore.initializeSample(group, sample, inputList, formatMap.get(props.fileFormat)?.converter);
     }
 };
 
 const onAddSample = (groupIndex: number) => {
     addModalGroup.value = groupIndex;
     addModalOpen.value = true;
+};
+
+const onAddSamples = async (groupIndex: number, files: File[]) => {
+    const samples = await Promise.all(files.map(async (file) => ({
+        name: file.name,
+        content: (await readTextFile(file)).split("\n").filter((peptide) => peptide.length > 0)
+    })));
+
+    errors.value = samples.map(s => formatMap.get(props.fileFormat)?.verifier.verify(s.content)).flat();
+
+    if (errors.value.length <= 0) {
+        samples.forEach(s => {
+            const [ group, sample ] = sampleStore.addSample(groupIndex, s.name);
+            sampleStore.initializeSample(group, sample, s.content, formatMap.get(props.fileFormat)?.converter);
+        });
+    }
 };
 
 const onAddGroup = () => {

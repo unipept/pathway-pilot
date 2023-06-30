@@ -1,34 +1,23 @@
 <template>
-    <group-table 
-        :items="tableItems"
-        :max="4"
-    />
+    <file-upload-button @upload="onUpload">
+        <v-icon>mdi-paperclip-plus</v-icon>
+        <span class="ms-1">Batch upload multiple samples</span>
+    </file-upload-button>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
-import GroupTable from '@/components/tables/multi-sample/GroupTable.vue';
+import FileUploadButton from '@/components/inputs/FileUploadButton.vue';
+import { useFileReader } from '@/composables/useFileReader';
 
-const tableItems = computed(() => [
-    {
-        name: 'Group 1',
-        items: [
-            { name: "test1.txt", size: "100 peptides", loading: false },
-            { name: "test2.txt", size: "100 peptides", loading: false },
-            { name: "test3.txt", size: "100 peptides", loading: false },
-            { name: "test4.txt", size: "100 peptides", loading: false },
-        ]
-    },
-    {
-        name: 'Group 2',
-        items: [
-            { name: "test1.txt", size: "100 peptides", loading: false },
-            { name: "test2.txt", size: "100 peptides", loading: true },
-            { name: "test3.txt", size: "100 peptides", loading: true },
-            { name: "test4.txt", size: "100 peptides", loading: true },
-        ]
-    },
-]);
+const { readTextFile } = useFileReader();
+
+const onUpload = async (files: FileList) => {
+    for (let i = 0; i < files.length; i++) {
+        const fileContent = await readTextFile(files[i]);
+        const fileName = files[i].name;
+        console.log(fileName);
+    }
+}
 </script>
 
 <style scoped>

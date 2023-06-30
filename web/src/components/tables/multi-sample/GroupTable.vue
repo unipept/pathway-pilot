@@ -27,8 +27,9 @@
                 class="ms-10"
                 :items="group.items"
                 :max="max"
-                @add="() => onAddSample(i)"
-                @remove="(sampleIndex) => onRemoveSample(i, sampleIndex)"
+                @add:sample="() => onAddSample(i)"
+                @add:samples="(files) => onAddSamples(i, files)"
+                @remove:sample="(sampleIndex) => onRemoveSample(i, sampleIndex)"
                 @update:sample="(sampleIndex, name) => onUpdateSampleName(i, sampleIndex, name)"
             />
         </v-card-text>
@@ -57,7 +58,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emits = defineEmits([
     'add:group',
-    'add:sample', 
+    'add:sample',
+    'add:samples',
     'remove:group',
     'remove:sample',
     'update:group:name',
@@ -68,6 +70,10 @@ const canAddGroup = computed(() => props.items.length < props.max);
 
 const onAddSample = (groupIndex: number) => {
     emits('add:sample', groupIndex);
+}
+
+const onAddSamples = (groupIndex: number, files: File[]) => {
+    emits('add:samples', groupIndex, files);
 }
 
 const onAddGroup = () => {

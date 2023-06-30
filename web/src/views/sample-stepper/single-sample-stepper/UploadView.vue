@@ -86,11 +86,11 @@ const formatMap = new Map<FileFormat, { component: any, verifier: any, converter
     } ]
 ]);
 
-const onSubmit = async (peptideList: string[]) => {
-    errors.value = formatMap.get(props.fileFormat)?.verifier.verify(peptideList);
+const onSubmit = async (inputList: string[]) => {
+    errors.value = formatMap.get(props.fileFormat)?.verifier.verify(inputList);
 
     if (errors.value.length <= 0) {
-        await sampleStore.initialize(peptideList, formatMap.get(props.fileFormat)?.converter);
+        await sampleStore.initialize(inputList, formatMap.get(props.fileFormat)?.converter);
         sampleStore.updateTree(await new UnipeptCommunicator().fetchTaxonomy(sampleStore.taxa()))
     }
 };

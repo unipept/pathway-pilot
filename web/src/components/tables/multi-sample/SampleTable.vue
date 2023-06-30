@@ -28,14 +28,15 @@
 
             <template #bottom>
                 <div class="d-flex justify-center pt-3">
-                    <v-btn class="me-3" variant="outlined" color="primary" @click="$emit('add')">
+                    <v-btn class="me-3" variant="outlined" color="primary" @click="onAddSample">
                         <v-icon>mdi-plus</v-icon>
                         <span class="ms-1">Upload another sample</span>
                     </v-btn>
-                    <v-btn variant="outlined" color="primary">
+
+                    <file-upload-button @upload="onAddSamples">
                         <v-icon>mdi-paperclip-plus</v-icon>
                         <span class="ms-1">Batch upload multiple samples</span>
-                    </v-btn>
+                    </file-upload-button>
                 </div>
             </template>
         </v-data-table>
@@ -46,6 +47,7 @@
 import { SampleTableItem } from './SampleTableItem';
 import { computed } from 'vue';
 import SampleTableRow from './SampleTableRow.vue';
+import FileUploadButton from '@/components/inputs/FileUploadButton.vue';
 
 export interface Props {
     items: SampleTableItem[]
@@ -56,7 +58,7 @@ const props = withDefaults(defineProps<Props>(), {
     max: 4
 })
 
-const emits = defineEmits([ 'remove', 'add', 'update:sample' ]);
+const emits = defineEmits([ 'remove:sample', 'add:sample', 'add:samples', 'update:sample' ]);
 
 const tableItems = computed(() => [ ...props.items ]
     .map((item: SampleTableItem) => ({
@@ -67,8 +69,16 @@ const tableItems = computed(() => [ ...props.items ]
     }))
 );
 
+const onAddSample = () => {
+    emits('add:sample');
+}
+
+const onAddSamples = (files: File[]) => {
+    emits('add:samples', files);
+}
+
 const onRemoveSample = (sampleIndex: number) => {
-    emits('remove', sampleIndex);
+    emits('remove:sample', sampleIndex);
 }
 
 const onUpdateSampleName = (sampleIndex: number, name: string) => {
