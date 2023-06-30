@@ -99,13 +99,6 @@ import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 const sampleStore = useGroupSampleStore();
 const visualisationStore = useVisualisationStore();
 
-// const { colorAllTaxa, colorHighlightedTaxa, colorDifferential } = useMapAnnotator(
-//     sampleStore.ecs,
-//     new Map(),
-//     new Map(),
-//     new Map(),
-//     (t) => []
-// );
 const { downloadPng } = usePngDownloader();
 
 const image = ref<HTMLElement | null>(null);
@@ -149,12 +142,11 @@ const colorAll = (areas: any[]) => {
     return areas.map(area => {
         area.colors = [];
         for (const ecNumber of area.info.ecNumbers) {
-            let i = 0;
-            for (const group of groups.value) {
+            groups.value.forEach((group, i) => {
                 if (group.ecs.has(ecNumber.id) && !area.colors.includes(ColorConstants.LEGEND[i])) {
-                    area.colors.push(ColorConstants.LEGEND[i++]);
+                    area.colors.push(ColorConstants.LEGEND[i]);
                 }
-            }
+            });
         }
 
         return area;
@@ -255,8 +247,10 @@ watch(pathway, async (pathway: Pathway | undefined) => {
 });
 
 watch(groups, () => {
-    onAbundance(groups.value.length === 2 && showAbundanceView.value)
-    abundance.value = groups.value.length !== 2 ? 'disabled' : true;
+    const nonEmptyGroups = groups.value.filter(group => !group.empty).length;
+
+    onAbundance(nonEmptyGroups === 2 && showAbundanceView.value)
+    abundance.value = nonEmptyGroups !== 2 ? 'disabled' : true;
 });
 </script>
 

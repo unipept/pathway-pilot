@@ -41,6 +41,7 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
     };
 
     const addSample = (groupIndex: number, sampleName: string) => {
+        groups.value = [ ...groups.value ];
         return [ groupIndex, groups.value[groupIndex].addSample(sampleName) ];
     };
 
@@ -49,6 +50,7 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
     };
 
     const removeSample = (groupIndex: number, sampleIndex: number) => {
+        groups.value = [ ...groups.value ];
         groups.value[groupIndex].removeSample(sampleIndex);
     };
 

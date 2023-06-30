@@ -22,6 +22,8 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
 
     const initialized = computed(() => samples.value.some(sample => sample.initialized));
 
+    const empty = computed(() => samples.value.length === 0);
+
     const pathways = computed(() =>
         new Set(samples.value.map(sample => [ ...sample.pathways ]).flat())
     );
@@ -85,6 +87,7 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         name,
         samples,
         initialized,
+        empty,
         pathways,
         ecs,
 
