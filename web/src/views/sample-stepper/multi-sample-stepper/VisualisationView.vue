@@ -1,4 +1,6 @@
 <template>
+    <h2>Analyse your pathway</h2>
+    
     <div v-if="pngUrl">
         <v-card class="mt-3" elevation="5">
             <image-controls

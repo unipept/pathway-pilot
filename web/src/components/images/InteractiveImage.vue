@@ -1,8 +1,5 @@
 <template>
-    <div 
-        ref="image"
-        class="interactive-image-container"
-    >
+    <div ref="image" class="interactive-image-container">
         <div :style="style">
             <slot></slot>
         </div>
@@ -96,6 +93,6 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 </style>

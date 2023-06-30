@@ -1,12 +1,6 @@
 <template>
-    <v-timeline
-        density="compact"
-        side="end"
-        align="start"
-    >
-        <v-timeline-item
-            dot-color="primary"
-        >
+    <v-timeline density="compact" side="end" align="start">
+        <v-timeline-item dot-color="primary">
             <template v-slot:icon>1</template>
             <h2>Upload your samples</h2>
         </v-timeline-item>
@@ -29,20 +23,13 @@
             <upload-view :file-format="fileFormat" />
         </v-timeline-item>
 
-        <v-timeline-item
-            dot-color="primary"
-            width="100%"
-        >
+        <v-timeline-item dot-color="primary" width="100%">
             <template v-slot:icon>2</template>
             <pathway-selection-view @filtered="onPathwaysFiltered" />
         </v-timeline-item>
 
-        <v-timeline-item
-            dot-color="primary"
-            width="100%"
-        >
+        <v-timeline-item dot-color="primary" width="100%">
             <template v-slot:icon>3</template>
-            <h2>Analyse your pathway</h2>
             <visualisation-view />
         </v-timeline-item>
 

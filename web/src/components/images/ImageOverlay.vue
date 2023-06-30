@@ -1,5 +1,5 @@
 <template>
-    <svg width="100%" height="100%" version="1.1">
+    <svg width="100%" height="100%" version="1.1" overflow="visible">
         <rect class="border" width="100%" height="100%" fill="none" />
 
         <g v-for="area, i in rectangles.filter(a => isSelectable(a))"
@@ -83,8 +83,10 @@
                 :y="tt.boundingY"
                 :width="tt.boundingWidth"
                 :height="tt.boundingHeight"
-                fill="white"
+                fill="black"
                 stroke="black"
+                opacity="0.7"
+                rx="15"
             />
 
             <text v-if="areaHover === i"
@@ -93,6 +95,7 @@
                 font-size="26"
                 font-family="monospace"
                 dominant-baseline="hanging"
+                fill="white"
             >
                 <tspan v-for="t, j in tt.text"
                     :x="tt.textX"
@@ -106,7 +109,6 @@
 <script setup lang="ts">
 import useKeggStore from '@/stores/KeggStore';
 import { computed, onBeforeMount, ref } from 'vue';
-import Tooltip from '../misc/Tooltip.vue';
 
 export interface Props {
     areas: any[];
@@ -128,23 +130,29 @@ const coloredPolygons = computed(() => polygons.value.filter(a => a.colors.lengt
 const emptyPolygons = computed(() => polygons.value.filter(a => a.colors.length <= 0));
 
 const tooltip = (area: any): any => {
-    // In order to show the tooltip, we need to have the EC mapping
-    if (!keggStore.ecMapping) {
-        return {};
-    }
-
-    const textOffset = 40;
+    const [ px, py ] = [ 30, 20 ];
+    const lineHeight = 22;
+    const lineDistance = 10;
+    const characterWidth = 15.8;
+    const tooltipOffset = 25;
 
     const text = area.info.ecNumbers.map((ec: any) => `${ec.id}: ${keggStore.ecMapping?.get(ec.id)?.names[0] ?? "Unknown"}`);
 
-    const boundingWidth = text.reduce((a: number, b: string) => Math.max(a, b.length), 0) * 16.5;
-    const boundingHeight = area.info.ecNumbers.length * 40;
+    const amountOfLines = area.info.ecNumbers.length;
+    const amountOfCharacters = text.reduce((a: number, b: string) => Math.max(a, b.length), 0);
 
-    const boundingX = area.x1 - boundingWidth / 2 + (area.x2 - area.x1) / 2;
-    const boundingY = area.y1 - boundingHeight - 25;
+    // Caclulate the width an height of the bounding box
+    const boundingWidth  = 2 * px + characterWidth * amountOfCharacters;
+    const boundingHeight = 2 * py + lineHeight * amountOfLines + lineDistance * (amountOfLines - 1);
 
-    const textX = boundingX + 10;
-    const textY = boundingY + 10;
+    // Calculate the position of the bounding box
+    const boundingX = area.x1 + (area.x2 - area.x1) / 2 - boundingWidth / 2;
+    const boundingY = area.y1 - boundingHeight - tooltipOffset;
+
+    // Calculate the position of the text
+    const textX = boundingX + px;
+    const textY = boundingY + py;
+    const textOffset = lineHeight + lineDistance;
 
     return {
         boundingX: boundingX,

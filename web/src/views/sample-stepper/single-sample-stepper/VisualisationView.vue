@@ -36,12 +36,7 @@
                             @update:scale="scale = $event"
                             @update:translate="translate = $event"
                         >
-                            <reactive-image
-                                class="image-container"
-                                :src="pngUrl"
-                                alt="Pathway"
-                                @resize="onResize"
-                            >
+                            <reactive-image :src="pngUrl" @resize="onResize">
                                 <image-overlay v-if="imageLoaded"
                                     :areas="coloredAreas"
                                     :scale="imageScale"
@@ -203,14 +198,6 @@ watch(highlightedTaxa, () => {
 </script>
 
 <style scoped>
-.image-container {
-    position: relative;
-    outline-color: white;
-    outline-style: solid;
-    outline-width: 10px;
-    outline-offset: -5px;
-}
-
 .loading-container {
     display: flex;
     flex-direction: column;

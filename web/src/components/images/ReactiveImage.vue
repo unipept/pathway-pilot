@@ -15,10 +15,12 @@ import { VImg } from 'vuetify/components';
 
 export interface Props {
     src: string
-    alt: string
+    alt?: string
 };
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+    alt: ''
+});
 
 const emits = defineEmits(['resize']);
 
@@ -72,5 +74,6 @@ onBeforeUnmount(() => {
 <style scoped>
 .select-none {
     user-select: none;
+    overflow: visible;
 }
 </style>
