@@ -2,54 +2,35 @@
     <v-data-table v-if="hasItems"
         :headers="headers"
         :items="items"
+        :sort-by="[{ key: 'taxon_id', order: 'asc' }]"
+        :must-sort=true
         item-value="raw_input"
         density="compact"
     >
-        <template #item.taxon_id="{ item }">
-            <div class="px-4">
-                {{ item.raw.taxon_id }}
-            </div>
+        <template #item="{ index, item }">
+            <matched-input-table-row
+                :group="item.value.group"
+                :taxon="new Taxon(item.value.taxon_id, item.value.taxon_name, item.value.taxon_rank)"
+                :node-annotations="item.value.node_annotations"
+                :matched-annotations="item.value.matched_annotations"
+            />
         </template>
 
-        <template #item.taxon_name="{ item }">
-            <div class="px-4">
-                {{ item.raw.taxon_name }}
-            </div>
-        </template>
-
-        <template #item.taxon_rank="{ item }">
-            <div class="px-4">
-                {{ item.raw.taxon_rank }}
-            </div>
-        </template>
-
-        <template #item.node_annotations="{ item }">
-            <div class="d_flex px-4 pt-1">
-                <highlight-chip v-for="(annotation, i) of item.raw.node_annotations"
-                    :key="i"
-                    :class="{ 'me-1': i < item.raw.node_annotations.length - 1 }"
-                    class="mb-1"
-                    :name="annotation"
-                    :highlight="highlight(annotation, item.raw.matched_annotations)"
-                />
-            </div>
+        <template #no-data>
+            <tr>
+                <td colspan="5">
+                    <b class="d-flex justify-center">No matches found in this node</b>
+                </td>
+            </tr>
         </template>
     </v-data-table>
-
-    <v-card v-else elevation="3">
-        <v-card-text>
-            <div class="error-container text-warning">
-                <v-icon class="me-2 mb-1" size="30">mdi-alert-outline</v-icon>
-                We were not able to match any input to the selected node.
-            </div>
-        </v-card-text>
-    </v-card>
 </template>
 
 <script setup lang="ts">
 import { MatchedInputTableItem } from './MatchedInputTableItem';
-import HighlightChip from '../chips/HighlightChip.vue';
 import { computed } from 'vue';
+import MatchedInputTableRow from './MatchedInputTableRow.vue';
+import Taxon from '@/logic/entities/Taxon';
 
 export interface Props {
     items: MatchedInputTableItem[];
@@ -60,6 +41,11 @@ const props = defineProps<Props>();
 const hasItems = computed(() => props.items.length > 0);
 
 const headers = [
+    ...(props.items.some(i => i.group) ? [{
+        title: "Sample group",
+        align: "start",
+        key: "group",
+    }] : []),
     {
         title: "Taxon id",
         align: "start",
@@ -81,40 +67,4 @@ const headers = [
         key: "node_annotations",
     }
 ];
-
-const highlight = (annotation: string, matchedAnnotations: string[] | undefined) => {
-    if (!matchedAnnotations) {
-        return false;
-    }
-
-    return matchedAnnotations?.includes(annotation) ?? false;
-}
 </script>
-
-<style scoped>
-.error-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-}
-
-:deep(td) {
-    padding: 0px !important;
-}
-
-:deep(td) > :not(.active) {
-    padding-left: 16px;
-    padding-right: 16px;
-}
-
-:deep(td) > .active {
-    background-color: #eee;
-    width: inherit;
-    height: inherit;
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-top: 6px;
-}
-</style>

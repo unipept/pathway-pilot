@@ -47,9 +47,9 @@ const dialogOpen = ref<boolean>(props.modelValue);
 const currentTab = ref<number>(0);
 
 const annotations = computed(() => [
-    ...props.area.info.koNumbers.map((ko: any) => ko.id),
+    //...props.area.info.koNumbers.map((ko: any) => ko.id),
     ...props.area.info.ecNumbers.map((ec: any) => ec.id),
-    ...props.area.info.reactions.map((reaction: any) => reaction.id)
+    //...props.area.info.reactions.map((reaction: any) => reaction.id)
 ]);
 
 const tabs = computed(() => [

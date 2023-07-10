@@ -1,6 +1,6 @@
 <template>
     <v-card>
-        <v-card-title>Associated input</v-card-title>
+        <v-card-title>Matched organisms</v-card-title>
         <v-card-subtitle class="mt-n2 text-subtitle-1">
             The following entries contain a match against the selected node. The matched annotations are highlighted for each entry in the Annotations column.
         </v-card-subtitle>
@@ -16,8 +16,8 @@ import { computed } from 'vue';
 import MatchedInputTable from '@/components/tables/MatchedInputTable.vue';
 import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import Taxon from '@/logic/entities/Taxon';
-import EcNumber from '@/logic/entities/EcNumber';
 import useVisualisationStore from '@/stores/VisualisationStore';
+import { MatchedInputTableItem } from '@/components/tables/MatchedInputTableItem';
 
 export interface Props {
     annotations: string[]
@@ -44,7 +44,8 @@ const MatchedInputItems = computed(() => {
                 node_annotations: props.annotations,
                 matched_annotations: getMatchedAnnotations(taxon)
             };
-        });
+        })
+        .filter((item: MatchedInputTableItem) => item.matched_annotations.length > 0);
 });
 
 const getMatchedAnnotations = (taxon: Taxon) => {
