@@ -40,7 +40,8 @@
                                 <image-overlay v-if="imageLoaded"
                                     :areas="coloredAreas"
                                     :scale="imageScale"
-                                    :onClick="onClickArea"
+                                    :selected="selectedArea?.id ?? -1"
+                                    :onClickArea="onClickArea"
                                     :onClickCompound="onClickCompound"
                                 />
                             </reactive-image>
@@ -157,8 +158,11 @@ const onResize = (event: any) => {
 }
 
 const onClickArea = (area: any) => {
+    if (selectedArea.value && selectedArea.value.id === area.id) {
+        selectedArea.value = undefined;
+        return;
+    }
     selectedArea.value = area;
-    areaModalOpen.value = true;
 }
 
 const onClickCompound = (compound: any) => {
@@ -188,7 +192,10 @@ watch(pathway, async () => {
     const data = await visualisationStore.getPathwayData();
 
     pngUrl.value = data?.image;
-    areas.value  = data?.nodes ?? [];
+    areas.value  = data?.nodes.map((node: any, i: number) => {
+        node.id = i;
+        return node;
+    }) ?? [];
 });
 
 watch(highlightedTaxa, () => {

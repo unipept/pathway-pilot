@@ -3,15 +3,13 @@
         <rect class="border" width="100%" height="100%" fill="none" />
 
         <g v-for="area, i in rectangles.filter(a => isSelectable(a))"
-            class="group"
             :transform="`scale(${scale})`"
-            :onclick="() => onClick(area)"
+            :onclick="() => onClickArea(area)"
             :onmouseenter="() => onMouseEnter(i)"
             :onmouseleave="onMouseLeave"
+            cursor="pointer"
         >
             <rect v-for="rect in splitRectangle(area, area.colors.length)"
-                class="group-item"
-                :class="{ 'group-item-trans': rect.color === 'transparent' }"
                 :x="rect.x1"
                 :y="rect.y1"
                 :width="(rect.x2 - rect.x1)"
@@ -19,18 +17,30 @@
                 :fill="rect.color"
                 :fill-opacity="0.5"
             />
+
+            <rect
+                :x="area.x1"
+                :y="area.y1"
+                :width="(area.x2 - area.x1)"
+                :height="(area.y2 - area.y1)"
+                fill="transparent"
+                :filter="area.id === selectedNode ? 'drop-shadow(0 0 10px rgba(48, 108, 207, 1))' : ''"
+                :stroke="area.id === selectedNode ? '#306ccf' : ''"
+                :stroke-opacity="area.id === selectedNode ? 0.8 : 0"
+                :stroke-width="area.id === selectedNode ? 3 : 0"
+            />
         </g>
 
         <g v-for="area in emptyPolygons"
             :transform="`scale(${scale})`"
-            :onclick="() => onClick(area)"
+            :onclick="() => onClickArea(area)"
         >
             <polygon :points="area.points" :fill="polygons.length > 20 ? '#e3e3e3' : 'transparent'" />
         </g>
 
         <g v-for="area in coloredPolygons"
             :transform="`scale(${scale})`"
-            :onclick="() => onClick(area)"
+            :onclick="() => onClickArea(area)"
         >
             <defs>
                 <linearGradient v-if="area.colors.length > 1" 
@@ -108,19 +118,22 @@
 
 <script setup lang="ts">
 import useKeggStore from '@/stores/KeggStore';
-import { computed, onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 
 export interface Props {
     areas: any[];
     scale: number;
+    selected: number;
 
-    onClick: (area: any) => void;
+    onClickArea: (area: any) => void;
     onClickCompound: (compound: any) => void;
 };
 
 const props = defineProps<Props>();
 
 const keggStore = useKeggStore();
+
+const selectedNode = ref<number>(props.selected);
 
 const rectangles = computed(() => props.areas.filter(a => a.shape === 'rect'));
 const circles = computed(() => props.areas.filter(a => a.shape === 'circle'));
@@ -209,6 +222,10 @@ const onMouseLeave = (e: MouseEvent) => {
     areaHover.value = undefined;
 }
 
+watch(() => props.selected, () => {
+    selectedNode.value = props.selected;
+});
+
 onBeforeMount(async () => {
     await keggStore.fetchEcMapping();
 });
@@ -220,14 +237,5 @@ onBeforeMount(async () => {
     outline-style: solid;
     outline-width: 6px;
     outline-offset: -3px;
-}
-
-.group:hover .group-item {
-    filter: brightness(0.9);
-    cursor: pointer;
-}
-
-.group:hover .group-item-trans {
-    fill: rgb(226, 226, 226);
 }
 </style>

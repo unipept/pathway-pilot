@@ -40,7 +40,7 @@
                                 <image-overlay v-if="imageLoaded"
                                     :areas="coloredAreas"
                                     :scale="imageScale"
-                                    :onClick="onClickArea"
+                                    :onClickArea="onClickArea"
                                     :onClickCompound="onClickCompound"
                                 />
                             </reactive-image>

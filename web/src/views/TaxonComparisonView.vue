@@ -38,6 +38,15 @@
             <visualisation-view />
         </v-timeline-item>
 
+        <v-timeline-item v-if="pathway"
+            dot-color="primary"
+            size="20"
+            fill-dot
+            width="100%"
+        >
+            <h4>Advanced analysis</h4>
+        </v-timeline-item>
+
         <v-timeline-item dot-color="primary" width="100%">
             <template v-slot:icon>5</template>
             <export-view :pathways="filteredPathways" />
@@ -56,9 +65,12 @@ import useVisualisationStore from '@/stores/VisualisationStore';
 import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import FileFormat from './sample-stepper/FileFormat';
 import { ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 
 const { reset: resetSingleSampleStore } = useSingleSampleStore();
 const { reset: resetVisualisationStore } = useVisualisationStore();
+
+const { pathway } = storeToRefs(useVisualisationStore());
 
 const fileFormat = ref<FileFormat>(FileFormat.PEPTIDE_LIST);
 const filteredPathways = ref<any[]>([]);
