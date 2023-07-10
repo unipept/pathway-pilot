@@ -12,9 +12,11 @@
                 download
                 restore
                 :abundance="abundance"
+                :filter="filter"
                 @download="onDownload"
                 @restore="onRestore"
                 @abundance="onAbundance"
+                @filter="onFilter"
             >
                 <div ref="image">
                     <!-- TODO: height has to be responsive here I guess -->
@@ -50,6 +52,15 @@
                 </div>
             </image-controls>
         </v-card>
+
+        <v-dialog 
+            v-model="filterModalOpen"
+            @click:outside="filterModalOpen = false"
+            max-width="75%"
+            height="100%"
+        >
+            <taxon-filter-view />
+        </v-dialog>
 
         <area-modal
             :model-value="areaModalOpen"
@@ -91,12 +102,12 @@ import CompoundModal from '@/components/modals/CompoundModal.vue';
 import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
-import Pathway from '@/logic/entities/Pathway';
 import { useMapAnnotator } from '@/composables/useMapAnnotator';
 import Taxon from '@/logic/entities/Taxon';
-import ImageControls, { ToggleButtonValue } from '@/components/images/ImageControls.vue';
+import ImageControls, { ActiveButtonValue, ToggleButtonValue } from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
 import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
+import TaxonFilterView from '@/views/sample-stepper/single-sample-stepper/advanced/TaxonFilterView.vue';
 
 const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
@@ -112,17 +123,18 @@ const { downloadPng } = usePngDownloader();
 
 const image = ref<HTMLElement | null>(null);
 
-const pngUrl = ref<string | undefined>(undefined)
-const areas  = ref<any[]>([])
+const pngUrl = ref<string | undefined>(undefined);
+const areas  = ref<any[]>([]);
 
-const imageLoaded = ref<boolean>(false)
-const imageScale = ref<number>(1)
+const imageLoaded = ref<boolean>(false);
+const imageScale = ref<number>(1);
 
-const areaModalOpen = ref<boolean>(false)
-const compoundModalOpen = ref<boolean>(false)
+const areaModalOpen = ref<boolean>(false);
+const compoundModalOpen = ref<boolean>(false);
+const filterModalOpen = ref<boolean>(false);
 
-const selectedArea = ref<any | undefined>(undefined)
-const selectedCompound = ref<string>('')
+const selectedArea = ref<any | undefined>(undefined);
+const selectedCompound = ref<string>('');
 
 const scale = ref<number>(1);
 const translate = ref<{ x: number, y: number }>({ x: 0, y: 0 });
@@ -131,6 +143,8 @@ const { pathway, highlightedTaxa } = storeToRefs(visualisationStore);
 
 const abundance = ref<ToggleButtonValue>(false);
 const showAbundanceView = ref<boolean>(false);
+
+const filter = ref<ActiveButtonValue>(true);
 
 const legendItems = computed(() => highlightedTaxa.value.map(taxon => ({
         label: taxon.name,
@@ -185,6 +199,10 @@ const onAbundance = (value: boolean) => {
     showAbundanceView.value = value;
 }
 
+const onFilter = () => {
+    filterModalOpen.value = true;
+}
+
 watch(pathway, async () => {
     pngUrl.value = undefined;
     
@@ -201,6 +219,7 @@ watch(pathway, async () => {
 watch(highlightedTaxa, () => {
     onAbundance(highlightedTaxa.value.length === 2 && showAbundanceView.value)
     abundance.value = highlightedTaxa.value.length !== 2 ? 'disabled' : true;
+    filter.value = highlightedTaxa.value.length > 0 ? 'active' : true;
 });
 </script>
 

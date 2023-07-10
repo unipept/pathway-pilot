@@ -52,6 +52,18 @@
                 />
             </tooltip>
 
+            <tooltip message="Apply filters">
+                <v-btn v-if="filter"
+                    class="mx-1"
+                    density="comfortable"
+                    icon="mdi-filter-outline"
+                    elevation="0"
+                    size="small"
+                    :color="filterActive ? 'primary' : ''"
+                    @click="onFilter"
+                />
+            </tooltip>
+
             <v-menu v-if="settings">
                 <template v-slot:activator="{ props }">
                     <v-btn
@@ -84,6 +96,7 @@ import ToggleButton from '../inputs/ToggleButton.vue';
 import { computed } from 'vue';
 
 export type ToggleButtonValue = boolean | 'disabled';
+export type ActiveButtonValue = boolean | 'active';
 
 export interface Props {
     settings?: boolean
@@ -91,6 +104,7 @@ export interface Props {
     restore?: boolean
     fullscreen?: boolean
     abundance?: ToggleButtonValue
+    filter?: ActiveButtonValue
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -98,16 +112,18 @@ const props = withDefaults(defineProps<Props>(), {
     download: false,
     restore: false,
     fullscreen: false,
-    abundance: false
+    abundance: false,
+    filter: false
 });
 
-const emits = defineEmits(["download", "fullscreen", "restore", "abundance"]);
+const emits = defineEmits(["download", "fullscreen", "restore", "abundance", "filter"]);
 
 const image = ref<HTMLElement | null>(null);
 
 const { isFullscreen, exit, toggle } = useFullscreen(image);
 
 const abundanceDisabled = computed(() => props.abundance === 'disabled');
+const filterActive = computed(() => props.filter === 'active');
 
 const abundanceTooltip = computed(() => {
     if (abundanceDisabled.value) {
@@ -134,6 +150,10 @@ const onRestore = () => {
 
 const onAbundance = (toggled: boolean) => {
     emits("abundance", toggled);
+}
+
+const onFilter = () => {
+    emits("filter");
 }
 </script>
 

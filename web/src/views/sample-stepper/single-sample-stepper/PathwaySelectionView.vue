@@ -73,12 +73,16 @@ import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import BubblePlot from '@/components/visualisations/BubblePlot.vue';
 import SearchFilter from '@/components/inputs/SearchFilter.vue';
 import FilterView from './FilterView.vue';
+import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
+import { useTaxonomyTree } from '@/composables/useTaxonomyTree';
 
 const emits = defineEmits(["filtered"]);
 
 const keggStore = useKeggStore();
 const mappingStore = useSingleSampleStore(); 
 const visualisationStore = useVisualisationStore();
+
+const { fetchTaxonomyTree } = useTaxonomyTree();
 
 const { initialized, pathways } = storeToRefs(mappingStore);
 const { pathway: selectedPathway } = storeToRefs(visualisationStore);
@@ -105,9 +109,10 @@ const pathwayItems = computed(() => [ ...(isFiltered.value ? filteredPathways.va
     )
 );
 
-const onBubblePlotClick = (pathway: Pathway | undefined) => {
+const onBubblePlotClick = async (pathway: Pathway | undefined) => {
     visualisationStore.setPathway(pathway);
     visualisationStore.setHighlightedTaxa([]);
+    mappingStore.updateTree(await fetchTaxonomyTree(mappingStore.pathwayToTaxa(pathway?.id ?? "")));
 };
 
 watch(selectedPathway, onBubblePlotClick);

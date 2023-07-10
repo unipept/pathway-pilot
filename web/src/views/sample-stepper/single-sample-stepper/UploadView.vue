@@ -91,7 +91,6 @@ const onSubmit = async (inputList: string[]) => {
 
     if (errors.value.length <= 0) {
         await sampleStore.initialize(inputList, formatMap.get(props.fileFormat)?.converter);
-        sampleStore.updateTree(await new UnipeptCommunicator().fetchTaxonomy(sampleStore.taxa()))
     }
 };
 
