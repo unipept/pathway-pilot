@@ -47,6 +47,7 @@ import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 import VerifierError from '@/logic/verifiers/VerifierError';
 import ErrorModal from '@/components/modals/ErrorModal.vue';
 import { useFileReader } from '@/composables/useFileReader';
+import useVisualisationStore from '@/stores/VisualisationStore';
 
 import PeptideListForm from '@/components/forms/multi-sample/peptide/PeptideListForm.vue';
 import PeptideShakerForm from '@/components/forms/multi-sample/peptide/PeptideShakerForm.vue';
@@ -68,6 +69,7 @@ import MaxQuantConverter from '@/logic/converters/peptide/MaxQuantConverter';
 import ProteomeDiscovererConverter from '@/logic/converters/peptide/ProteomeDiscovererConverter';
 import MetaProteomeAnalyzerConverter from '@/logic/converters/peptide/MetaProteomeAnalyzerConverter';
 import ProteinListConverter from '@/logic/converters/protein/ProteinListConverter';
+import { watch } from 'vue';
 
 export interface Props {
     fileFormat: FileFormat;
@@ -76,6 +78,7 @@ export interface Props {
 const props = defineProps<Props>();
 
 const sampleStore = useGroupSampleStore();
+const visualisationStore = useVisualisationStore();
 
 const { readTextFile } = useFileReader();
 
@@ -193,4 +196,11 @@ const onUpdateGroupName = (groupIndex: number, name: string) => {
 const onUpdateSampleName = (groupIndex: number, sampleIndex: number, name: string) => {
     groups.value[groupIndex].updateSampleName(sampleIndex, name);
 };
+
+watch(groups, () => {
+    visualisationStore.setHighlightedItems(groups.value
+        .map((group, i) => group.empty ? -1 : i)
+        .filter(i => i >= 0)
+    );
+});
 </script>

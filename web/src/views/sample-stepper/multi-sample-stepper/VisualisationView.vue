@@ -7,9 +7,11 @@
                 download
                 restore
                 :abundance="abundance"
+                :filter="filter"
                 @download="onDownload"
                 @restore="onRestore"
                 @abundance="onAbundance"
+                @filter="onFilter"
             >
                 <div ref="image">
                     <!-- TODO: height has to be responsive here I guess -->
@@ -40,6 +42,7 @@
                                 <image-overlay v-if="imageLoaded"
                                     :areas="coloredAreas"
                                     :scale="imageScale"
+                                    :selected="selectedArea?.id ?? -1"
                                     :onClickArea="onClickArea"
                                     :onClickCompound="onClickCompound"
                                 />
@@ -50,11 +53,14 @@
             </image-controls>
         </v-card>
 
-        <area-modal
-            :model-value="areaModalOpen"
-            :area="selectedArea"
-            @update:model-value="areaModalOpen = $event"
-        />
+        <v-dialog 
+            v-model="filterModalOpen"
+            @click:outside="filterModalOpen = false"
+            max-width="75%"
+            height="100%"
+        >
+            <div></div>
+        </v-dialog>
 
         <compound-modal
             :model-value="compoundModalOpen"
@@ -84,13 +90,12 @@ import useVisualisationStore from '@/stores/VisualisationStore';
 import { computed, ref, watch } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
 import TaxonLegend from '@/components/legends/TaxonLegend.vue';
-import AreaModal from '@/components/modals/AreaModal.vue';
 import CompoundModal from '@/components/modals/CompoundModal.vue';
 import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import Pathway from '@/logic/entities/Pathway';
-import ImageControls, { ToggleButtonValue } from '@/components/images/ImageControls.vue';
+import ImageControls, { ActiveButtonValue, ToggleButtonValue } from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
 import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
 import { useLinearGradient } from '@/composables/useLinearGradient';
@@ -111,8 +116,8 @@ const areas  = ref<any[]>([]);
 const imageLoaded = ref<boolean>(false);
 const imageScale = ref<number>(1);
 
-const areaModalOpen = ref<boolean>(false);
 const compoundModalOpen = ref<boolean>(false);
+const filterModalOpen = ref<boolean>(false);
 
 const selectedArea = ref<any | undefined>(undefined);
 const selectedCompound = ref<string>('');
@@ -120,16 +125,20 @@ const selectedCompound = ref<string>('');
 const scale = ref<number>(1);
 const translate = ref<{ x: number, y: number }>({ x: 0, y: 0 });
 
-const { pathway } = storeToRefs(visualisationStore);
-const { groups } = storeToRefs(sampleStore);
+const { pathway, highlightedItems: highlightedGroups } = storeToRefs(visualisationStore);
 
 const abundance = ref<ToggleButtonValue>('disabled');
 const showAbundanceView = ref<boolean>(false);
 
-const legendItems = computed(() => groups.value.map((group, i) => ({
-    color: ColorConstants.LEGEND[i],
-    label: group.name,
-})));
+const filter = ref<ActiveButtonValue>(true);
+
+const legendItems = computed(() => highlightedGroups.value.map(groupId => {
+    const group = sampleStore.group(groupId);
+    return {
+        label: group.name,
+        color: ColorConstants.LEGEND[groupId],
+    }
+}));
 
 const coloredAreas = computed(() => {
     if (showAbundanceView.value) {
@@ -144,9 +153,10 @@ const colorAll = (areas: any[]) => {
     return areas.map(area => {
         area.colors = [];
         for (const ecNumber of area.info.ecNumbers) {
-            groups.value.forEach((group, i) => {
-                if (group.ecs.has(ecNumber.id) && !area.colors.includes(ColorConstants.LEGEND[i])) {
-                    area.colors.push(ColorConstants.LEGEND[i]);
+            highlightedGroups.value.forEach(groupId => {
+                const group = sampleStore.group(groupId);
+                if (group.ecs.has(ecNumber.id) && !area.colors.includes(ColorConstants.LEGEND[groupId])) {
+                    area.colors.push(ColorConstants.LEGEND[groupId]);
                 }
             });
         }
@@ -158,8 +168,11 @@ const colorAll = (areas: any[]) => {
 const colorDifferential = (areas: any[]) => {
     const { getColor } = useLinearGradient(ColorConstants.LEGEND[0], ColorConstants.LEGEND[1]);
 
-    const group1EcNumbers = groups.value[0].ecs;
-    const group2EcNumbers = groups.value[1].ecs;
+    const group1 = sampleStore.group(highlightedGroups.value[0]);
+    const group2 = sampleStore.group(highlightedGroups.value[1]);
+
+    const group1EcNumbers = group1.ecs;
+    const group2EcNumbers = group2.ecs;
 
     const range = [ 0, 0 ];
     const differenceAreas = areas.map(area => {
@@ -168,11 +181,11 @@ const colorDifferential = (areas: any[]) => {
         const group1EcInArea: Set<string> = intersection(group1EcNumbers, new Set(area.info.ecNumbers.map((ec: EcNumber) => ec.id)));
         const group2EcInArea: Set<string> = intersection(group2EcNumbers, new Set(area.info.ecNumbers.map((ec: EcNumber) => ec.id)));
 
-        const group1Peptides = new Set([ ...group1EcInArea ].map(ec => [ ...groups.value[0].ecToPeptides(ec) ]).flat());
-        const group2Peptides = new Set([ ...group2EcInArea ].map(ec => [ ...groups.value[1].ecToPeptides(ec) ]).flat());
+        const group1Peptides = new Set([ ...group1EcInArea ].map(ec => [ ...group1.ecToPeptides(ec) ]).flat());
+        const group2Peptides = new Set([ ...group2EcInArea ].map(ec => [ ...group2.ecToPeptides(ec) ]).flat());
         
-        const group1PeptideCount = [ ...group1Peptides ].map(peptide => groups.value[0].peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
-        const group2PeptideCount = [ ...group2Peptides ].map(peptide => groups.value[1].peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
+        const group1PeptideCount = [ ...group1Peptides ].map(peptide => group1.peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
+        const group2PeptideCount = [ ...group2Peptides ].map(peptide => group2.peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
 
         if (group1PeptideCount > 0 || group2PeptideCount > 0) {
             const difference = group2PeptideCount - group1PeptideCount;
@@ -214,8 +227,11 @@ const onResize = (event: any) => {
 }
 
 const onClickArea = (area: any) => {
+    if (selectedArea.value && selectedArea.value.id === area.id) {
+        selectedArea.value = undefined;
+        return;
+    }
     selectedArea.value = area;
-    areaModalOpen.value = true;
 }
 
 const onClickCompound = (compound: any) => {
@@ -238,6 +254,10 @@ const onAbundance = (value: boolean) => {
     showAbundanceView.value = value;
 }
 
+const onFilter = () => {
+    filterModalOpen.value = true;
+}
+
 watch(pathway, async (pathway: Pathway | undefined) => {
     pngUrl.value = undefined;
     
@@ -245,14 +265,16 @@ watch(pathway, async (pathway: Pathway | undefined) => {
     const data = await visualisationStore.getPathwayData();
 
     pngUrl.value = data?.image;
-    areas.value  = data?.nodes ?? [];
+    areas.value  = data?.nodes.map((node: any, i: number) => {
+        node.id = i;
+        return node;
+    }) ?? [];
 });
 
-watch(groups, () => {
-    const nonEmptyGroups = groups.value.filter(group => !group.empty).length;
-
-    onAbundance(nonEmptyGroups === 2 && showAbundanceView.value)
-    abundance.value = nonEmptyGroups !== 2 ? 'disabled' : true;
+watch(highlightedGroups, () => {
+    onAbundance(highlightedGroups.value.length === 2 && showAbundanceView.value)
+    abundance.value = highlightedGroups.value.length !== 2 ? 'disabled' : true;
+    filter.value = highlightedGroups.value.length > 0 ? 'active' : true;
 });
 </script>
 

@@ -111,7 +111,7 @@ const pathwayItems = computed(() => [ ...(isFiltered.value ? filteredPathways.va
 
 const onBubblePlotClick = async (pathway: Pathway | undefined) => {
     visualisationStore.setPathway(pathway);
-    visualisationStore.setHighlightedTaxa([]);
+    visualisationStore.setHighlightedItems([]);
     mappingStore.updateTree(await fetchTaxonomyTree(mappingStore.pathwayToTaxa(pathway?.id ?? "")));
 };
 

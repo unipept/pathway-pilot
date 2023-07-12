@@ -57,9 +57,7 @@ const visualisationStore = useVisualisationStore();
 const { fetchTaxonomyTree, compressRankTree, filterTree } = useTaxonomyTree();
 
 const { taxaTree } = storeToRefs(mappingStore);
-const { pathway: selectedPathway, highlightedTaxa: selectedTaxa } = storeToRefs(visualisationStore);
-
-console.log(selectedTaxa.value)
+const { pathway: selectedPathway, highlightedItems: selectedTaxa } = storeToRefs(visualisationStore);
 
 const taxa = computed(() => mappingStore.pathwayToTaxa(selectedPathway.value?.id!));
 
@@ -67,13 +65,16 @@ const compressedTaxaTree = computed(() => compressRankTree(taxaTree.value, taxa.
 const filteredTaxaTree = ref<TreeviewItem>(compressedTaxaTree.value);
 
 const taxaSearch = ref<string>("");
-const selectedItems = ref<TreeviewItem[]>(selectedTaxa.value.map(taxon => ({
-    id: taxon.id,
-    name: taxon.name,
-    nameExtra: taxon.rank,
-    highlighted: false,
-    children: []
-})));
+const selectedItems = ref<TreeviewItem[]>(selectedTaxa.value.map(taxonId => {
+    const taxon = mappingStore?.taxon(taxonId) ?? new Taxon(taxonId, "Unknown", "Unknown");
+    return {
+        id: taxonId,
+        name: taxon.name,
+        nameExtra: taxon.rank,
+        highlighted: false,
+        children: []
+    };
+}));
 
 const expandTree = ref<number>(15);
 
@@ -94,8 +95,6 @@ watch(selectedPathway, async () => {
 });
 
 watch(selectedItems, () => {
-    visualisationStore.setHighlightedTaxa(selectedItems.value.map(item => 
-        new Taxon(item.id, item.name, item.nameExtra)
-    ));
+    visualisationStore.setHighlightedItems(selectedItems.value.map(item => item.id));
 });
 </script>

@@ -7,9 +7,11 @@ const useVisualisationStore = defineStore('visualisationStore', () => {
     // Keep track of already fetched pathways
     const pathwayData = reactive<Map<string, Promise<any>>>(new Map());
 
-    // Currently selected pathway and taxa
+    // Currently selected pathway
     const pathway = ref<Pathway | undefined>(undefined);
-    const highlightedTaxa = ref<Taxon[]>([]);
+
+    // Currently highlighted groups
+    const highlightedItems = ref<number[]>([]);
 
     const getPathwayData = () => {
         return pathwayData.get(pathway.value?.id ?? "");
@@ -26,21 +28,22 @@ const useVisualisationStore = defineStore('visualisationStore', () => {
         }
     }
 
-    const setHighlightedTaxa = (taxa: Taxon[]) => {
-        highlightedTaxa.value = taxa;
+    const setHighlightedItems = (items: number[]) => {
+        highlightedItems.value = items;
     }
 
     const reset = () => {
         pathway.value = undefined;
-        highlightedTaxa.value = [];
+        highlightedItems.value = [];
+
         pathwayData.clear();
     }
 
     return {
         pathway,
-        highlightedTaxa,
+        highlightedItems,
         setPathway,
-        setHighlightedTaxa,
+        setHighlightedItems,
         getPathwayData,
         reset
     };

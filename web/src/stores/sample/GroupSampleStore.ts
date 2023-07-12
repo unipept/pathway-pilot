@@ -31,6 +31,10 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
     // ========================== METHODS ============================
     // ===============================================================
 
+    const group = (index: number) => {
+        return groups.value[index];
+    };
+
     const addGroup = () => {
         groups.value = [ ...groups.value, useMultiSampleStore(`groupSampleStore_group${_counter++}`, `Group ${_counter}`) ];
         return groups.value.length - 1;
@@ -77,6 +81,7 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
         pathways,
         ecs,
 
+        group,
         addGroup,
         removeGroup,
         addSample,

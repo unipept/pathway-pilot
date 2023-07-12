@@ -107,9 +107,10 @@ const pathwayItems = computed(() => [ ...(isFiltered.value ? filteredPathways.va
 
 const onBubblePlotClick = (pathway: Pathway | undefined) => {
     visualisationStore.setPathway(pathway);
-    visualisationStore.setHighlightedTaxa([]);
+    visualisationStore.setHighlightedItems(mappingStore.groups
+        .map((group, i) => group.empty ? -1 : i).filter(i => i >= 0)
+    );
 };
-
 
 watch(selectedPathway, onBubblePlotClick);
 

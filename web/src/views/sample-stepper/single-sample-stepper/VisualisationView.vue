@@ -139,28 +139,30 @@ const selectedCompound = ref<string>('');
 const scale = ref<number>(1);
 const translate = ref<{ x: number, y: number }>({ x: 0, y: 0 });
 
-const { pathway, highlightedTaxa } = storeToRefs(visualisationStore);
+const { pathway, highlightedItems: highlightedTaxa } = storeToRefs(visualisationStore);
 
 const abundance = ref<ToggleButtonValue>(false);
 const showAbundanceView = ref<boolean>(false);
 
 const filter = ref<ActiveButtonValue>(true);
 
-const legendItems = computed(() => highlightedTaxa.value.map(taxon => ({
+const legendItems = computed(() => highlightedTaxa.value.map(taxonId => {
+    const taxon = mappingStore?.taxon(taxonId) ?? new Taxon(taxonId, "Unknown", "Unknown");
+    return {
         label: taxon.name,
-        color: ColorConstants.LEGEND[visualisationStore.highlightedTaxa.map(t => t.id).indexOf(taxon.id)]
-    }))
-);
+        color: ColorConstants.LEGEND[highlightedTaxa.value.indexOf(taxon.id)]
+    }
+}));
 
 const coloredAreas = computed(() => {
     if (showAbundanceView.value) {
-        return colorDifferential(areas.value, highlightedTaxa.value[0].id, highlightedTaxa.value[1].id);
+        return colorDifferential(areas.value, highlightedTaxa.value[0], highlightedTaxa.value[1]);
     }
 
     if (highlightedTaxa.value.length === 0) {
         return colorAllAreas(areas.value);
     } else {
-        return colorHighlightedGroups(areas.value, highlightedTaxa.value.map((t: Taxon) => t.id));
+        return colorHighlightedGroups(areas.value, highlightedTaxa.value);
     }
 });
 
