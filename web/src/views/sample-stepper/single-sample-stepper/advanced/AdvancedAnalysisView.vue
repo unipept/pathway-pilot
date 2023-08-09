@@ -4,10 +4,10 @@
     <div v-if="area" class="mt-3">
         <v-card>
             <v-card-title>Matched organisms</v-card-title>
-            <v-card-subtitle class="mt-n2 text-subtitle-1">
+            <v-card-text class="mt-n2 text-subtitle-1">
                 The following entries contain a match against the selected node. The matched annotations are highlighted for each 
                 entry in the Annotations column.
-            </v-card-subtitle>
+            </v-card-text>
 
             <v-card-text>
                 <matched-input-table :items="MatchedInputItems" />

@@ -5,6 +5,10 @@
  */
 
 // https://next.vuetifyjs.com/features/sass-variables/`
-// @use 'vuetify' with (
-//   $color-pack: false
-// );
+@use 'vuetify' with (
+    $container-max-widths: (
+        'lg': 900px,
+        'xl': 900px,
+        'xxl': 900px
+    )
+);
