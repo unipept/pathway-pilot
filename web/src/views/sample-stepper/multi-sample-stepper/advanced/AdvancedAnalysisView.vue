@@ -15,9 +15,10 @@
         </v-card>
     </div>
 
-    <warning-alert v-else class="mt-3">
-        Please select an area in order to display more detailed information.
-    </warning-alert>
+    <info-alert v-else class="mt-3">
+        You can <b>click</b> on any rectangular area in the visualisation to select it. Upon selection, more detailed information 
+        will be displayed here.
+    </info-alert>
 
     <v-divider class="mt-3 mb-2" />
 
@@ -53,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import WarningAlert from '@/components/alerts/WarningAlert.vue';
+import InfoAlert from '@/components/alerts/InfoAlert.vue';
 import MatchedInputTable from '@/components/tables/MatchedInputTable.vue';
 import { MatchedInputTableItem } from '@/components/tables/MatchedInputTableItem';
 import Taxon from '@/logic/entities/Taxon';

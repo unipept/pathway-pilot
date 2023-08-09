@@ -1,0 +1,9 @@
+<template>
+    <v-alert
+        color="primary"
+        icon="mdi-information-outline"
+        variant="outlined"
+    >
+        <slot></slot>
+    </v-alert>
+</template>
