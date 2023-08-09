@@ -2,7 +2,9 @@
     <h4>Advanced analysis</h4>
 
     <div v-if="area" class="mt-3">
-        <v-card>
+        <linked-annotations-view :area="area" />
+
+        <v-card class="mt-3">
             <v-card-title>Matched organisms</v-card-title>
             <v-card-text class="mt-n2 text-subtitle-1">
                 The following entries contain a match against the selected node. The matched annotations are highlighted for each 
@@ -62,6 +64,7 @@ import useVisualisationStore from '@/stores/VisualisationStore';
 import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
+import LinkedAnnotationsView from '@/views/information/LinkedAnnotationsView.vue';
 
 export interface Props {
     area: any

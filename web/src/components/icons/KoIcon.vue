@@ -1,6 +1,6 @@
 <template>
     <span class="icon {{ size }}" style="{ color: color }">
-        EC
+        KO
     </span>
 </template>
 
@@ -13,7 +13,7 @@ export interface Props {
 };
 
 withDefaults(defineProps<Props>(), {
-    color: 'orange',
+    color: 'blue',
     size: 'default'
 });
 </script>
