@@ -20,7 +20,6 @@ import useKeggStore from '@/stores/KeggStore';
 import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
-import { watch } from 'vue';
 
 export interface Props {
     pathways: any[];

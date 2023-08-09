@@ -86,7 +86,7 @@ import Taxon from '@/logic/entities/Taxon';
 import ImageControls, { ActiveButtonValue, ToggleButtonValue } from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
 import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
-import TaxonFilterView from '@/views/sample-stepper/single-sample-stepper/advanced/TaxonFilterView.vue';
+import TaxonFilterView from './TaxonFilterView.vue';
 
 export interface Props {
     area: any

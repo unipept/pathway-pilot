@@ -7,8 +7,9 @@
 // https://next.vuetifyjs.com/features/sass-variables/`
 @use 'vuetify' with (
     $container-max-widths: (
-        'lg': 900px,
-        'xl': 900px,
-        'xxl': 900px
+        'md': 1000px,
+        'lg': 1000px,
+        'xl': 1000px,
+        'xxl': 1000px
     )
 );

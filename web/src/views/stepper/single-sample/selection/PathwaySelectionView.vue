@@ -73,7 +73,6 @@ import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import BubblePlot from '@/components/visualisations/BubblePlot.vue';
 import SearchFilter from '@/components/inputs/SearchFilter.vue';
 import FilterView from './FilterView.vue';
-import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
 import { useTaxonomyTree } from '@/composables/useTaxonomyTree';
 
 const emits = defineEmits(["filtered"]);

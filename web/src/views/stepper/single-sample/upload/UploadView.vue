@@ -16,8 +16,7 @@ import { ref } from 'vue';
 import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import VerifierError from '@/logic/verifiers/VerifierError';
 import ErrorModal from '@/components/modals/ErrorModal.vue';
-import UnipeptCommunicator from '@/logic/communicators/UnipeptCommunicator';
-import FileFormat from '../FileFormat';
+import FileFormat from '../../FileFormat';
 import useVisualisationStore from '@/stores/VisualisationStore';
 
 import PeptideListForm from '@/components/forms/single-sample/peptide/PeptideListForm.vue';
