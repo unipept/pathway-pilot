@@ -2,10 +2,14 @@
     <v-data-table v-if="hasItems"
         :headers="headers"
         :items="items"
-        :sort-by="[{ key: 'taxon_id', order: 'asc' }]"
+        :sort-by="pageOptions.sortBy"
         :must-sort=true
+        :page="page"
+        items-per-page="5"
         item-value="raw_input"
         density="compact"
+        @update:options="pageOptions = $event"
+        @update:page=""
     >
         <template #item="{ index, item }">
             <matched-input-table-row
@@ -23,12 +27,26 @@
                 </td>
             </tr>
         </template>
+
+        <template #bottom>
+            <div style="position: relative;">
+                <v-pagination
+                    v-model="page"
+                    :length="pageOptions.pageCount"
+                    :total-visible="7"
+                    density="comfortable"
+                ></v-pagination>
+                <div style="position: absolute; right: 0; top: 5px;">
+                    <slot name="download"></slot>
+                </div>
+            </div>
+        </template>
     </v-data-table>
 </template>
 
 <script setup lang="ts">
 import { MatchedInputTableItem } from './MatchedInputTableItem';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import MatchedInputTableRow from './MatchedInputTableRow.vue';
 import Taxon from '@/logic/entities/Taxon';
 
@@ -37,6 +55,12 @@ export interface Props {
 }
 
 const props = defineProps<Props>();
+
+const page = ref(1);
+const pageOptions = ref({
+    pageCount: 1,
+    sortBy: [{ key: 'taxon_id', order: 'asc' }]
+});
 
 const hasItems = computed(() => props.items.length > 0);
 

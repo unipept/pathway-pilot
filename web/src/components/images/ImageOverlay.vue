@@ -24,10 +24,10 @@
                 :width="(area.x2 - area.x1)"
                 :height="(area.y2 - area.y1)"
                 fill="transparent"
-                :filter="area.id === selectedNode ? 'drop-shadow(0 0 10px rgba(48, 108, 207, 1))' : ''"
-                :stroke="area.id === selectedNode ? '#306ccf' : ''"
-                :stroke-opacity="area.id === selectedNode ? 0.8 : 0"
-                :stroke-width="area.id === selectedNode ? 3 : 0"
+                :filter="area.id === selectedArea?.id ? 'drop-shadow(0 0 10px rgba(48, 108, 207, 1))' : ''"
+                :stroke="area.id === selectedArea?.id ? '#306ccf' : ''"
+                :stroke-opacity="area.id === selectedArea?.id ? 0.8 : 0"
+                :stroke-width="area.id === selectedArea?.id ? 3 : 0"
             />
         </g>
 
@@ -121,19 +121,23 @@ import useKeggStore from '@/stores/KeggStore';
 import { computed, onBeforeMount, ref, watch } from 'vue';
 
 export interface Props {
-    areas: any[];
-    scale: number;
-    selected: number;
+    area: any
+    compound: string
 
-    onClickArea: (area: any) => void;
-    onClickCompound: (compound: any) => void;
+    areas: any[]
+    scale: number
 };
 
 const props = defineProps<Props>();
 
+const emits = defineEmits(['update:area', 'update:compound']);
+
 const keggStore = useKeggStore();
 
-const selectedNode = ref<number>(props.selected);
+const selectedArea = ref<any>(props.area);
+const selectedCompound = ref<string>(props.compound);
+
+const areaHover = ref<number | undefined>(undefined);
 
 const rectangles = computed(() => props.areas.filter(a => a.shape === 'rect'));
 const circles = computed(() => props.areas.filter(a => a.shape === 'circle'));
@@ -179,8 +183,6 @@ const tooltip = (area: any): any => {
     }
 }
 
-const areaHover = ref<number | undefined>(undefined);
-
 const isSelectable = (area: any) => {
     return area.info.ecNumbers.length 
          + area.info.koNumbers.length
@@ -214,6 +216,16 @@ const splitRectangle = (rectangle: any, parts: number) => {
     return rectangles;
 }
 
+const onClickArea = (area: any) => {
+    selectedArea.value = selectedArea.value?.id === area.id ? undefined : area;
+    emits('update:area', selectedArea.value);
+};
+
+const onClickCompound = (area: any) => {
+    selectedCompound.value = area.info.compounds[0].id;
+    emits('update:compound', selectedCompound.value);
+};
+
 const onMouseEnter = (areaId: number) => {
     areaHover.value = areaId;
 }
@@ -221,10 +233,6 @@ const onMouseEnter = (areaId: number) => {
 const onMouseLeave = (e: MouseEvent) => {
     areaHover.value = undefined;
 }
-
-watch(() => props.selected, () => {
-    selectedNode.value = props.selected;
-});
 
 onBeforeMount(async () => {
     await keggStore.fetchEcMapping();

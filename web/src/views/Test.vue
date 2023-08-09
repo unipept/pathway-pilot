@@ -1,23 +1,12 @@
 <template>
-    <file-upload-button @upload="onUpload">
-        <v-icon>mdi-paperclip-plus</v-icon>
-        <span class="ms-1">Batch upload multiple samples</span>
-    </file-upload-button>
+    <advanced-analysis-view :area="selectedArea" />
 </template>
 
 <script lang="ts" setup>
-import FileUploadButton from '@/components/inputs/FileUploadButton.vue';
-import { useFileReader } from '@/composables/useFileReader';
+import { ref } from 'vue';
+import AdvancedAnalysisView from './sample-stepper/single-sample-stepper/advanced/AdvancedAnalysisView.vue';
 
-const { readTextFile } = useFileReader();
-
-const onUpload = async (files: FileList) => {
-    for (let i = 0; i < files.length; i++) {
-        const fileContent = await readTextFile(files[i]);
-        const fileName = files[i].name;
-        console.log(fileName);
-    }
-}
+const selectedArea = ref<any>(undefined);
 </script>
 
 <style scoped>

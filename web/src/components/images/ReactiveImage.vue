@@ -5,7 +5,12 @@
         :src="src" 
         :alt="alt"
     >
-        <slot></slot>
+        <slot
+            :width="width"
+            :height="height"
+            :naturalWidth="naturalWidth"
+            :naturalHeight="naturalHeight"
+        ></slot>
     </v-img>
 </template>
 
@@ -43,13 +48,6 @@ const onResize = () => {
 
     width.value = reactiveImage.value?.image.clientWidth;
     height.value = reactiveImage.value?.image.clientHeight;
-
-    emits('resize', {
-        width: width.value,
-        height: height.value,
-        naturalWidth: naturalWidth.value,
-        naturalHeight: naturalHeight.value
-    });
 };
 
 onMounted(() => {

@@ -19,32 +19,23 @@
                 @filter="onFilter"
             >
                 <div ref="image">
-                    <!-- TODO: height has to be responsive here I guess -->
                     <v-card style="position: relative;" max-height="700px">
-                        <taxon-legend v-if="imageLoaded && !showAbundanceView"
-                            class="legend"
-                            :items="legendItems"
-                        />
+                        <taxon-legend v-if="!abundanceView" :items="legendItems" />
 
-                        <abundance-legend v-if="imageLoaded && showAbundanceView" 
-                            class="abundance-legend"
-                            :topItem="legendItems[0]"
-                            :bottomItem="legendItems[1]"
-                        />
+                        <abundance-legend v-else :topItem="legendItems[0]" :bottomItem="legendItems[1]" />
 
                         <interactive-image
-                            :scale="scale"
-                            :translate="translate"
-                            @update:scale="scale = $event"
-                            @update:translate="translate = $event"
+                            v-model:scale="scale"
+                            v-model:translate="translate"
                         >
-                            <reactive-image :src="pngUrl" @resize="onResize">
-                                <image-overlay v-if="imageLoaded"
+                            <reactive-image :src="pngUrl" v-slot="{ width, naturalWidth }">
+                                <image-overlay v-if="naturalWidth > 0"
+                                    v-model:area="selectedArea"
+                                    v-model:compound="selectedCompound"
                                     :areas="coloredAreas"
-                                    :scale="imageScale"
-                                    :selected="selectedArea?.id ?? -1"
-                                    :onClickArea="onClickArea"
-                                    :onClickCompound="onClickCompound"
+                                    :scale="width / naturalWidth"
+                                    @update:area="$emit('update:area', $event)"
+                                    @update:compound="compoundModalOpen = true"
                                 />
                             </reactive-image>
                         </interactive-image>
@@ -55,18 +46,12 @@
 
         <v-dialog 
             v-model="filterModalOpen"
-            @click:outside="filterModalOpen = false"
             max-width="75%"
             height="100%"
+            @click:outside="filterModalOpen = false"
         >
             <taxon-filter-view />
         </v-dialog>
-
-        <area-modal
-            :model-value="areaModalOpen"
-            :area="selectedArea"
-            @update:model-value="areaModalOpen = $event"
-        />
 
         <compound-modal
             :model-value="compoundModalOpen"
@@ -80,12 +65,7 @@
     </warning-alert>
 
     <div v-else class="loading-container">
-        <v-progress-circular
-            size="50"
-            width="5"
-            color="primary"
-            indeterminate
-        />
+        <v-progress-circular size="50" width="5" color="primary" indeterminate />
     </div>
 </template>
 
@@ -96,7 +76,6 @@ import useVisualisationStore from '@/stores/VisualisationStore';
 import { computed, ref, watch } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
 import TaxonLegend from '@/components/legends/TaxonLegend.vue';
-import AreaModal from '@/components/modals/AreaModal.vue';
 import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import CompoundModal from '@/components/modals/CompoundModal.vue';
 import InteractiveImage from '@/components/images/InteractiveImage.vue';
@@ -109,10 +88,18 @@ import { usePngDownloader } from '@/composables/download/usePngDownloader';
 import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
 import TaxonFilterView from '@/views/sample-stepper/single-sample-stepper/advanced/TaxonFilterView.vue';
 
+export interface Props {
+    area: any
+};
+
+const props = defineProps<Props>();
+
+defineEmits(['update:area']);
+
 const mappingStore = useSingleSampleStore();
 const visualisationStore = useVisualisationStore();
 
-const { colorAllAreas, colorHighlightedGroups, colorDifferential } = useMapAnnotator(
+const { color } = useMapAnnotator(
     mappingStore.ecs,
     mappingStore.ecToPeptides,
     mappingStore.taxonToEcs,
@@ -126,25 +113,21 @@ const image = ref<HTMLElement | null>(null);
 const pngUrl = ref<string | undefined>(undefined);
 const areas  = ref<any[]>([]);
 
-const imageLoaded = ref<boolean>(false);
-const imageScale = ref<number>(1);
-
-const areaModalOpen = ref<boolean>(false);
-const compoundModalOpen = ref<boolean>(false);
-const filterModalOpen = ref<boolean>(false);
-
-const selectedArea = ref<any | undefined>(undefined);
-const selectedCompound = ref<string>('');
-
 const scale = ref<number>(1);
 const translate = ref<{ x: number, y: number }>({ x: 0, y: 0 });
 
-const { pathway, highlightedItems: highlightedTaxa } = storeToRefs(visualisationStore);
+const selectedArea = ref<any | undefined>(props.area);
+const selectedCompound = ref<string>('');
+
+const compoundModalOpen = ref<boolean>(false);
+const filterModalOpen = ref<boolean>(false);
 
 const abundance = ref<ToggleButtonValue>(false);
-const showAbundanceView = ref<boolean>(false);
+const abundanceView = ref<boolean>(false);
 
 const filter = ref<ActiveButtonValue>(true);
+
+const { pathway, highlightedItems: highlightedTaxa } = storeToRefs(visualisationStore);
 
 const legendItems = computed(() => highlightedTaxa.value.map(taxonId => {
     const taxon = mappingStore?.taxon(taxonId) ?? new Taxon(taxonId, "Unknown", "Unknown");
@@ -154,37 +137,7 @@ const legendItems = computed(() => highlightedTaxa.value.map(taxonId => {
     }
 }));
 
-const coloredAreas = computed(() => {
-    if (showAbundanceView.value) {
-        return colorDifferential(areas.value, highlightedTaxa.value[0], highlightedTaxa.value[1]);
-    }
-
-    if (highlightedTaxa.value.length === 0) {
-        return colorAllAreas(areas.value);
-    } else {
-        return colorHighlightedGroups(areas.value, highlightedTaxa.value);
-    }
-});
-
-const onResize = (event: any) => {
-    if (event.width && event.width !== 0) {
-        imageScale.value = event.width / event.naturalWidth;
-        imageLoaded.value = true;
-    }
-}
-
-const onClickArea = (area: any) => {
-    if (selectedArea.value && selectedArea.value.id === area.id) {
-        selectedArea.value = undefined;
-        return;
-    }
-    selectedArea.value = area;
-}
-
-const onClickCompound = (compound: any) => {
-    selectedCompound.value = compound.info.compounds[0].id;
-    compoundModalOpen.value = true;
-}
+const coloredAreas = computed(() => color(areas.value, highlightedTaxa.value, abundanceView.value));
 
 const onDownload = () => {
     if (image.value) {
@@ -198,7 +151,7 @@ const onRestore = () => {
 }
 
 const onAbundance = (value: boolean) => {
-    showAbundanceView.value = value;
+    abundanceView.value = value;
 }
 
 const onFilter = () => {
@@ -212,14 +165,11 @@ watch(pathway, async () => {
     const data = await visualisationStore.getPathwayData();
 
     pngUrl.value = data?.image;
-    areas.value  = data?.nodes.map((node: any, i: number) => {
-        node.id = i;
-        return node;
-    }) ?? [];
+    areas.value  = data?.nodes.map((node: any, i: number) => ({ ...node, id: i })) ?? [];
 });
 
 watch(highlightedTaxa, () => {
-    onAbundance(highlightedTaxa.value.length === 2 && showAbundanceView.value)
+    onAbundance(highlightedTaxa.value.length === 2 && abundanceView.value)
     abundance.value = highlightedTaxa.value.length !== 2 ? 'disabled' : true;
     filter.value = highlightedTaxa.value.length > 0 ? 'active' : true;
 });
@@ -232,24 +182,6 @@ watch(highlightedTaxa, () => {
     align-items: center;
     justify-content: center;
     height: calc(100vh - 100px);
-}
-
-.legend {
-    position: absolute;
-    right: 0;
-    margin: 12px;
-    font-size: 90%;
-    background-color: white;
-    z-index: 1;
-}
-
-.abundance-legend {
-    position: absolute;
-    right: 0;
-    margin: 12px;
-    font-size: 90%;
-    background-color: white;
-    z-index: 1;
 }
 </style>
 

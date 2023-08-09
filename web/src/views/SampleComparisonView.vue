@@ -30,7 +30,16 @@
 
         <v-timeline-item dot-color="primary" width="100%">
             <template v-slot:icon>3</template>
-            <visualisation-view />
+            <visualisation-view v-model:area="selectedArea" />
+        </v-timeline-item>
+
+        <v-timeline-item v-if="pathway"
+            dot-color="primary"
+            size="20"
+            fill-dot
+            width="100%"
+        >
+            <advanced-analysis-view :area="selectedArea" />
         </v-timeline-item>
 
         <v-timeline-item dot-color="primary" width="100%">
@@ -50,12 +59,18 @@ import ExportView from './sample-stepper/multi-sample-stepper/ExportView.vue';
 import { ref, watch } from 'vue';
 import FileFormat from './sample-stepper/FileFormat';
 import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
+import { storeToRefs } from 'pinia';
+import AdvancedAnalysisView from './sample-stepper/multi-sample-stepper/advanced/AdvancedAnalysisView.vue';
 
 const { reset: resetGroupSampleStore } = useGroupSampleStore();
 const { reset: resetVisualisationStore } = useVisualisationStore();
 
+const { pathway } = storeToRefs(useVisualisationStore());
+
 const fileFormat = ref<FileFormat>(FileFormat.PEPTIDE_LIST);
 const filteredPathways = ref<any[]>([]);
+
+const selectedArea = ref<any>(undefined);
 
 resetGroupSampleStore();
 resetVisualisationStore();

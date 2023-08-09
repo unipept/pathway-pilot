@@ -67,6 +67,16 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
         groups.value = [];
     }
 
+    const taxon = (taxonId: number) => {
+        for (const group of groups.value) {
+            const taxon = group.taxon(taxonId);
+            if (taxon) {
+                return taxon;
+            }
+        }
+        return undefined;
+    };
+
     const ecToPathways = (ec: string) => {
         return new Set(groups.value.map(group => [ ...group.ecToPathways(ec) ]).flat());
     };
@@ -90,6 +100,7 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
         resetGroup,
         reset,
 
+        taxon,
         ecToPathways,
         pathwayToPeptideCounts
     };

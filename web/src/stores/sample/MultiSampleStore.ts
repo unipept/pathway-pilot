@@ -67,12 +67,30 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         samples.value = [];
     }
 
+    const taxon = (taxonId: number) => {
+        for (const sample of samples.value) {
+            const taxon = sample.taxon(taxonId);
+            if (taxon) {
+                return taxon;
+            }
+        }
+        return undefined;
+    };
+
+    const taxonToEcs = (taxon: string) => {
+        return new Set(samples.value.map(sample => sample.taxonToEcs(taxon)).flat());
+    };
+
     const ecToPathways = (ec: string) => {
         return new Set(samples.value.map(sample => sample.ecToPathways(ec)).flat());
     };
 
     const ecToPeptides = (ec: string) => {
         return new Set(samples.value.map(sample => sample.ecToPeptides(ec)).flat());
+    };
+
+    const pathwayToTaxa = (pathway: string) => {
+        return new Set(samples.value.map(sample => sample.pathwayToTaxa(pathway)).flat());
     };
 
     const pathwayToPeptideCounts = (pathway: string) => {
@@ -99,8 +117,11 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         resetSample,
         reset,
 
+        taxon,
+        taxonToEcs,
         ecToPathways,
         ecToPeptides,
+        pathwayToTaxa,
         pathwayToPeptideCounts,
         peptideToCounts
     };

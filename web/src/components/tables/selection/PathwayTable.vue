@@ -5,7 +5,7 @@
         :search="search"
         :page="page"
         :filter-keys="['id', 'subCategory', 'name']"
-        :sort-by="[{ key: 'count', order: 'desc' }]"
+        :sort-by="pageOptions.sortBy"
         :must-sort=true
         items-per-page="5"
         density="compact"
@@ -88,7 +88,8 @@ const emits = defineEmits(["update:model-value"]);
 
 const page = ref(1);
 const pageOptions = ref({
-    pageCount: 1
+    pageCount: 1,
+    sortBy: [{ key: 'count', order: 'desc' }],
 });
 
 const selected = ref<Pathway | undefined>(undefined);

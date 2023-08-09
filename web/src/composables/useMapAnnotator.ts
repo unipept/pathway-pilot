@@ -112,9 +112,22 @@ export function useMapAnnotator(
         });
     };
 
+    const color = (areas: any[], highlightedGroups: number[], abundance: boolean = false) => {
+        if (abundance) {
+            return colorDifferential(areas, highlightedGroups[0], highlightedGroups[1]);
+        }
+    
+        if (highlightedGroups.length > 0) {
+            return colorHighlightedGroups(areas, highlightedGroups);
+        }
+
+        return colorAllAreas(areas);
+    };
+
     return {
         colorAllAreas,
         colorHighlightedGroups,
         colorDifferential,
+        color
     };
 };
