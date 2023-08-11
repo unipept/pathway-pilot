@@ -1,20 +1,9 @@
 <template>
     <h4>Advanced analysis</h4>
 
-    <div v-if="area" class="mt-3">
-        <linked-annotations-view :area="area" />
-
-        <v-card class="mt-3">
-            <v-card-title>Matched organisms</v-card-title>
-            <v-card-text class="mt-n2 text-subtitle-1">
-                The following entries contain a match against the selected node. The matched annotations are highlighted for each 
-                entry in the Annotations column.
-            </v-card-text>
-
-            <v-card-text>
-                <matched-input-table :items="MatchedInputItems" />
-            </v-card-text>
-        </v-card>
+    <div v-if="area">
+        <linked-annotations-view class="mt-3" :area="area" />
+        <matched-taxa-view class="mt-3" :items="MatchedInputItems" />
     </div>
 
     <info-alert v-else class="mt-3">
@@ -57,7 +46,6 @@
 
 <script setup lang="ts">
 import InfoAlert from '@/components/alerts/InfoAlert.vue';
-import MatchedInputTable from '@/components/tables/MatchedInputTable.vue';
 import { MatchedInputTableItem } from '@/components/tables/MatchedInputTableItem';
 import Taxon from '@/logic/entities/Taxon';
 import useVisualisationStore from '@/stores/VisualisationStore';
@@ -65,6 +53,7 @@ import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import LinkedAnnotationsView from '@/views/information/LinkedAnnotationsView.vue';
+import MatchedTaxaView from '@/views/information/MatchedTaxaView.vue';
 
 export interface Props {
     area: any
@@ -83,9 +72,7 @@ const { highlightedItems: highlightedGroups } = storeToRefs(visualisationStore);
 const filterColor = computed(() => highlightedGroups.value.length > 0 ? 'primary' : '');
 
 const annotations = computed(() => [
-    //...props.area.info.koNumbers.map((ko: any) => ko.id),
     ...props.area.info.ecNumbers.map((ec: any) => ec.id),
-    //...props.area.info.reactions.map((reaction: any) => reaction.id)
 ]);
 
 const MatchedInputItems = computed(() => groups.value
