@@ -46,12 +46,13 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { EnzymeTableItem } from '../EnzymeTableItem';
+import { FilterTableItem } from './FilterTableItem';
 
 export interface Props {
-    modelValue: string[];
-    items: EnzymeTableItem[];
+    modelValue: FilterTableItem[];
+    items: FilterTableItem[];
     search: string;
+    color: string;
 }
 
 const props = defineProps<Props>();
@@ -63,20 +64,24 @@ const pageOptions = ref({
     pageCount: 1
 });
 
-const selected = ref<string[]>(props.modelValue);
+const selected = ref<FilterTableItem[]>(props.modelValue);
 
 const onRowClicked = (e: any, i: any) => {
-    if (selected.value.includes(i.item.raw.name)) {
-        selected.value = selected.value.filter((ec) => ec !== i.item.raw.name);
+    if (selected.value.map(item => item.name).includes(i.item.raw.name)) {
+        selected.value = selected.value.filter((item) => item.name !== i.item.raw.name);
     } else {
-        selected.value = [...selected.value, i.item.raw.name];
+        selected.value = [...selected.value, {
+            name: i.item.raw.name,
+            description: i.item.raw.description,
+            color: props.color
+        }];
     }
 
     emits("update:model-value", selected.value);
 };
 
 const rowActive = (item: any) => {
-    return selected.value.includes(item.raw.name);
+    return selected.value.map(item => item.name).includes(item.raw.name);
 };
 
 const headers = [

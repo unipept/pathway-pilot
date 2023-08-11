@@ -17,6 +17,7 @@ export type PathwayValue = {
     ecNumbers: string[];
     koNumbers: string[];
     reactionIds: string[];
+    compoundIds: string[];
 };
 
 export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
@@ -24,7 +25,8 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
         descriptionFile: string  = config.pathwayDataFile,
         ecLinkFile: string       = config.ecPathwayLinkFile,
         koLinkFile: string       = config.koPathwayLinkFile,
-        reactionLinkFile: string = config.reactionPathwayLinkFile
+        reactionLinkFile: string = config.reactionPathwayLinkFile,
+        compoundLinkFile: string = config.compoundPathwayLinkFile,
     ) {
         super();
 
@@ -32,6 +34,7 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
         this.handleEcLinkFile(ecLinkFile);
         this.handleKoLinkFile(koLinkFile);
         this.handleReactionLinkFile(reactionLinkFile);
+        this.handleCompoundLinkFile(compoundLinkFile);
     }
 
     private handleDescriptionFile(descriptionFile: string) {
@@ -46,7 +49,8 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
                 subCategory: subCategory,
                 ecNumbers: [],
                 koNumbers: [],
-                reactionIds: []
+                reactionIds: [],
+                compoundIds: []
             });
         });
     }
@@ -89,6 +93,20 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
             } else {
                  // TODO: add logging or error handling
                  console.log(`Pathway ${pathwayId} not found`);
+            }
+        });
+    }
+
+    private handleCompoundLinkFile(compoundLinkFile: string) {
+        this.readlines(compoundLinkFile, (line: string) => {
+            const [ compoundId, pathwayId ] = line.split('\t');
+
+            const pathway = this.get(pathwayId);
+            if (pathway && !pathway.compoundIds.includes(compoundId)) {
+                pathway.compoundIds.push(compoundId);
+            } else {
+                // TODO: add logging or error handling
+                console.log(`Pathway ${pathwayId} not found`);
             }
         });
     }

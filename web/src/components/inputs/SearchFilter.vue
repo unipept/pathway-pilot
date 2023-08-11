@@ -22,21 +22,22 @@
         <v-chip v-for="item, i in filter"
             class="mb-2"
             :class="{ 'me-2': i !== filter.length - 1 }"
-            color="primary"
+            :color="item.color"
             size="small"
             append-icon="mdi-close-circle-outline"
             @click="() => onRemoveFilter(i)"
-        >{{ item }}</v-chip>
+        >{{ item.name }}</v-chip>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { SearchFilterItem } from './SearchFilterItem';
 
 export interface Props {
     search: string
     searchLabel?: string
-    filter: string[]
+    filter: SearchFilterItem[]
     filterLabel?: string
 }
 

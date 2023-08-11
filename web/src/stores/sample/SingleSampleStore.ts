@@ -3,8 +3,11 @@ import { defineStore } from 'pinia';
 import Taxon from "@/logic/entities/Taxon";
 import { computed, reactive, ref } from 'vue';
 import { TreeviewItem, defaultTreeviewItem } from '@/components/visualisations/TreeviewItem';
+import useKeggStore from '../KeggStore';
 
 const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: string = '') => defineStore(`singleSampleStore/${sampleId}`, () => {
+    const keggStore = useKeggStore();
+    
     // ===============================================================
     // ======================== VARIABLES ============================
     // ===============================================================
@@ -24,6 +27,8 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
     const _ecToPathways = new Map<string, Set<string>>();
     const _ecToPeptides = new Map<string, Set<string>>();
 
+    const _compoundToPathways = new Map<string, Set<string>>();
+
     // ===============================================================
     // ======================== REFERENCES ===========================
     // ===============================================================
@@ -36,6 +41,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
     const pathways = reactive<Set<string>>(new Set());
     const ecs = reactive<Set<string>>(new Set());
+    const compounds = reactive<Set<string>>(new Set());
 
     const taxaTree = ref<TreeviewItem>(defaultTreeviewItem);
 
@@ -51,6 +57,8 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
     const initialize = async (inputList: any[], sampleConverter: any) => {
         size.value = inputList.length;
+
+        await keggStore.fetchPathwayMapping();
 
         const sampleData = await new sampleConverter({
             onProgressUpdate: (progress: number) => {
@@ -74,6 +82,15 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
             const pathway = object.pathway;
             pathways.add(pathway);
+
+            for (const compound of keggStore.pathwayMapping.get(pathway).compoundIds) {
+                compounds.add(compound);
+
+                if (!_compoundToPathways.has(compound)) {
+                    _compoundToPathways.set(compound, new Set());
+                }
+                _compoundToPathways.get(compound)!.add(pathway);
+            }
 
             if (!_taxonToEcs.has(object.taxon_id)) {
                 _taxonToEcs.set(object.taxon_id, new Set());
@@ -204,6 +221,8 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
     const ecToPathways = (ec: string) => [ ..._ecToPathways.get(ec) ?? [] ];
 
     const ecToPeptides = (ec: string) => [ ..._ecToPeptides.get(ec) ?? [] ];
+
+    const compoundToPathways = (compound: string) => [ ..._compoundToPathways.get(compound) ?? [] ];
     
     return {
         uploadName,
@@ -212,6 +231,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         processing,
         pathways,
         ecs,
+        compounds,
         taxaTree,
         initialized,
 
@@ -232,6 +252,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         pathwayToPeptideCounts,
         ecToPathways,
         ecToPeptides,
+        compoundToPathways
     };
 })();
 

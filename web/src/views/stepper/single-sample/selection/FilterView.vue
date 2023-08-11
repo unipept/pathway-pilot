@@ -1,28 +1,63 @@
 <template>
     <v-card flat>
         <v-card-text>
-            <p class="mb-2">
-                The table below presents all the Enzyme Commission (EC) numbers identified in your dataset through the use of 
-                <resource-link url="https://unipept.ugent.be/">Unipept</resource-link>. By selecting one or more entries from this table, 
-                you can apply specific filters on the pathways. For instance, if you choose EC 1.1.1.1, only the pathways containing this 
-                particular EC number, and found within your input data will be displayed. This allows for targeted pathway exploration based 
-                on the selected enzyme.
-            </p>
+            <v-row>
+                <v-col cols="6">
+                    <p class="mb-2">
+                        The table below presents all the Enzyme Commission (EC) numbers identified in your dataset through the use of 
+                        <resource-link url="https://unipept.ugent.be/">Unipept</resource-link>. By selecting one or more entries from this table, 
+                        you can apply specific filters on the pathways. For instance, if you choose EC 1.1.1.1, only the pathways containing this 
+                        particular EC number, and found within your input data will be displayed. This allows for targeted pathway exploration based 
+                        on the selected enzyme.
+                    </p>
+                </v-col>
 
-            <v-text-field
-                class="mt-3 mb-n3"
-                v-model="enzymeSearch"
-                label="Search for your EC number"
-                prepend-inner-icon="mdi-magnify"
-                variant="solo"
-                density="comfortable"
-            />
+                <v-col cols="6">
+                    <p class="mb-2">
+                        The table below presents all the different compounds identified in your dataset. By selecting one or more entries from this table, 
+                        you can apply specific filters on the pathways. For instance, if you choose C00001, only the pathways containing H2O, and found within 
+                        your input data will be displayed. This allows for targeted pathway exploration based on the selected compound.
+                    </p>
+                </v-col>
+            </v-row>
 
-            <enzyme-table
-                v-model="selectedEnzymes"
-                :items="enzymeItems"
-                :search="enzymeSearch"
-            />
+            <v-row>
+                <v-col cols="6">
+                    <v-text-field
+                        class="mt-3 mb-n3"
+                        v-model="enzymeSearch"
+                        label="Search for your EC number"
+                        prepend-inner-icon="mdi-magnify"
+                        variant="solo"
+                        density="comfortable"
+                    />
+
+                    <filter-table
+                        v-model="selectedFilter"
+                        :items="enzymeItems"
+                        :search="enzymeSearch"
+                        color="orange"
+                    />
+                </v-col>
+
+                <v-col cols="6">
+                    <v-text-field
+                        class="mt-3 mb-n3"
+                        v-model="compoundSearch"
+                        label="Search for your compound"
+                        prepend-inner-icon="mdi-magnify"
+                        variant="solo"
+                        density="comfortable"
+                    />
+
+                    <filter-table
+                        v-model="selectedFilter"
+                        :items="compoundItems"
+                        :search="compoundSearch"
+                        color="green"
+                    />
+                </v-col>
+            </v-row>
         </v-card-text>
     </v-card>
 </template>
@@ -32,34 +67,57 @@ import { computed, ref, watch } from 'vue';
 import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import useKeggStore from '@/stores/KeggStore';
-import EnzymeTable from '@/components/tables/selection/EnzymeTable.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
+import FilterTable from '@/components/tables/selection/FilterTable.vue';
+import { SearchFilterItem } from '@/components/inputs/SearchFilterItem';
+import { FilterTableItem } from '@/components/tables/selection/FilterTableItem';
+import { onBeforeMount } from 'vue';
 
 export interface Props {
-    enzymes: string[]
+    filter: SearchFilterItem[];
 }
 
 const props = defineProps<Props>();
 
-const emits = defineEmits(['update:enzymes']);
+const emits = defineEmits(['update:filter']);
 
 const sampleStore = useSingleSampleStore();
 const keggStore   = useKeggStore();
 
-const { ecs }       = storeToRefs(sampleStore);
-const { ecMapping } = storeToRefs(keggStore);
+const { ecs, compounds } = storeToRefs(sampleStore);
 
-const selectedEnzymes = ref<string[]>(props.enzymes);
-const enzymeSearch    = ref<string>("");
+const selectedFilter = ref<FilterTableItem[]>(props.filter.map((filter: SearchFilterItem) => ({
+    name: filter.name,
+    description: '',
+    color: filter.color
+})));
+
+const enzymeSearch = ref<string>("");
+const compoundSearch = ref<string>("");
 
 const enzymeItems = computed(() => [ ...ecs.value ]
     .map((ec: string) => ({
         name: ec,
-        description: ecMapping.value.get(ec)?.names[0] ?? ""
+        description: keggStore.ecMapping?.get(ec)?.names[0] ?? ""
     }))
 );
 
-watch(selectedEnzymes, () => {
-    emits('update:enzymes', selectedEnzymes.value);
-});
+const compoundItems = computed(() => [ ...compounds.value ]
+    .map((compound: string) => ({
+        name: compound,
+        description: keggStore.compoundMapping?.get(compound)?.names[0] ?? ""
+    }))
+);
+
+watch(selectedFilter, () => {
+    emits('update:filter', selectedFilter.value.map((item: FilterTableItem) => ({
+        name: item.name,
+        color: item.color
+    })));
+})
+
+onBeforeMount(async () => {
+    await keggStore.fetchEcMapping();
+    await keggStore.fetchCompoundMapping();
+})
 </script>
