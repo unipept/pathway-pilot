@@ -1,17 +1,28 @@
 <template>
     <h2>Export your analysis</h2>
 
-    <div v-if="initialized" class="mt-3">
-        <v-btn @click="onDownloadPathways">
-            <v-icon>mdi-download</v-icon>
-            <span>Download pathways</span>
-        </v-btn>
+    <v-row v-if="initialized" class="mt-3">
+        <v-col cols="6">
+            <p>
+                You can download all pathways (step 2), linked to your input data. The pathways are sorted by their associated number of peptides.
+            </p>
+            <v-btn class="mt-3" @click="onDownloadPathways">
+                <v-icon>mdi-download</v-icon>
+                <span>Download pathways</span>
+            </v-btn>
+        </v-col>
 
-        <v-btn @click="onDownloadStore">
-            <v-icon>mdi-download</v-icon>
-            <span>Download store</span>
-        </v-btn>
-    </div>
+        <v-col cols="6">
+            <p>
+                You can download our internal mapping file. This csv file stores the taxonomic information for each peptide, as well as the pathways it 
+                is associated with.
+            </p>
+            <v-btn class="mt-3" @click="onDownloadStore">
+                <v-icon>mdi-download</v-icon>
+                <span>Download store</span>
+            </v-btn>
+        </v-col>
+    </v-row>
 </template>
 
 <script setup lang="ts">
