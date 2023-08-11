@@ -1,7 +1,7 @@
 <template>
     <v-timeline-item dot-color="primary" width="100%">
         <template v-slot:icon>{{ step }}</template>
-        <visualisation-view v-model:area="selectedArea" />
+        <visualisation-view v-model:area="selectedArea" v-model:compound="selectedCompound" />
     </v-timeline-item>
 
     <v-timeline-item v-if="pathway"
@@ -10,7 +10,7 @@
         fill-dot
         width="100%"
     >
-        <advanced-analysis-view :area="selectedArea" />
+        <advanced-analysis-view :area="selectedArea" :compound="selectedCompound" />
     </v-timeline-item>
 </template>
 
@@ -28,6 +28,7 @@ export interface Props {
 defineProps<Props>();
 
 const selectedArea = ref<any>(undefined);
+const selectedCompound = ref<any>(undefined);
 
 const { pathway } = storeToRefs(useVisualisationStore());
 </script>

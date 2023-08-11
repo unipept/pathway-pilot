@@ -6,8 +6,12 @@
         <matched-taxa-view class="mt-3" :items="MatchedInputItems" />
     </div>
 
+    <div v-else-if="compound">
+        <compound-information-view class="mt-3" :compoundId="compound.info.compounds[0].id" />
+    </div>
+
     <info-alert v-else class="mt-3">
-        You can <b>click</b> on any rectangular area in the visualisation to select it. Upon selection, more detailed information 
+        You can <b>click</b> on any node in the visualisation to select it. Upon selection, more detailed information 
         will be displayed here.
     </info-alert>
 
@@ -54,9 +58,11 @@ import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import MatchedTaxaView from '@/views/information/MatchedTaxaView.vue';
+import CompoundInformationView from '@/views/information/CompoundInformationView.vue';
 
 export interface Props {
-    area: any
+    area: any | undefined
+    compound: any | undefined
 };
 
 const props = defineProps<Props>();

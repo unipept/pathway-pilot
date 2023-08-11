@@ -73,6 +73,7 @@
             :onclick="() => onClickCompound(area)"
             :onmouseenter="() => onMouseEnter(i + 123456)"
             :onmouseleave="onMouseLeave"
+            cursor="pointer"
         >
             <circle
                 class="group-item group-item-trans"
@@ -80,8 +81,10 @@
                 :cy="area.y + 1"
                 :r="area.r"
                 fill="white"
-                :stroke="polygons.length > 20 ? '#e3e3e3' : 'black'"
-                :stroke-width="polygons.length > 20 ? 5 : 2"
+                :filter="area.id === selectedCompound?.id ? 'drop-shadow(0 0 10px rgba(48, 108, 207, 1))' : ''"
+                :stroke="area.id === selectedCompound?.id ? '#306ccf' : (polygons.length > 20 ? '#e3e3e3' : 'black')"
+                :stroke-opacity="area.id === selectedCompound?.id ? 0.8 : 0"
+                :stroke-width="area.id === selectedCompound?.id ? 3 : (polygons.length > 20 ? 5 : 2)"
             />
         </g>
 
@@ -118,11 +121,12 @@
 
 <script setup lang="ts">
 import useKeggStore from '@/stores/KeggStore';
+import { on } from 'events';
 import { computed, onBeforeMount, ref, watch } from 'vue';
 
 export interface Props {
     area: any
-    compound: string
+    compound: any
 
     areas: any[]
     scale: number
@@ -135,7 +139,7 @@ const emits = defineEmits(['update:area', 'update:compound']);
 const keggStore = useKeggStore();
 
 const selectedArea = ref<any>(props.area);
-const selectedCompound = ref<string>(props.compound);
+const selectedCompound = ref<any>(props.compound);
 
 const areaHover = ref<number | undefined>(undefined);
 
@@ -216,15 +220,16 @@ const splitRectangle = (rectangle: any, parts: number) => {
     return rectangles;
 }
 
-const onClickArea = (area: any) => {
-    selectedArea.value = selectedArea.value?.id === area.id ? undefined : area;
-    emits('update:area', selectedArea.value);
-};
-
-const onClickCompound = (area: any) => {
-    selectedCompound.value = area.info.compounds[0].id;
+const onClick = (area: any, compound: any) => {
+    selectedCompound.value = selectedCompound.value?.id === compound?.id ? undefined : compound;
+    selectedArea.value = selectedArea.value?.id === area?.id ? undefined : area;
     emits('update:compound', selectedCompound.value);
-};
+    emits('update:area', selectedArea.value);
+}
+
+const onClickArea = (area: any) => onClick(area, undefined);
+
+const onClickCompound = (compound: any) => onClick(undefined, compound);
 
 const onMouseEnter = (areaId: number) => {
     areaHover.value = areaId;

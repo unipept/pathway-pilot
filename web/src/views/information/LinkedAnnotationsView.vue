@@ -10,42 +10,30 @@
         
             <v-row class="mt-3">
                 <v-col cols="4">
-                    <v-card>
-                        <v-card-text>
-                            <enzyme-chip v-for="(ec, i) in ecAnnotations"
-                                class="flex-grow-1 w-100"
-                                :class="{ 'mt-2': i > 0 }"
-                                size="large"
-                                :key="ec" 
-                                :name="ec"
-                            />
-                        </v-card-text>
-                    </v-card>
+                    <enzyme-chip v-for="(ec, i) in ecAnnotations"
+                        class="flex-grow-1 w-100"
+                        :class="{ 'mt-2': i > 0 }"
+                        size="large"
+                        :key="ec" 
+                        :name="ec"
+                    />
                 </v-col>
                 <v-col cols="4">
-                    <v-card>
-                        <v-card-text>
-                            <orthology-chip v-for="(ko, i) in koAnnotations"
-                                class="w-100"
-                                :class="{ 'mt-2': i > 0 }"
-                                size="large"
-                                :key="ko" 
-                                :name="ko"
-                            />
-                        </v-card-text>
-                    </v-card>
+                    <orthology-chip v-for="(ko, i) in koAnnotations"
+                        class="w-100"
+                        :class="{ 'mt-2': i > 0 }"
+                        size="large"
+                        :key="ko" 
+                        :name="ko"
+                    />
                 </v-col>
                 <v-col cols="4">
-                    <v-card>
-                        <v-card-text>
-                            <reaction-chip v-for="(reaction, i) in reactionAnnotations"
-                                class="flex-grow-1 w-100"
-                                :class="{ 'mt-2': i > 0 }"
-                                :key="reaction" 
-                                :name="reaction"
-                            />
-                        </v-card-text>
-                    </v-card>
+                    <reaction-chip v-for="(reaction, i) in reactionAnnotations"
+                        class="flex-grow-1 w-100"
+                        :class="{ 'mt-2': i > 0 }"
+                        :key="reaction" 
+                        :name="reaction"
+                    />
                 </v-col>
             </v-row>
         </v-card-text>

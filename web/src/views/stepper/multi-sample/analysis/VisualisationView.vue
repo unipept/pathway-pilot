@@ -30,7 +30,7 @@
                                     :areas="coloredAreas"
                                     :scale="width / naturalWidth"
                                     @update:area="$emit('update:area', $event)"
-                                    @update:compound="compoundModalOpen = true"
+                                    @update:compound="$emit('update:compound', $event)"
                                 />
                             </reactive-image>
                         </interactive-image>
@@ -47,12 +47,6 @@
         >
             <div></div>
         </v-dialog>
-
-        <compound-modal
-            :model-value="compoundModalOpen"
-            :compoundId="selectedCompound"
-            @update:model-value="compoundModalOpen = $event"
-        />
     </div>
 
     <warning-alert v-else-if="!pathway" class="mt-5">
@@ -76,7 +70,6 @@ import useVisualisationStore from '@/stores/VisualisationStore';
 import { computed, ref, watch } from "vue";
 import ColorConstants from "@/logic/constants/ColorConstants";
 import TaxonLegend from '@/components/legends/TaxonLegend.vue';
-import CompoundModal from '@/components/modals/CompoundModal.vue';
 import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
@@ -91,11 +84,12 @@ import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 
 export interface Props {
     area: any
+    compound: any
 };
 
 const props = defineProps<Props>();
 
-defineEmits(['update:area']);
+defineEmits(['update:area', 'update:compound']);
 
 const sampleStore = useGroupSampleStore();
 const visualisationStore = useVisualisationStore();
@@ -111,9 +105,8 @@ const scale = ref<number>(1);
 const translate = ref<{ x: number, y: number }>({ x: 0, y: 0 });
 
 const selectedArea = ref<any | undefined>(props.area);
-const selectedCompound = ref<string>('');
+const selectedCompound = ref<any | undefined>(props.compound);
 
-const compoundModalOpen = ref<boolean>(false);
 const filterModalOpen = ref<boolean>(false);
 
 const abundance = ref<ToggleButtonValue>(false);
