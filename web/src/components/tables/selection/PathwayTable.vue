@@ -5,7 +5,7 @@
         :search="search"
         :page="page"
         :filter-keys="['id', 'subCategory', 'name']"
-        :sort-by="[{ key: 'count', order: 'desc' }]"
+        :sort-by="pageOptions.sortBy"
         :must-sort=true
         items-per-page="5"
         density="compact"
@@ -63,13 +63,18 @@
             </div>
         </template>
     </v-data-table>
+
+    <!--<warning-alert class="mt-3">
+        We're sorry, but we couldn't find any pathways that match your search pattern and filters. Feel free to adjust your search criteria or filters to explore different pathways.
+    </warning-alert>-->
 </template>
 
 <script setup lang="ts">
 import Pathway from '@/logic/entities/Pathway';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { PathwayTableItem } from '../selection/PathwayTableItem';
 import { groupColors, pathwayGroups } from "@/types/PathwayGroup";
+import WarningAlert from '@/components/alerts/WarningAlert.vue';
 
 export interface Props {
     modelValue: Pathway | undefined;
@@ -83,7 +88,8 @@ const emits = defineEmits(["update:model-value"]);
 
 const page = ref(1);
 const pageOptions = ref({
-    pageCount: 1
+    pageCount: 1,
+    sortBy: [{ key: 'count', order: 'desc' }],
 });
 
 const selected = ref<Pathway | undefined>(undefined);

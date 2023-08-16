@@ -1,16 +1,16 @@
 import KeggCommunicator from "../../communicators/KEGGCommunicator";
 import UnipeptCommunicator from "../../communicators/UnipeptCommunicator";
-import ProgressListener from "../ProgressListener";
+import { defaultProgressListener, ProgressListener } from "@/logic/ProgressListener";
 import Converter from "../Converter";
 
 export default class PeptideListConverter implements Converter {
-    private unipeptCommunicator: UnipeptCommunicator;
-    private keggCommunicator: KeggCommunicator;
+    private readonly unipeptCommunicator: UnipeptCommunicator;
+    private readonly keggCommunicator: KeggCommunicator;
 
     constructor(
-        private readonly progressListener: ProgressListener
+        private readonly progressListener: ProgressListener = defaultProgressListener
     ) {
-        this.unipeptCommunicator = new UnipeptCommunicator();
+        this.unipeptCommunicator = new UnipeptCommunicator(progressListener);
         this.keggCommunicator = new KeggCommunicator();
     }
 
@@ -64,10 +64,8 @@ export default class PeptideListConverter implements Converter {
 
             }
 
-            this.progressListener.onProgressUpdate((i + 1) / peptideInfoLength);
+            //this.progressListener.onProgressUpdate((i + 1) / peptideInfoLength);
         }
-
-        // TODO: Do some precomputed normalisation here?
 
         return Array.from(resultMapping.values());
     }

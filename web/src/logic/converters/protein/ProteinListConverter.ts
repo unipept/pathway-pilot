@@ -1,16 +1,16 @@
 import KeggCommunicator from "../../communicators/KEGGCommunicator";
 import UnipeptCommunicator from "../../communicators/UnipeptCommunicator";
-import ProgressListener from "../ProgressListener";
+import { defaultProgressListener, ProgressListener } from "@/logic/ProgressListener";
 import Converter from "../Converter";
 
 export default class ProteinListConverter implements Converter {
-    private unipeptCommunicator: UnipeptCommunicator;
-    private keggCommunicator: KeggCommunicator;
+    private readonly unipeptCommunicator: UnipeptCommunicator;
+    private readonly keggCommunicator: KeggCommunicator;
 
     constructor(
-        private readonly progressListener: ProgressListener
+        private readonly progressListener: ProgressListener = defaultProgressListener
     ) {
-        this.unipeptCommunicator = new UnipeptCommunicator();
+        this.unipeptCommunicator = new UnipeptCommunicator(this.progressListener);
         this.keggCommunicator = new KeggCommunicator();
     }
 
@@ -63,7 +63,7 @@ export default class ProteinListConverter implements Converter {
                 }
             }
 
-            this.progressListener.onProgressUpdate((i + 1) / proteinInfoLength);
+            //this.progressListener.onProgressUpdate((i + 1) / proteinInfoLength);
         }
 
         return Array.from(resultMapping.values());

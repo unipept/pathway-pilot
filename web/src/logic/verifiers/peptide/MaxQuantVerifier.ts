@@ -1,7 +1,11 @@
+import { defaultProgressListener, ProgressListener } from "@/logic/ProgressListener";
 import VerifierError from "../VerifierError";
+import Verifier from "../Verifier";
 
-export default class MaxQuantVerifier {
-    constructor() {}
+export default class MaxQuantVerifier implements Verifier {
+    constructor(
+        private readonly progressListener: ProgressListener = defaultProgressListener
+    ) {}
 
     public verify(maxQuantResult: string[]) {
         const headerItems = maxQuantResult[0].split('\t').map(s => s.trim());
@@ -17,6 +21,8 @@ export default class MaxQuantVerifier {
             if (!/^[ACDEFGHIKLMNPQRSTVWY]+$/.test(peptide)) {
                 errors.push(new VerifierError(i + 1, "Peptide contains invalid characters"));
             }
+
+            this.progressListener.onProgressUpdate(i / maxQuantResult.length);
         }
 
         return errors;

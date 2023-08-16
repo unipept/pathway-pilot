@@ -1,5 +1,5 @@
 <template>
-    <v-card flat>
+    <v-card>
         <v-card-title>Compound: {{ compoundId }}</v-card-title>
         <v-card-subtitle class="mt-n2 text-subtitle-1">
             <span v-for="name of compoundNames">
@@ -7,23 +7,26 @@
             </span>
         </v-card-subtitle>
 
-        <v-card-text class="mb-3">
-            <v-row>
-                <v-col cols=6>
-                    <h2>Pathways ({{ compoundPathways.length }})</h2>
-                    <pathway-table :items="compoundPathways" :loading="compoundLoading" />
-                </v-col>
-                <v-col cols=6>
-                    <h2>Modules ({{ compoundModules.length }})</h2>
-                    <pathway-table :items="compoundModules" :loading="compoundLoading" />
-                </v-col>
-            </v-row>
+        <v-card-text>
+            <v-card class="pa-2" variant="outlined" flat>
+                <h2>Pathways ({{ compoundPathways.length }})</h2>
+                <pathway-table class="mt-3" :items="compoundPathways" :loading="compoundLoading" />
+            </v-card>
 
-            <h2 class="mt-3">Reactions ({{ compoundReactions.length }})</h2>
-            <reaction-table :items="compoundReactions" :loading="compoundLoading" />
+            <v-card class="pa-2 mt-3" variant="outlined" flat>
+                <h2>Modules ({{ compoundModules.length }})</h2>
+                <pathway-table class="mt-3" :items="compoundModules" :loading="compoundLoading" />
+            </v-card>
 
-            <h2 class="mt-3">Enzymes ({{ compoundEnzymes.length }})</h2>
-            <enzyme-table :items="compoundEnzymes" :loading="compoundLoading" />
+            <v-card class="pa-2 mt-3" variant="outlined" flat>
+                <h2 class="mt-3">Reactions ({{ compoundReactions.length }})</h2>
+                <reaction-table class="mt-3" :items="compoundReactions" :loading="compoundLoading" />
+            </v-card>
+
+            <v-card class="pa-2 mt-3" variant="outlined" flat>
+                <h2 class="mt-3">Enzymes ({{ compoundEnzymes.length }})</h2>
+                <enzyme-table class="mt-3" :items="compoundEnzymes" :loading="compoundLoading" />
+            </v-card>
 
             <p class="mt-3">
                 View more information at <resource-link :url="keggUrl">Kegg</resource-link>
@@ -33,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onBeforeMount, onMounted, ref } from 'vue';
 import PathwayTable from '@/components/tables/PathwayTable.vue';
 import ReactionTable from '@/components/tables/ReactionTable.vue';
 import EnzymeTable from '@/components/tables/EnzymeTable.vue';
@@ -71,17 +74,24 @@ const compoundModules = computed(() =>
 
 const compoundEnzymes = computed(() =>
     compoundEntry.value?.ecNumbers.map((enzyme: any) => ({
-        name: enzyme
+        name: enzyme,
+        description: keggStore.ecMapping.get(enzyme)?.names[0]
     })) ?? []
 );
 
 const compoundReactions = computed(() =>
     compoundEntry.value?.reactionIds.map((reaction: any) => ({
-        name: reaction
+        name: reaction,
+        description: keggStore.reactionMapping.get(reaction)?.names[0]
     })) ?? []
 );
 
 const keggUrl = computed(() => url(props.compoundId));
+
+onBeforeMount(async () => {
+    await keggStore.fetchReactionMapping();
+    await keggStore.fetchEcMapping();
+});
 
 onMounted(async () => {
     compoundLoading.value = true;

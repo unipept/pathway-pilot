@@ -1,5 +1,6 @@
 export interface SampleTableItem {
+    uploadName: string
     name: string
     size: string
-    loading: boolean
+    loading: number | false
 };

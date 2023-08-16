@@ -1,10 +1,12 @@
-import ProgressListener from "../ProgressListener";
+import { defaultProgressListener, ProgressListener } from "@/logic/ProgressListener";
 import PeptideListConverter from "./PeptideListConverter";
 import Converter from "../Converter";
+import KeggCommunicator from "@/logic/communicators/KEGGCommunicator";
+import UnipeptCommunicator from "@/logic/communicators/UnipeptCommunicator";
 
 export default class MaxQuantConverter implements Converter {
     constructor(
-        private readonly progressListener: ProgressListener
+        private readonly progressListener: ProgressListener = defaultProgressListener
     ) {}
 
     public isPeptide() {

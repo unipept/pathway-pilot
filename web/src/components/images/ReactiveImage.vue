@@ -5,7 +5,12 @@
         :src="src" 
         :alt="alt"
     >
-        <slot></slot>
+        <slot
+            :width="width"
+            :height="height"
+            :naturalWidth="naturalWidth"
+            :naturalHeight="naturalHeight"
+        ></slot>
     </v-img>
 </template>
 
@@ -15,10 +20,12 @@ import { VImg } from 'vuetify/components';
 
 export interface Props {
     src: string
-    alt: string
+    alt?: string
 };
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+    alt: ''
+});
 
 const emits = defineEmits(['resize']);
 
@@ -41,13 +48,6 @@ const onResize = () => {
 
     width.value = reactiveImage.value?.image.clientWidth;
     height.value = reactiveImage.value?.image.clientHeight;
-
-    emits('resize', {
-        width: width.value,
-        height: height.value,
-        naturalWidth: naturalWidth.value,
-        naturalHeight: naturalHeight.value
-    });
 };
 
 onMounted(() => {
@@ -72,5 +72,6 @@ onBeforeUnmount(() => {
 <style scoped>
 .select-none {
     user-select: none;
+    overflow: visible;
 }
 </style>

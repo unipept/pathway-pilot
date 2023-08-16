@@ -1,8 +1,17 @@
 <template>
-    <v-card flat>
-        <v-card-text class="information">
-            <h4 class="mb-3">Upload your MaxQuant file</h4>
+    <upload-form
+        label="Paste your MaxQuant results here"
+        :example="example"
+        :loading="loading"
+        :multi="multi"
+        @submit="onSubmit"
+        @reset="onReset"
+    >
+        <template #header>
+            <h4>Upload your MaxQuant file</h4>
+        </template>
 
+        <template #information>    
             <p class="subtitle">
                 Please input a valid <resource-link url="https://www.maxquant.org/">MaxQuant</resource-link> file by either pasting the file contents 
                 on the right-hand side or selecting a single <span>.tsv</span> file. The file should <b>always</b> start with a header row, and should contain 
@@ -29,16 +38,8 @@
                     </li>
                 </ol>
             </p>
-
-            <upload-form
-                label="Paste your MaxQuant results here"
-                :loading="loading"
-                :example="example"
-                @submit="$emit('submit', $event)"
-                @reset="$emit('reset', $event)"
-            />
-        </v-card-text>
-    </v-card>
+        </template>
+    </upload-form>
 </template>
 
 <script setup lang="ts">
@@ -48,19 +49,22 @@ import ResourceLink from '@/components/misc/ResourceLink.vue';
 import example from '../../examples/peptide/MaxQuantExample';
 
 export interface Props {
-    loading?: boolean;
+    loading?: false | number
+    multi?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
     loading: false,
+    multi: false
 });
 
-defineEmits(["submit", "reset"]);
-</script>
+const emits = defineEmits(["submit", "reset"]);
 
-<style scoped>
-.information {
-    padding: 0;
-    font-size: 16px;
-}
-</style>
+const onSubmit = (inputList: string[], sampleName: string) => {
+    emits("submit", inputList, sampleName);
+};
+
+const onReset = () => {
+    emits("reset");
+};
+</script>

@@ -1,5 +1,9 @@
+import { ProgressListener, defaultProgressListener } from "../ProgressListener";
+
+
 export default class UnipeptCommunicator {
     constructor(
+        private readonly progressListener: ProgressListener = defaultProgressListener,
         private readonly baseUrl: string = "https://api.unipept.ugent.be/api/v2"
     ) {}
 
@@ -29,8 +33,11 @@ export default class UnipeptCommunicator {
             const fetchUrl = `${url}?input[]=${chunk.join("&input[]=")}`;
             await fetch(fetchUrl, { method: 'POST' })
                 .then(response => response.json())
-                .then(data => result.push(...data));
+                .then(data => result.push(...data))
+                .then(() => this.progressListener.onProgressUpdate(i / items.length));
         }
+
+        this.progressListener.onProgressUpdate(1);
 
         return result;
     }
