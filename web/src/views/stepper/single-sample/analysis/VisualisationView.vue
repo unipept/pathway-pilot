@@ -103,7 +103,7 @@ const selectedCompound = ref<any | undefined>(props.compound);
 const { pathway, highlightedItems: highlightedTaxa } = storeToRefs(visualisationStore);
 
 const legendItems = computed(() => highlightedTaxa.value.map(taxonId => {
-    const taxon = mappingStore?.taxon(taxonId) ?? new Taxon(taxonId, "Unknown", "Unknown");
+    const taxon = mappingStore?.taxon(taxonId) ?? { id: taxonId, name: "Unknown", rank: "Unknown" };
     return {
         label: taxon.name,
         color: ColorConstants.LEGEND[highlightedTaxa.value.indexOf(taxon.id)]

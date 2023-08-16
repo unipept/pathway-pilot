@@ -14,7 +14,7 @@
         <template #item="{ index, item }">
             <matched-input-table-row
                 :group="item.value.group"
-                :taxon="new Taxon(item.value.taxon_id, item.value.taxon_name, item.value.taxon_rank)"
+                :taxon="{ id: item.value.taxon_id, name: item.value.taxon_name, rank: item.value.taxon_rank }"
                 :node-annotations="item.value.node_annotations"
                 :matched-annotations="item.value.matched_annotations"
             />

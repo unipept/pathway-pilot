@@ -73,7 +73,7 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         for (const object of sampleData) {
             let taxon = _taxa.get(object.taxon_id);
             if (!taxon) {
-                taxon = new Taxon(object.taxon_id, object.taxon_name, object.taxon_rank);
+                taxon = { id: object.taxon_id, name: object.taxon_name, rank: object.taxon_rank };
                 _taxa.set(object.taxon_id, taxon);
             }
 

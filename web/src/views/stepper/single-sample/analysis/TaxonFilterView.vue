@@ -66,7 +66,7 @@ const filteredTaxaTree = ref<TreeviewItem>(compressedTaxaTree.value);
 
 const taxaSearch = ref<string>("");
 const selectedItems = ref<TreeviewItem[]>(selectedTaxa.value.map(taxonId => {
-    const taxon = mappingStore?.taxon(taxonId) ?? new Taxon(taxonId, "Unknown", "Unknown");
+    const taxon = mappingStore?.taxon(taxonId) ?? { id: taxonId, name: "Unknown", rank: "Unknown" };
     return {
         id: taxonId,
         name: taxon.name,
