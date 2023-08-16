@@ -124,6 +124,10 @@ watch(pathwayItems, (items: Pathway[]) => {
     emits("filtered", items);
 });
 
+watch(pathwayFilter, () => {
+    selectedPathway.value = undefined;
+});
+
 onMounted(async () => {
     await keggStore.fetchPathwayMapping();
     await keggStore.fetchEcMapping();

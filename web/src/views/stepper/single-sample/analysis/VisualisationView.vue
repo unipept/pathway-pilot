@@ -11,16 +11,12 @@
             <image-controls
                 download
                 restore
-                :abundance="abundance"
-                :filter="filter"
                 @download="onDownload"
                 @restore="onRestore"
-                @abundance="onAbundance"
-                @filter="onFilter"
             >
                 <div ref="image">
                     <v-card style="position: relative;" max-height="700px">
-                        <taxon-legend v-if="!abundanceView" :items="legendItems" />
+                        <taxon-legend v-if="!abundance" :items="legendItems" />
 
                         <abundance-legend v-else :topItem="legendItems[0]" :bottomItem="legendItems[1]" />
 
@@ -43,15 +39,6 @@
                 </div>
             </image-controls>
         </v-card>
-
-        <v-dialog 
-            v-model="filterModalOpen"
-            max-width="75%"
-            height="100%"
-            @click:outside="filterModalOpen = false"
-        >
-            <taxon-filter-view />
-        </v-dialog>
     </div>
 
     <warning-alert v-else-if="!pathway" class="mt-5">
@@ -76,14 +63,14 @@ import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import { useMapAnnotator } from '@/composables/useMapAnnotator';
 import Taxon from '@/logic/entities/Taxon';
-import ImageControls, { ActiveButtonValue, ToggleButtonValue } from '@/components/images/ImageControls.vue';
+import ImageControls from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
 import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
-import TaxonFilterView from './TaxonFilterView.vue';
 
 export interface Props {
     area: any
     compound: any
+    abundance: boolean
 };
 
 const props = defineProps<Props>();
@@ -113,13 +100,6 @@ const translate = ref<{ x: number, y: number }>({ x: 0, y: 0 });
 const selectedArea = ref<any | undefined>(props.area);
 const selectedCompound = ref<any | undefined>(props.compound);
 
-const filterModalOpen = ref<boolean>(false);
-
-const abundance = ref<ToggleButtonValue>(false);
-const abundanceView = ref<boolean>(false);
-
-const filter = ref<ActiveButtonValue>(true);
-
 const { pathway, highlightedItems: highlightedTaxa } = storeToRefs(visualisationStore);
 
 const legendItems = computed(() => highlightedTaxa.value.map(taxonId => {
@@ -130,7 +110,7 @@ const legendItems = computed(() => highlightedTaxa.value.map(taxonId => {
     }
 }));
 
-const coloredAreas = computed(() => color(areas.value, highlightedTaxa.value, abundanceView.value));
+const coloredAreas = computed(() => color(areas.value, highlightedTaxa.value, props.abundance));
 
 const onDownload = () => {
     if (image.value) {
@@ -143,14 +123,6 @@ const onRestore = () => {
     translate.value = { x: 0, y: 0 };
 }
 
-const onAbundance = (value: boolean) => {
-    abundanceView.value = value;
-}
-
-const onFilter = () => {
-    filterModalOpen.value = true;
-}
-
 watch(pathway, async () => {
     pngUrl.value = undefined;
     
@@ -159,12 +131,6 @@ watch(pathway, async () => {
 
     pngUrl.value = data?.image;
     areas.value  = data?.nodes.map((node: any, i: number) => ({ ...node, id: i })) ?? [];
-});
-
-watch(highlightedTaxa, () => {
-    onAbundance(highlightedTaxa.value.length === 2 && abundanceView.value)
-    abundance.value = highlightedTaxa.value.length !== 2 ? 'disabled' : true;
-    filter.value = highlightedTaxa.value.length > 0 ? 'active' : true;
 });
 </script>
 

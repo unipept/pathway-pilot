@@ -32,6 +32,10 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         new Set(samples.value.map(sample => [ ...sample.ecs ]).flat())
     );
 
+    const compounds = computed(() =>
+        new Set(samples.value.map(sample => [ ...sample.compounds ]).flat())
+    );
+
     // ===============================================================
     // ========================== METHODS ============================
     // ===============================================================
@@ -101,6 +105,10 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         return samples.value.map(sample => sample.peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
     };
 
+    const compoundToPathways = (compound: string) => {
+        return new Set(samples.value.map(sample => sample.compoundToPathways(compound)).flat());
+    };
+
     return {
         name,
         samples,
@@ -108,6 +116,7 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         empty,
         pathways,
         ecs,
+        compounds,
 
         updateName,
         updateSampleName,
@@ -123,7 +132,8 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         ecToPeptides,
         pathwayToTaxa,
         pathwayToPeptideCounts,
-        peptideToCounts
+        peptideToCounts,
+        compoundToPathways
     };
 })();
 

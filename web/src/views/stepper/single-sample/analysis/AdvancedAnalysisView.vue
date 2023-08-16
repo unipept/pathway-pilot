@@ -22,7 +22,7 @@
     </p>
 
     <div class="d-flex mt-2 align-center">
-        <v-btn class="me-3" icon="mdi-filter-outline" size="small" :color="filterColor" @click="$emit('click:filter')" />
+        <v-btn class="me-3" icon="mdi-filter-outline" size="small" :color="filterColor" @click="onFilter" />
         <p>
             Apply some additional filtering based on the present organisms or groups. A <b style="color: #306ccf;">blue</b> filter icon indicates 
             that the filter is active.
@@ -30,21 +30,18 @@
     </div>
     
     <div class="d-flex mt-2 align-center">
-        <v-btn class="me-3" icon="mdi-vector-difference" size="small" @click="$emit('click:abundance')" />
+        <v-btn 
+            class="me-3" 
+            icon="mdi-vector-difference" 
+            size="small" 
+            :color="abundanceColor" 
+            :disabled="abundanceDisabled"
+            @click="onAbundance"
+        />
         <p>
             Switch between a differential abbundance vieuw and the absolute values. A <b style="color: #306ccf;">blue</b> icon indicates 
             that the differential abbundance view is active. <b>This option is only available when comparing either 2 organisms or 2 sample groups!</b>
         </p>
-    </div>
-
-    <div class="d-flex mt-2 align-center">
-        <v-btn class="me-3" icon="mdi-restore" size="small" @click="$emit('click:restore')" />
-        <p>Reset the visualisation to its original state.</p>
-    </div>
-    
-    <div class="d-flex mt-2 align-center">
-        <v-btn class="me-3" icon="mdi-download" size="small" @click="$emit('click:download')" />
-        <p>Download the current visualisation view as a .png file.</p>
     </div>
 </template>
 
@@ -59,6 +56,7 @@ import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import MatchedTaxaView from '@/views/information/MatchedTaxaView.vue';
 import CompoundInformationView from '@/views/information/CompoundInformationView.vue';
+import { ref, watch } from 'vue';
 
 export interface Props {
     area: any | undefined
@@ -67,14 +65,19 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-defineEmits(['click:filter', 'click:abundance', 'click:restore', 'click:download']);
+const emits = defineEmits(['click:filter', 'click:abundance']);
 
 const sampleStore = useSingleSampleStore('single-sample');
 const visualisationStore = useVisualisationStore();
 
+const abundance = ref<boolean>(false);
+
 const { highlightedItems: highlightedTaxa } = storeToRefs(visualisationStore);
 
 const filterColor = computed(() => highlightedTaxa.value.length > 0 ? 'primary' : '');
+
+const abundanceColor = computed(() => abundance.value ? 'primary' : '');
+const abundanceDisabled = computed(() => highlightedTaxa.value.length !== 2);
 
 const annotations = computed(() => [
     ...props.area.info.ecNumbers.map((ec: any) => ec.id),
@@ -103,4 +106,20 @@ const MatchedInputItems = computed(() => {
 const getMatchedAnnotations = (taxon: Taxon) => {
     return annotations.value.filter(a => sampleStore.taxonToEcs(taxon.id)?.includes(a))
 }
+
+const onAbundance = () => {
+    if (highlightedTaxa.value.length === 2) {
+        abundance.value = !abundance.value;
+        emits('click:abundance', abundance.value);
+    }
+}
+
+const onFilter = () => {
+    emits('click:filter');
+}
+
+watch(highlightedTaxa, () => {
+    abundance.value = false;
+    emits('click:abundance', false);
+});
 </script>

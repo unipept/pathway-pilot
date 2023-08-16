@@ -47,7 +47,7 @@
             />
 
             <v-dialog v-model="filterOpen">
-                <filter-view v-model:enzymes="pathwayFilter"/>
+                <filter-view v-model:filter="pathwayFilter" />
             </v-dialog>
         </div>
 
@@ -73,6 +73,7 @@ import BubblePlot from '@/components/visualisations/BubblePlot.vue';
 import SearchFilter from '@/components/inputs/SearchFilter.vue';
 import FilterView from './FilterView.vue';
 import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
+import { SearchFilterItem } from '@/components/inputs/SearchFilterItem';
 
 const emits = defineEmits(["filtered"]);
 
@@ -85,12 +86,15 @@ const { pathway: selectedPathway } = storeToRefs(visualisationStore);
 const { pathwayMapping } = storeToRefs(keggStore);
 
 const pathwaySearch = ref<string>("");
-const pathwayFilter = ref<string[]>([]);
+const pathwayFilter = ref<SearchFilterItem[]>([]);
 
 const filterOpen = ref<boolean>(false);
 
-const filteredPathways = computed(() => [ ...pathwayFilter.value ]
-    .map((ec: string) => [ ...mappingStore.ecToPathways(ec) ]).flat());
+const filteredPathways = computed(() => Array.from(new Set([ ...pathwayFilter.value ]
+    .map((item: SearchFilterItem) => {
+        return [ ...(item.color === 'orange' ? mappingStore.ecToPathways(item.name) : mappingStore.compoundToPathways(item.name)) ];
+    }).flat()))
+);
 
 const isFiltered = computed(() => pathwayFilter.value.length > 0);
 
@@ -116,6 +120,10 @@ watch(selectedPathway, onBubblePlotClick);
 
 watch(pathwayItems, (items: Pathway[]) => {
     emits("filtered", items);
+});
+
+watch(pathwayFilter, () => {
+    selectedPathway.value = undefined;
 });
 
 onMounted(async () => {

@@ -27,6 +27,10 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
         new Set(groups.value.map(group => [ ...group.ecs ]).flat())
     );
 
+    const compounds = computed(() =>
+        new Set(groups.value.map(group => [ ...group.compounds ]).flat())
+    );
+
     // ===============================================================
     // ========================== METHODS ============================
     // ===============================================================
@@ -85,11 +89,16 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
         return groups.value.map(group => group.pathwayToPeptideCounts(pathway)).reduce((a, b) => a + b, 0);
     };
 
+    const compoundToPathways = (compound: string) => {
+        return new Set(groups.value.map(group => [ ...group.compoundToPathways(compound) ]).flat());
+    };
+
     return {
         groups,
         initialized,
         pathways,
         ecs,
+        compounds,
 
         group,
         addGroup,
@@ -102,7 +111,8 @@ const useGroupSampleStore = defineStore('groupSampleStore', () => {
 
         taxon,
         ecToPathways,
-        pathwayToPeptideCounts
+        pathwayToPeptideCounts,
+        compoundToPathways
     };
 });
 

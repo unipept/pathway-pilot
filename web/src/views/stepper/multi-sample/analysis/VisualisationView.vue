@@ -6,16 +6,12 @@
             <image-controls
                 download
                 restore
-                :abundance="abundance"
-                :filter="filter"
                 @download="onDownload"
                 @restore="onRestore"
-                @abundance="onAbundance"
-                @filter="onFilter"
             >
                 <div ref="image">
                     <v-card style="position: relative;" max-height="700px">
-                        <taxon-legend v-if="!abundanceView" :items="legendItems" />
+                        <taxon-legend v-if="!abundance" :items="legendItems" />
 
                         <abundance-legend v-else :topItem="legendItems[0]" :bottomItem="legendItems[1]" />
 
@@ -38,15 +34,6 @@
                 </div>
             </image-controls>
         </v-card>
-
-        <v-dialog 
-            v-model="filterModalOpen"
-            @click:outside="filterModalOpen = false"
-            max-width="75%"
-            height="100%"
-        >
-            <div></div>
-        </v-dialog>
     </div>
 
     <warning-alert v-else-if="!pathway" class="mt-5">
@@ -85,6 +72,7 @@ import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 export interface Props {
     area: any
     compound: any
+    abundance: boolean
 };
 
 const props = defineProps<Props>();
@@ -109,11 +97,6 @@ const selectedCompound = ref<any | undefined>(props.compound);
 
 const filterModalOpen = ref<boolean>(false);
 
-const abundance = ref<ToggleButtonValue>(false);
-const abundanceView = ref<boolean>(false);
-
-const filter = ref<ActiveButtonValue>(true);
-
 const { pathway, highlightedItems: highlightedGroups } = storeToRefs(visualisationStore);
 
 const legendItems = computed(() => highlightedGroups.value.map(groupId => {
@@ -125,7 +108,7 @@ const legendItems = computed(() => highlightedGroups.value.map(groupId => {
 }));
 
 const coloredAreas = computed(() => {
-    if (abundanceView.value) {
+    if (props.abundance) {
         return colorDifferential(areas.value);
     }
 
@@ -214,14 +197,6 @@ const onRestore = () => {
     translate.value = { x: 0, y: 0 };
 }
 
-const onAbundance = (value: boolean) => {
-    abundanceView.value = value;
-}
-
-const onFilter = () => {
-    filterModalOpen.value = true;
-}
-
 watch(pathway, async (pathway: Pathway | undefined) => {
     pngUrl.value = undefined;
     
@@ -233,12 +208,6 @@ watch(pathway, async (pathway: Pathway | undefined) => {
         node.id = i;
         return node;
     }) ?? [];
-});
-
-watch(highlightedGroups, () => {
-    onAbundance(highlightedGroups.value.length === 2 && abundanceView.value)
-    abundance.value = highlightedGroups.value.length !== 2 ? 'disabled' : true;
-    filter.value = highlightedGroups.value.length > 0 ? 'active' : true;
 });
 </script>
 
