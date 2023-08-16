@@ -37,7 +37,7 @@ import VisualisationView from './analysis/VisualisationView.vue';
 import AdvancedAnalysisView from './analysis/AdvancedAnalysisView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import { storeToRefs } from 'pinia';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import TaxonFilterView from './analysis/TaxonFilterView.vue';
 
 export interface Props {
@@ -62,4 +62,9 @@ const onAbundance = (value: boolean) => {
 const onFilter = () => {
     filterModalOpen.value = true;
 };
+
+watch(pathway, () => {
+    selectedArea.value = undefined;
+    selectedCompound.value = undefined;
+});
 </script>

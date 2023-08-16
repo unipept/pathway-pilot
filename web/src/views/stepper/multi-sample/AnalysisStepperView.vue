@@ -27,7 +27,7 @@ import VisualisationView from './analysis/VisualisationView.vue';
 import AdvancedAnalysisView from './analysis/AdvancedAnalysisView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import { storeToRefs } from 'pinia';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 export interface Props {
     step: number;
@@ -45,4 +45,9 @@ const abundanceView = ref<boolean>(false);
 const onAbundance = (value: boolean) => {
     abundanceView.value = value;
 };
+
+watch(pathway, () => {
+    selectedArea.value = undefined;
+    selectedCompound.value = undefined;
+});
 </script>

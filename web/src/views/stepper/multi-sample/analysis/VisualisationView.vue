@@ -95,8 +95,6 @@ const translate = ref<{ x: number, y: number }>({ x: 0, y: 0 });
 const selectedArea = ref<any | undefined>(props.area);
 const selectedCompound = ref<any | undefined>(props.compound);
 
-const filterModalOpen = ref<boolean>(false);
-
 const { pathway, highlightedItems: highlightedGroups } = storeToRefs(visualisationStore);
 
 const legendItems = computed(() => highlightedGroups.value.map(groupId => {
@@ -198,6 +196,8 @@ const onRestore = () => {
 }
 
 watch(pathway, async (pathway: Pathway | undefined) => {
+    onRestore();
+    
     pngUrl.value = undefined;
     
     // Fetch data from the store when loaded
@@ -208,6 +208,14 @@ watch(pathway, async (pathway: Pathway | undefined) => {
         node.id = i;
         return node;
     }) ?? [];
+});
+
+watch(() => props.area, () => {
+    selectedArea.value = props.area;
+});
+
+watch(() => props.compound, () => {
+    selectedCompound.value = props.compound;
 });
 </script>
 

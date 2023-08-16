@@ -124,6 +124,8 @@ const onRestore = () => {
 }
 
 watch(pathway, async () => {
+    onRestore();
+    
     pngUrl.value = undefined;
     
     // Fetch data from the store when loaded
@@ -131,6 +133,14 @@ watch(pathway, async () => {
 
     pngUrl.value = data?.image;
     areas.value  = data?.nodes.map((node: any, i: number) => ({ ...node, id: i })) ?? [];
+});
+
+watch(() => props.area, () => {
+    selectedArea.value = props.area;
+});
+
+watch(() => props.compound, () => {
+    selectedCompound.value = props.compound;
 });
 </script>
 
