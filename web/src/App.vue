@@ -12,18 +12,6 @@
                         Pathway Pilot
                     </router-link>
                 </h2>
-
-                <router-link class="app-bar-item" to="/single" v-slot="{ href, navigate }">
-                    <v-btn @click="navigate" :href="href">
-                        Compare organisms
-                    </v-btn>
-                </router-link>
-
-                <router-link class="app-bar-item" to="/multi" v-slot="{ href, navigate }">
-                    <v-btn @click="navigate" :href="href">
-                        Compare samples
-                    </v-btn>
-                </router-link>
             </v-container>
         </v-app-bar>
 

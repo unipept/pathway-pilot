@@ -1,7 +1,7 @@
 <template>
     <v-timeline-item dot-color="primary">
         <template v-slot:icon>{{ step }}</template>
-        <h2>Upload your sample</h2>
+        <h2>Upload your samples</h2>
     </v-timeline-item>
 
     <v-timeline-item
