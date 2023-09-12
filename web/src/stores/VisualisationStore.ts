@@ -23,7 +23,7 @@ const useVisualisationStore = defineStore('visualisationStore', () => {
         const id = newPathway?.id;
         if (id && !pathwayData.has(id)) {
             pathwayData.set(id, fetch(
-                `http://localhost:4000/pathway/${id}`
+                `https://pathwaypilot.ugent.be/api/pathway/${id}`
             ).then(res => res.json()));
         }
     }

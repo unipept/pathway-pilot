@@ -1,6 +1,6 @@
 export default class KeggCommunicator {
     constructor(
-        private readonly baseUrl: string = "http://localhost:4000"
+        private readonly baseUrl: string = "https://pathwaypilot.ugent.be/api"
     ) {}
 
     public async fetchPathwayMapping() {
