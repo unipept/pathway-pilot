@@ -1,4 +1,4 @@
-# PathwatPilot
+# PathwayPilot
 PathwayPilot is a taxonomy assignment and pathway visualisation tool for metaproteomics data. It combines Unipept [[1]](#1) and KEGG [[2]](#2) to provide pathway visualisations showing which pathways are represented in which species. It works both with peptide and protein input. 
 
 ## Usage
