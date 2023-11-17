@@ -9,7 +9,7 @@
         </v-card-text>
 
         <v-card-text>
-            <v-row class="mt-5 input-container">
+            <v-row class="mt-1 input-container">
                 <v-col :class="{ 'loading': loading }">
                     <file-input v-model="peptideFile" @upload="onUpload" />
                 </v-col>

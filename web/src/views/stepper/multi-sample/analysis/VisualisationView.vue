@@ -152,6 +152,17 @@ const colorDifferential = (areas: any[]) => {
         const group1PeptideCount = [ ...group1Peptides ].map(peptide => group1.peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
         const group2PeptideCount = [ ...group2Peptides ].map(peptide => group2.peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
 
+        if (
+            area.info.ecNumbers.map((ec: EcNumber) => ec.id).includes("2.5.1.65") || 
+            area.info.ecNumbers.map((ec: EcNumber) => ec.id).includes("2.5.1.47") ||
+            area.info.ecNumbers.map((ec: EcNumber) => ec.id).includes("2.6.1.1") ||
+            area.info.ecNumbers.map((ec: EcNumber) => ec.id).includes("1.1.1.37")
+        ) {
+            console.log(area.info.ecNumbers.map((ec: EcNumber) => ec.id))
+            console.log(group1PeptideCount);
+            console.log(group2PeptideCount);
+        }
+
         if (group1PeptideCount > 0 || group2PeptideCount > 0) {
             const difference = group2PeptideCount - group1PeptideCount;
             range[0] = Math.min(range[0], difference);

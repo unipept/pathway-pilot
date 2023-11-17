@@ -35,9 +35,13 @@
         </v-card-text>
     </v-card>
 
-    <v-btn v-if="canAddGroup" class="me-3" variant="outlined" color="primary" @click="onAddGroup">
+    <v-btn v-if="canAddGroup" class="me-3" color="primary" @click="onAddGroup">
         <v-icon>mdi-plus</v-icon>
         <span class="ms-1">Add another group</span>
+    </v-btn>
+
+    <v-btn v-if="canAddGroup" class="me-3" variant="outlined" color="primary" @click="onLoadDemo">
+        <span class="ms-1">Load examples</span>
     </v-btn>
 </template>
 
@@ -63,7 +67,8 @@ const emits = defineEmits([
     'remove:group',
     'remove:sample',
     'update:group:name',
-    'update:sample:name'
+    'update:sample:name',
+    'load:demo'
 ]);
 
 const canAddGroup = computed(() => props.items.length < props.max);
@@ -94,5 +99,9 @@ const onUpdateGroupName = (groupIndex: number, name: string) => {
 
 const onUpdateSampleName = (groupIndex: number, sampleIndex: number, name: string) => {
     emits('update:sample:name', groupIndex, sampleIndex, name);
+}
+
+const onLoadDemo = () => {
+    emits('load:demo');
 }
 </script>

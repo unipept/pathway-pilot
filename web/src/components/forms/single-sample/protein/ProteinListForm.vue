@@ -12,13 +12,19 @@
         </template>
 
         <template #information>    
-            <p class="subtitle">
+            <p>
                 Please input a list of proteins by either pasting the <resource-link url="https://www.uniprot.org/">UniProt</resource-link> accession 
-                identifiers on the right-hand side or selecting a single <span>.txt</span> file. Each line of input will be treated as an individual 
-                UniProt accession id, and it should only contain valid accession numbers. Please refer to the example below for guidance on the expected input format.
+                identifiers on the right-hand side or selecting a single <i>.txt</i> file. Each line of input will be treated as an individual 
+                UniProt accession id, and it should only contain valid accession numbers. Please refer to the example below for guidance on the expected 
+                input format.
             </p>
 
-            <p class="subtitle mt-3">
+            <p class="mt-2">
+                <b>PathwayPilot will not apply any additional filtering during the upload.</b> Therefore, it is important that you apply any necessary filtering 
+                beforehand to ensure that the input data only contains the relevant UniProt accession ids.
+            </p>
+
+            <p class="mt-3">
                 After uploading your data, it will undergo two seperate processing steps as follows:
 
                 <ol class="ms-5">

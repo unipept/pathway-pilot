@@ -19,6 +19,7 @@
             @remove:group="onRemoveGroup"
             @update:group:name="onUpdateGroupName"
             @update:sample:name="onUpdateSampleName"
+            @load:demo="onLoadDemo"
         />
 
         <v-dialog v-model="addModalOpen" max-width="75%">
@@ -48,6 +49,7 @@ import VerifierError from '@/logic/verifiers/VerifierError';
 import ErrorModal from '@/components/modals/ErrorModal.vue';
 import { useFileReader } from '@/composables/useFileReader';
 import useVisualisationStore from '@/stores/VisualisationStore';
+import { watch } from 'vue';
 
 import PeptideListForm from '@/components/forms/multi-sample/peptide/PeptideListForm.vue';
 import PeptideShakerForm from '@/components/forms/multi-sample/peptide/PeptideShakerForm.vue';
@@ -69,7 +71,12 @@ import MaxQuantConverter from '@/logic/converters/peptide/MaxQuantConverter';
 import ProteomeDiscovererConverter from '@/logic/converters/peptide/ProteomeDiscovererConverter';
 import MetaProteomeAnalyzerConverter from '@/logic/converters/peptide/MetaProteomeAnalyzerConverter';
 import ProteinListConverter from '@/logic/converters/protein/ProteinListConverter';
-import { watch } from 'vue';
+
+import Control_HM607 from '@/assets/examples/control/HM607';
+import Control_HM625 from '@/assets/examples/control/HM625';
+import Control_HM647 from '@/assets/examples/control/HM647';
+import UC_Severe_HM580 from '@/assets/examples/uc-severe/HM580';
+import UC_Severe_HM617 from '@/assets/examples/uc-severe/HM617';
 
 export interface Props {
     fileFormat: FileFormat;
@@ -196,6 +203,29 @@ const onUpdateGroupName = (groupIndex: number, name: string) => {
 const onUpdateSampleName = (groupIndex: number, sampleIndex: number, name: string) => {
     groups.value[groupIndex].updateSampleName(sampleIndex, name);
 };
+
+const onLoadDemo = async () => {
+    sampleStore.reset();
+
+    const group1 = sampleStore.addGroup();
+    onUpdateGroupName(group1, "Control");
+
+    const group2 = sampleStore.addGroup();
+    onUpdateGroupName(group2, "UC Severe");
+
+    onAddSamples(group1, [ Control_HM607, Control_HM625, Control_HM647 ])
+        .then(() => {
+            onUpdateSampleName(group1, 0, "HM607");
+            onUpdateSampleName(group1, 1, "HM625");
+            onUpdateSampleName(group1, 2, "HM647");
+        });
+
+    onAddSamples(group2, [ UC_Severe_HM580, UC_Severe_HM617 ])
+        .then(() => {
+            onUpdateSampleName(group2, 0, "HM580");
+            onUpdateSampleName(group2, 1, "HM617");
+        });
+}
 
 watch(groups, () => {
     visualisationStore.setHighlightedItems(groups.value
