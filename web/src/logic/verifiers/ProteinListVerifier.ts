@@ -1,5 +1,5 @@
 import { defaultProgressListener, ProgressListener } from "@/logic/ProgressListener";
-import Verifier from "../Verifier";
+import Verifier from "./Verifier";
 
 export default class ProteinListVerifier implements Verifier {
     constructor(

@@ -1,5 +1,5 @@
 <template>
-    <max-quant-form
+    <protein-list-form
         :multi="true"
         @submit="onSubmit"
         @reset="onReset"
@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import MaxQuantForm from '@/components/forms/single-sample/peptide/MaxQuantForm.vue';
+import ProteinListForm from '@/components/forms/single-sample/ProteinListForm.vue';
 
 const emits = defineEmits(["submit", "reset"]);
 

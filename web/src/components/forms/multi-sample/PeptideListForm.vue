@@ -1,5 +1,5 @@
 <template>
-    <peptide-shaker-form
+    <peptide-list-form
         :multi="true"
         @submit="onSubmit"
         @reset="onReset"
@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import PeptideShakerForm from '@/components/forms/single-sample/peptide/PeptideShakerForm.vue';
+import PeptideListForm from '@/components/forms/single-sample/PeptideListForm.vue';
 
 const emits = defineEmits(["submit", "reset"]);
 

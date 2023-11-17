@@ -45,10 +45,10 @@
 </template>
 
 <script setup lang="ts">
-import UploadForm from '../UploadForm.vue';
+import UploadForm from './UploadForm.vue';
 import ResourceLink from '@/components/misc/ResourceLink.vue';
 
-import example from '../../examples/protein/ProteinListExample';
+import example from '@/assets/examples/ProteinListExample';
 
 export interface Props {
     loading?: false | number

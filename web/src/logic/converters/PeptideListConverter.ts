@@ -1,32 +1,32 @@
-import KeggCommunicator from "../../communicators/KEGGCommunicator";
-import UnipeptCommunicator from "../../communicators/UnipeptCommunicator";
+import KeggCommunicator from "../communicators/KEGGCommunicator";
+import UnipeptCommunicator from "../communicators/UnipeptCommunicator";
 import { defaultProgressListener, ProgressListener } from "@/logic/ProgressListener";
-import Converter from "../Converter";
+import Converter from "./Converter";
 
-export default class ProteinListConverter implements Converter {
+export default class PeptideListConverter implements Converter {
     private readonly unipeptCommunicator: UnipeptCommunicator;
     private readonly keggCommunicator: KeggCommunicator;
 
     constructor(
         private readonly progressListener: ProgressListener = defaultProgressListener
     ) {
-        this.unipeptCommunicator = new UnipeptCommunicator(this.progressListener);
+        this.unipeptCommunicator = new UnipeptCommunicator(progressListener);
         this.keggCommunicator = new KeggCommunicator();
     }
 
     public isPeptide() {
-        return false;
+        return true;
     }
 
-    public async convert(proteinList: string[]) {
-        const proteinInfo = await this.unipeptCommunicator.fetchProteinInfo(proteinList);
+    public async convert(peptideList: string[]) {
+        const peptideInfo = await this.unipeptCommunicator.fetchPeptideInfo(peptideList);
 
         const ecMapping = await this.keggCommunicator.fetchEcMapping();
 
-        const proteinInfoLength = proteinInfo.length;
+        const peptideInfoLength = peptideInfo.length;
 
         const resultMapping = new Map<string, any>();
-        for (const [ i, info ] of proteinInfo.entries()) {
+        for (const [ i, info ] of peptideInfo.entries()) {
             for (const ec of info.ec) {
                 const mapping: any = ecMapping.get(ec.ec_number);
 
@@ -52,18 +52,19 @@ export default class ProteinListConverter implements Converter {
                         };
                     }
 
-                    if (!entry.items.has(info.protein)) {
-                        entry.items.set(info.protein, 0);
+                    if (!entry.items.has(info.peptide)) {
+                        entry.items.set(info.peptide, 0);
                     }
-                    entry.items.set(info.protein, entry.items.get(info.protein) + 1);
+                    entry.items.set(info.peptide, entry.items.get(info.peptide) + 1);
 
                     entry.count += 1;
 
                     resultMapping.set(key, entry);
                 }
+
             }
 
-            //this.progressListener.onProgressUpdate((i + 1) / proteinInfoLength);
+            //this.progressListener.onProgressUpdate((i + 1) / peptideInfoLength);
         }
 
         return Array.from(resultMapping.values());

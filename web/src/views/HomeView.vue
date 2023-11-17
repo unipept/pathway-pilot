@@ -1,5 +1,5 @@
 <template>
-    <p class="mb-3">
+    <p class="mt-2 mb-5">
         Welcome to PathwayPilot, your go-to web tool for effortlessly exploring and visualizing metabolic pathways using KEGG database data. 
         Navigating the intricate world of living organisms' metabolic processes can be challenging, and that's where PathwayPilot shines. Whether 
         you're dealing with peptides or proteins, analyzing a single organism or comparing multiple, our user-friendly interface simplifies the 
