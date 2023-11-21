@@ -2,11 +2,6 @@
     <h2>Analyse your pathway</h2>
 
     <div v-if="pngUrl">
-        <warning-alert v-if="highlightedTaxa.length === 0" class="mt-3">
-            Based on your previous selection, no taxa were chosen. Consequently, <b>all nodes with at least one match</b> are displayed using a uniform color. 
-            It is possible to modify your selection in the preceding step to refine the visualization.
-        </warning-alert>
-
         <v-card class="mt-3" elevation="5">
             <image-controls
                 download
