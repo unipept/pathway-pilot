@@ -22,6 +22,8 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
 
     const initialized = computed(() => samples.value.some(sample => sample.initialized));
 
+    const size = computed(() => samples.value.map(sample => sample.size).reduce((a, b) => a + b, 0));
+
     const empty = computed(() => samples.value.length === 0);
 
     const pathways = computed(() =>
@@ -113,6 +115,7 @@ const useMultiSampleStore = (sampleId: string = 'multi-sample', sampleName: stri
         name,
         samples,
         initialized,
+        size,
         empty,
         pathways,
         ecs,

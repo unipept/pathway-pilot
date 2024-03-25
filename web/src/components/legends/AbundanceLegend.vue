@@ -4,7 +4,7 @@
         <div 
             class="legend my-1"
             :style="{
-                backgroundImage: `linear-gradient(${topItem.color}, ${bottomItem.color})`
+                backgroundImage: `linear-gradient(${topItem.color}, #ffffe0, ${bottomItem.color})`
             }"
         ></div>
         <span>{{ bottomItem.label }}</span>

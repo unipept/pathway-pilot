@@ -64,9 +64,9 @@ import Pathway from '@/logic/entities/Pathway';
 import ImageControls, { ActiveButtonValue, ToggleButtonValue } from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
 import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
-import { useLinearGradient } from '@/composables/useLinearGradient';
+import { useDivergingLog } from '@/composables/useDivergingLog';
 import EcNumber from '@/logic/entities/EcNumber';
-import { intersection } from 'd3';
+import { intersection, max } from 'd3';
 import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 
 export interface Props {
@@ -131,8 +131,6 @@ const colorAll = (areas: any[]) => {
 };
 
 const colorDifferential = (areas: any[]) => {
-    const { getColor } = useLinearGradient(ColorConstants.LEGEND[0], ColorConstants.LEGEND[1]);
-
     const group1 = sampleStore.group(highlightedGroups.value[0]);
     const group2 = sampleStore.group(highlightedGroups.value[1]);
 
@@ -140,6 +138,7 @@ const colorDifferential = (areas: any[]) => {
     const group2EcNumbers = group2.ecs;
 
     const range = [ 0, 0 ];
+
     const differenceAreas = areas.map(area => {
         area.colors = [];
 
@@ -149,19 +148,8 @@ const colorDifferential = (areas: any[]) => {
         const group1Peptides = new Set([ ...group1EcInArea ].map(ec => [ ...group1.ecToPeptides(ec) ]).flat());
         const group2Peptides = new Set([ ...group2EcInArea ].map(ec => [ ...group2.ecToPeptides(ec) ]).flat());
         
-        const group1PeptideCount = [ ...group1Peptides ].map(peptide => group1.peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
-        const group2PeptideCount = [ ...group2Peptides ].map(peptide => group2.peptideToCounts(peptide)).reduce((a, b) => a + b, 0);
-
-        if (
-            area.info.ecNumbers.map((ec: EcNumber) => ec.id).includes("2.5.1.65") || 
-            area.info.ecNumbers.map((ec: EcNumber) => ec.id).includes("2.5.1.47") ||
-            area.info.ecNumbers.map((ec: EcNumber) => ec.id).includes("2.6.1.1") ||
-            area.info.ecNumbers.map((ec: EcNumber) => ec.id).includes("1.1.1.37")
-        ) {
-            console.log(area.info.ecNumbers.map((ec: EcNumber) => ec.id))
-            console.log(group1PeptideCount);
-            console.log(group2PeptideCount);
-        }
+        const group1PeptideCount = [ ...group1Peptides ].map(peptide => group1.peptideToCounts(peptide)).reduce((a, b) => a + b, 0) / group1.size;
+        const group2PeptideCount = [ ...group2Peptides ].map(peptide => group2.peptideToCounts(peptide)).reduce((a, b) => a + b, 0) / group2.size;
 
         if (group1PeptideCount > 0 || group2PeptideCount > 0) {
             const difference = group2PeptideCount - group1PeptideCount;
@@ -171,26 +159,18 @@ const colorDifferential = (areas: any[]) => {
             area.colors = [ difference ];
         }
 
+        area.counts = [ group1PeptideCount, group2PeptideCount ];
+
         return area;
     });
 
-    const scale = (n: number, min: number, max: number, minR: number, maxR: number) => {
-        if (min === max) {
-            return 0.5;
-        }
-        return (maxR - minR) * (n - min) / (max - min) + minR;
-    }
-
-    let lower = 0;
-    let upper = 1;
-    if (range[0] >= 0 && range[1] >= 0) {
-        lower = 0.5;
-    } else if (range[0] <= 0 && range[1] <= 0) {
-        upper = 0.5;
-    }
+    const { getColor } = useDivergingLog(
+        [ range[0], 0, range[1] ],
+        ColorConstants.LEGEND[0], "#ffffe0", ColorConstants.LEGEND[1]
+    );
 
     return differenceAreas.map(area => {
-        area.colors = area.colors.map((n: number) => getColor(scale(n, range[0], range[1], lower, upper)));
+        area.colors = area.colors.map((n: number) => getColor(n));
         return area;
     });
 }
@@ -219,6 +199,8 @@ watch(pathway, async (pathway: Pathway | undefined) => {
         node.id = i;
         return node;
     }) ?? [];
+
+    console.log(areas.value);
 });
 
 watch(() => props.area, () => {
