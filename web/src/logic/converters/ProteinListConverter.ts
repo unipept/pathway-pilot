@@ -19,7 +19,16 @@ export default class ProteinListConverter implements Converter {
     }
 
     public async convert(proteinList: string[]) {
-        const proteinInfo = await this.unipeptCommunicator.fetchProteinInfo(proteinList);
+        // Split proteins and intensities
+        const proteins = []
+        const proteinsToIntensities = new Map<string, number>();
+        for (const protein of proteinList) {
+            const [ accession, intensity ] = protein.split("\t");
+            proteins.push(accession);
+            proteinsToIntensities.set(accession, parseFloat(intensity));
+        }
+
+        const proteinInfo = await this.unipeptCommunicator.fetchProteinInfo(proteins);
 
         const ecMapping = await this.keggCommunicator.fetchEcMapping();
 
@@ -55,7 +64,7 @@ export default class ProteinListConverter implements Converter {
                     if (!entry.items.has(info.protein)) {
                         entry.items.set(info.protein, 0);
                     }
-                    entry.items.set(info.protein, entry.items.get(info.protein) + 1);
+                    entry.items.set(info.protein, entry.items.get(info.protein) + proteinsToIntensities.get(info.protein));
 
                     entry.count += 1;
 

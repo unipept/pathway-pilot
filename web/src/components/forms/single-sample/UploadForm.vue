@@ -116,7 +116,7 @@ const onUpload = async (file: File) => {
 
 const onLoadExample = () => {
     peptideFile.value = undefined;
-    peptides.value = props.example.join("\n");
+    peptides.value = props.example.join("\r\n");
     sampleName.value = "Example sample";
 };
 </script>

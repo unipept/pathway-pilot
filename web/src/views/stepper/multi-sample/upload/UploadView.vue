@@ -60,11 +60,18 @@ import ProteinListVerifier from '@/logic/verifiers/ProteinListVerifier';
 import PeptideListConverter from '@/logic/converters/PeptideListConverter';
 import ProteinListConverter from '@/logic/converters/ProteinListConverter';
 
-import Control_HM607 from '@/assets/examples/control/HM607';
-import Control_HM625 from '@/assets/examples/control/HM625';
-import Control_HM647 from '@/assets/examples/control/HM647';
-import UC_Severe_HM580 from '@/assets/examples/uc-severe/HM580';
-import UC_Severe_HM617 from '@/assets/examples/uc-severe/HM617';
+import Control_HM607 from '@/assets/examples/peptides/control/HM607';
+import Control_HM625 from '@/assets/examples/peptides/control/HM625';
+import Control_HM647 from '@/assets/examples/peptides/control/HM647';
+import UC_Severe_HM580 from '@/assets/examples/peptides/uc-severe/HM580';
+import UC_Severe_HM617 from '@/assets/examples/peptides/uc-severe/HM617';
+
+import P02_P02_T0 from '@/assets/examples/proteins/P02/P02_T0';
+import P02_P02_T1 from '@/assets/examples/proteins/P02/P02_T1';
+import P02_P02_T2 from '@/assets/examples/proteins/P02/P02_T2';
+import P01_P01_T0 from '@/assets/examples/proteins/P01/P01_T0';
+import P01_P01_T1 from '@/assets/examples/proteins/P01/P01_T1';
+import P01_P01_T2 from '@/assets/examples/proteins/P01/P01_T2';
 
 export interface Props {
     fileFormat: FileFormat;
@@ -84,7 +91,7 @@ const tableItems = computed(() => groups.value.map(group => ({
     items: group.samples.map((sample: any) => ({
         uploadName: sample.uploadName,
         name: sample.name,
-        size: `${sample.size} peptides`,
+        size: `${sample.size} ${props.fileFormat === FileFormat.PEPTIDE_LIST ? "peptides" : "proteins"}`,
         loading: sample.processing
     }))
 })));
@@ -172,6 +179,14 @@ const onUpdateSampleName = (groupIndex: number, sampleIndex: number, name: strin
 };
 
 const onLoadDemo = async () => {
+    if (props.fileFormat === FileFormat.PEPTIDE_LIST) {
+        await loadPeptideDemo();
+    } else if (props.fileFormat === FileFormat.PROTEIN_LIST) {
+        await loadProteinDemo();
+    }
+};
+
+const loadPeptideDemo = async () => {
     sampleStore.reset();
 
     const group1 = sampleStore.addGroup();
@@ -187,10 +202,34 @@ const onLoadDemo = async () => {
             onUpdateSampleName(group1, 2, "HM647");
         });
 
-    onAddSamples(group2, [ UC_Severe_HM580, UC_Severe_HM617 ])
+    onAddSamples(group2, [ UC_Severe_HM580, UC_Severe_HM617])
         .then(() => {
             onUpdateSampleName(group2, 0, "HM580");
             onUpdateSampleName(group2, 1, "HM617");
+        });
+}
+
+const loadProteinDemo = async () => {
+    sampleStore.reset();
+
+    const group1 = sampleStore.addGroup();
+    onUpdateGroupName(group1, "P01");
+
+    const group2 = sampleStore.addGroup();
+    onUpdateGroupName(group2, "P02");
+
+    onAddSamples(group1, [ P01_P01_T0, P01_P01_T1, P01_P01_T2 ])
+        .then(() => {
+            onUpdateSampleName(group1, 0, "P02_T0");
+            onUpdateSampleName(group1, 1, "P02_T1");
+            onUpdateSampleName(group1, 2, "P02_T2");
+        });
+
+    onAddSamples(group2, [ P02_P02_T0, P02_P02_T1, P02_P02_T2 ])
+        .then(() => {
+            onUpdateSampleName(group2, 0, "P02_T0");
+            onUpdateSampleName(group2, 1, "P02_T1");
+            onUpdateSampleName(group2, 2, "P02_T2");
         });
 }
 

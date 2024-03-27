@@ -11,7 +11,7 @@ export default class PeptideListVerifier implements Verifier {
         const errors: VerifierError[] = [];
 
         for (const [ i, peptide ] of peptideList.entries()) {
-            if (!/^[ACDEFGHIKLMNPQRSTVWY]+$/.test(peptide)) {
+            if (!/^[ACDEFGHIKLMNPQRSTVWY]+$/.test(peptide.trimEnd())) {
                 errors.push(new VerifierError(i, "Peptide contains invalid characters"));
             }
 

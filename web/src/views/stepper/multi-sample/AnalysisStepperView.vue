@@ -5,6 +5,7 @@
             v-model:area="selectedArea" 
             v-model:compound="selectedCompound"
             :abundance="abundanceView"
+            :file-format="fileFormat"
         />
     </v-timeline-item>
 
@@ -28,9 +29,11 @@ import AdvancedAnalysisView from './analysis/AdvancedAnalysisView.vue';
 import useVisualisationStore from '@/stores/VisualisationStore';
 import { storeToRefs } from 'pinia';
 import { ref, watch } from 'vue';
+import FileFormat from '../FileFormat';
 
 export interface Props {
     step: number;
+    fileFormat: FileFormat;
 };
 
 defineProps<Props>();

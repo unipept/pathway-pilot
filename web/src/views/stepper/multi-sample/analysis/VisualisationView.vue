@@ -68,11 +68,13 @@ import { useDivergingLog } from '@/composables/useDivergingLog';
 import EcNumber from '@/logic/entities/EcNumber';
 import { intersection, max } from 'd3';
 import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
+import FileFormat from '../../FileFormat';
 
 export interface Props {
     area: any
     compound: any
     abundance: boolean
+    fileFormat: FileFormat
 };
 
 const props = defineProps<Props>();
@@ -139,6 +141,8 @@ const colorDifferential = (areas: any[]) => {
 
     const range = [ 0, 0 ];
 
+    const proteins = true;
+
     const differenceAreas = areas.map(area => {
         area.colors = [];
 
@@ -147,6 +151,24 @@ const colorDifferential = (areas: any[]) => {
 
         const group1Peptides = new Set([ ...group1EcInArea ].map(ec => [ ...group1.ecToPeptides(ec) ]).flat());
         const group2Peptides = new Set([ ...group2EcInArea ].map(ec => [ ...group2.ecToPeptides(ec) ]).flat());
+
+        if (props.fileFormat === FileFormat.PROTEIN_LIST) {
+            const group1PeptideCount = [ ...group1Peptides ].map(peptide => group1.peptideToCounts(peptide)).reduce((a, b) => a + b, 1);
+            const group2PeptideCount = [ ...group2Peptides ].map(peptide => group2.peptideToCounts(peptide)).reduce((a, b) => a + b, 1);
+
+            if (group1PeptideCount > 0 || group2PeptideCount > 0) {
+                const log2FoldChange = Math.log2(group2PeptideCount) - Math.log2(group1PeptideCount);
+
+                range[0] = Math.min(range[0], log2FoldChange);
+                range[1] = Math.max(range[1], log2FoldChange);
+
+                area.colors = [ log2FoldChange ];
+            }
+
+            area.counts = [ Math.log2(group1PeptideCount), Math.log2(group2PeptideCount) ];
+
+            return area;
+        }
         
         const group1PeptideCount = [ ...group1Peptides ].map(peptide => group1.peptideToCounts(peptide)).reduce((a, b) => a + b, 0) / group1.size;
         const group2PeptideCount = [ ...group2Peptides ].map(peptide => group2.peptideToCounts(peptide)).reduce((a, b) => a + b, 0) / group2.size;
