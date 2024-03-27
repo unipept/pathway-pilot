@@ -60,11 +60,24 @@ import ProteinListVerifier from '@/logic/verifiers/ProteinListVerifier';
 import PeptideListConverter from '@/logic/converters/PeptideListConverter';
 import ProteinListConverter from '@/logic/converters/ProteinListConverter';
 
-import Control_HM607 from '@/assets/examples/peptides/control/HM607';
-import Control_HM625 from '@/assets/examples/peptides/control/HM625';
-import Control_HM647 from '@/assets/examples/peptides/control/HM647';
-import UC_Severe_HM580 from '@/assets/examples/peptides/uc-severe/HM580';
-import UC_Severe_HM617 from '@/assets/examples/peptides/uc-severe/HM617';
+import AL_3W_1 from '@/assets/examples/peptides/al/AL_3W_1';
+import AL_3W_2 from '@/assets/examples/peptides/al/AL_3W_2';
+import AL_3W_3 from '@/assets/examples/peptides/al/AL_3W_3';
+// import AL_5W_1 from '@/assets/examples/peptides/al/AL_5W_1';
+// import AL_5W_2 from '@/assets/examples/peptides/al/AL_5W_2';
+// import AL_5W_3 from '@/assets/examples/peptides/al/AL_5W_3';
+// import AL_8W_1 from '@/assets/examples/peptides/al/AL_8W_1';
+// import AL_8W_2 from '@/assets/examples/peptides/al/AL_8W_2';
+// import AL_8W_3 from '@/assets/examples/peptides/al/AL_8W_3';
+import CR_3W_1 from '@/assets/examples/peptides/cr/CR_3W_1';
+import CR_3W_2 from '@/assets/examples/peptides/cr/CR_3W_2';
+import CR_3W_3 from '@/assets/examples/peptides/cr/CR_3W_3';
+// import CR_5W_1 from '@/assets/examples/peptides/cr/CR_5W_1';
+// import CR_5W_2 from '@/assets/examples/peptides/cr/CR_5W_2';
+// import CR_5W_3 from '@/assets/examples/peptides/cr/CR_5W_3';
+// import CR_8W_1 from '@/assets/examples/peptides/cr/CR_8W_1';
+// import CR_8W_2 from '@/assets/examples/peptides/cr/CR_8W_2';
+// import CR_8W_3 from '@/assets/examples/peptides/cr/CR_8W_3';
 
 import P02_P02_T0 from '@/assets/examples/proteins/P02/P02_T0';
 import P02_P02_T1 from '@/assets/examples/proteins/P02/P02_T1';
@@ -190,22 +203,35 @@ const loadPeptideDemo = async () => {
     sampleStore.reset();
 
     const group1 = sampleStore.addGroup();
-    onUpdateGroupName(group1, "Control");
+    onUpdateGroupName(group1, "Ad Libitum");
 
     const group2 = sampleStore.addGroup();
-    onUpdateGroupName(group2, "UC Severe");
+    onUpdateGroupName(group2, "Caloric Restriction");
 
-    onAddSamples(group1, [ Control_HM607, Control_HM625, Control_HM647 ])
+    onAddSamples(group1, [ AL_3W_1, AL_3W_2, AL_3W_3/*, AL_5W_1, AL_5W_2, AL_5W_3, AL_8W_1, AL_8W_2, AL_8W_3*/ ])
         .then(() => {
-            onUpdateSampleName(group1, 0, "HM607");
-            onUpdateSampleName(group1, 1, "HM625");
-            onUpdateSampleName(group1, 2, "HM647");
+            onUpdateSampleName(group1, 0, "AL_3W_1");
+            onUpdateSampleName(group1, 1, "AL_3W_2");
+            onUpdateSampleName(group1, 2, "AL_3W_3");
+            // onUpdateSampleName(group1, 3, "AL_5W_1");
+            // onUpdateSampleName(group1, 4, "AL_5W_2");
+            // onUpdateSampleName(group1, 5, "AL_5W_3");
+            // onUpdateSampleName(group1, 6, "AL_8W_1");
+            // onUpdateSampleName(group1, 7, "AL_8W_2");
+            // onUpdateSampleName(group1, 8, "AL_8W_3");
         });
 
-    onAddSamples(group2, [ UC_Severe_HM580, UC_Severe_HM617])
+    onAddSamples(group2, [ CR_3W_1, CR_3W_2, CR_3W_3/*, CR_5W_1, CR_5W_2, CR_5W_3, CR_8W_1, CR_8W_2, CR_8W_3*/ ])
         .then(() => {
-            onUpdateSampleName(group2, 0, "HM580");
-            onUpdateSampleName(group2, 1, "HM617");
+            onUpdateSampleName(group2, 0, "CR_3W_1");
+            onUpdateSampleName(group2, 1, "CR_3W_2");
+            onUpdateSampleName(group2, 2, "CR_3W_3");
+            // onUpdateSampleName(group2, 3, "CR_5W_1");
+            // onUpdateSampleName(group2, 4, "CR_5W_2");
+            // onUpdateSampleName(group2, 5, "CR_5W_3");
+            // onUpdateSampleName(group2, 6, "CR_8W_1");
+            // onUpdateSampleName(group2, 7, "CR_8W_2");
+            // onUpdateSampleName(group2, 8, "CR_8W_3");
         });
 }
 
