@@ -224,6 +224,8 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
 
     const compoundToPathways = (compound: string) => [ ..._compoundToPathways.get(compound) ?? [] ];
     
+    const getSize = () => size.value;
+
     return {
         uploadName,
         name,
@@ -252,7 +254,8 @@ const useSingleSampleStore = (sampleId: string = 'single-sample', sampleName: st
         pathwayToPeptideCounts,
         ecToPathways,
         ecToPeptides,
-        compoundToPathways
+        compoundToPathways,
+        getSize
     };
 })();
 

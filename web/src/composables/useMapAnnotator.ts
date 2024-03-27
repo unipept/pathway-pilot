@@ -1,10 +1,12 @@
 import ColorConstants from "@/logic/constants/ColorConstants";
 import EcNumber from "@/logic/entities/EcNumber";
-import { useLinearGradient } from "./useLinearGradient";
 import { intersection } from "@/logic/util/SetUtil";
+import FileFormat from "@/views/stepper/FileFormat";
+import { useDivergingLog } from "./useDivergingLog";
 
 export function useMapAnnotator(
     ecNumbers: Set<string>,
+    getSize: () => number,
     ecToPeptides: (ec: string) => string[], 
     groupToEcs: (group: number) => string[],
     peptideToCount: (peptide: string) => number, 
@@ -61,8 +63,8 @@ export function useMapAnnotator(
         });
     };
 
-    const colorDifferential = (areas: any[], group1: number, group2: number) => {
-        const { getColor } = useLinearGradient(ColorConstants.LEGEND[0], ColorConstants.LEGEND[1]);
+    const colorDifferential = (fileFormat: FileFormat, areas: any[], group1: number, group2: number) => {
+        console.log(fileFormat)
 
         const group1EcNumbers = groupToEcNumbers(group1);
         const group2EcNumbers = groupToEcNumbers(group2);
@@ -77,44 +79,60 @@ export function useMapAnnotator(
             const group1Peptides = new Set([ ...group1EcInArea ].map(ec => ecToPeptides(ec)).flat());
             const group2Peptides = new Set([ ...group2EcInArea ].map(ec => ecToPeptides(ec)).flat());
             
-            const group1PeptideCount = [ ...group1Peptides ].map(peptide => peptideToCount(peptide)).reduce((a, b) => a + b, 0);
-            const group2PeptideCount = [ ...group2Peptides ].map(peptide => peptideToCount(peptide)).reduce((a, b) => a + b, 0);
+            if (fileFormat === FileFormat.PEPTIDE_LIST) {
+                const group1PeptideCount = [ ...group1Peptides ].map(peptide => peptideToCount(peptide)).reduce((a, b) => a + b, 0) / getSize();
+                const group2PeptideCount = [ ...group2Peptides ].map(peptide => peptideToCount(peptide)).reduce((a, b) => a + b, 0) / getSize();
 
-            if (group1PeptideCount > 0 || group2PeptideCount > 0) {
-                const difference = group2PeptideCount - group1PeptideCount;
-                range[0] = Math.min(range[0], difference);
-                range[1] = Math.max(range[1], difference);
+                if (group1PeptideCount > 0 || group2PeptideCount > 0) {
+                    const difference = group2PeptideCount - group1PeptideCount;
+                    range[0] = Math.min(range[0], difference);
+                    range[1] = Math.max(range[1], difference);
 
-                area.colors = [ difference ];
+                    area.colors = [ difference ];
+                }
+
+                area.info.counts = [ 
+                    "Relative amount of matches group 1: " + group1PeptideCount.toPrecision(5),
+                    "Relative amount of matches group 2: " + group2PeptideCount.toPrecision(5)
+                ];
+
+                return area;
             }
+
+            const group1PeptideCount = [ ...group1Peptides ].map(peptide => peptideToCount(peptide)).reduce((a, b) => a + b, 1);
+            const group2PeptideCount = [ ...group2Peptides ].map(peptide => peptideToCount(peptide)).reduce((a, b) => a + b, 1);
+
+            if (group1PeptideCount > 1 || group2PeptideCount > 1) {
+                const log2FoldChange = Math.log2(group2PeptideCount) - Math.log2(group1PeptideCount);
+
+                range[0] = Math.min(range[0], log2FoldChange);
+                range[1] = Math.max(range[1], log2FoldChange);
+
+                area.colors = [ log2FoldChange ];
+            }
+
+            area.info.counts = [ 
+                "Log2 intensity group 1: " + Math.log2(group1PeptideCount).toPrecision(7),
+                "Log2 intensity group 2: " + Math.log2(group2PeptideCount).toPrecision(7)
+            ];
 
             return area;
         });
 
-        const scale = (n: number, min: number, max: number, minR: number, maxR: number) => {
-            if (min === max) {
-                return 0.5;
-            }
-            return (maxR - minR) * (n - min) / (max - min) + minR;
-        }
-
-        let lower = 0;
-        let upper = 1;
-        if (range[0] >= 0 && range[1] >= 0) {
-            lower = 0.5;
-        } else if (range[0] <= 0 && range[1] <= 0) {
-            upper = 0.5;
-        }
-
+        const { getColor } = useDivergingLog(
+            [ range[0], 0, range[1] ],
+            ColorConstants.LEGEND[0], "#ffffe0", ColorConstants.LEGEND[1]
+        );
+    
         return differenceAreas.map(area => {
-            area.colors = area.colors.map((n: number) => getColor(scale(n, range[0], range[1], lower, upper)));
+            area.colors = area.colors.map((n: number) => getColor(n));
             return area;
         });
     };
 
-    const color = (areas: any[], highlightedGroups: number[], abundance: boolean = false) => {
+    const color = (fileFormat: FileFormat, areas: any[], highlightedGroups: number[], abundance: boolean = false) => {
         if (abundance) {
-            return colorDifferential(areas, highlightedGroups[0], highlightedGroups[1]);
+            return colorDifferential(fileFormat, areas, highlightedGroups[0], highlightedGroups[1]);
         }
     
         if (highlightedGroups.length > 0) {

@@ -61,11 +61,13 @@ import Taxon from '@/logic/entities/Taxon';
 import ImageControls from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
 import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
+import FileFormat from '../../FileFormat';
 
 export interface Props {
     area: any
     compound: any
     abundance: boolean
+    fileFormat: FileFormat
 };
 
 const props = defineProps<Props>();
@@ -77,6 +79,7 @@ const visualisationStore = useVisualisationStore();
 
 const { color } = useMapAnnotator(
     mappingStore.ecs,
+    mappingStore.getSize,
     mappingStore.ecToPeptides,
     mappingStore.taxonToEcs,
     mappingStore.peptideToCounts,
@@ -105,7 +108,7 @@ const legendItems = computed(() => highlightedTaxa.value.map(taxonId => {
     }
 }));
 
-const coloredAreas = computed(() => color(areas.value, highlightedTaxa.value, props.abundance));
+const coloredAreas = computed(() => color(props.fileFormat, areas.value, highlightedTaxa.value, props.abundance));
 
 const onDownload = () => {
     if (image.value) {

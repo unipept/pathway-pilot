@@ -141,8 +141,6 @@ const colorDifferential = (areas: any[]) => {
 
     const range = [ 0, 0 ];
 
-    const proteins = true;
-
     const differenceAreas = areas.map(area => {
         area.colors = [];
 
@@ -156,7 +154,7 @@ const colorDifferential = (areas: any[]) => {
             const group1PeptideCount = [ ...group1Peptides ].map(peptide => group1.peptideToCounts(peptide)).reduce((a, b) => a + b, 1);
             const group2PeptideCount = [ ...group2Peptides ].map(peptide => group2.peptideToCounts(peptide)).reduce((a, b) => a + b, 1);
 
-            if (group1PeptideCount > 0 || group2PeptideCount > 0) {
+            if (group1PeptideCount > 1 || group2PeptideCount > 1) {
                 const log2FoldChange = Math.log2(group2PeptideCount) - Math.log2(group1PeptideCount);
 
                 range[0] = Math.min(range[0], log2FoldChange);
@@ -165,7 +163,10 @@ const colorDifferential = (areas: any[]) => {
                 area.colors = [ log2FoldChange ];
             }
 
-            area.counts = [ Math.log2(group1PeptideCount), Math.log2(group2PeptideCount) ];
+            area.info.counts = [ 
+                "Log2 intensity group 1: " + Math.log2(group1PeptideCount).toPrecision(7),
+                "Log2 intensity group 2: " + Math.log2(group2PeptideCount).toPrecision(7)
+            ];
 
             return area;
         }
@@ -181,7 +182,10 @@ const colorDifferential = (areas: any[]) => {
             area.colors = [ difference ];
         }
 
-        area.counts = [ group1PeptideCount, group2PeptideCount ];
+        area.info.counts = [ 
+            "Relative amount of matches group 1: " + group1PeptideCount.toPrecision(5),
+            "Relative amount of matches group 2: " + group2PeptideCount.toPrecision(5)
+        ];
 
         return area;
     });
@@ -221,8 +225,6 @@ watch(pathway, async (pathway: Pathway | undefined) => {
         node.id = i;
         return node;
     }) ?? [];
-
-    console.log(areas.value);
 });
 
 watch(() => props.area, () => {

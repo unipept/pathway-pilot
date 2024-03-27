@@ -157,9 +157,19 @@ const tooltip = (area: any): any => {
     const characterWidth = 15.8;
     const tooltipOffset = 25;
 
-    const text = area.info.ecNumbers.map((ec: any) => `${ec.id}: ${keggStore.ecMapping?.get(ec.id)?.names[0] ?? "Unknown"}`);
+    const areaCounts = area.info.counts ?? [];
 
-    const amountOfLines = area.info.ecNumbers.length + 3;
+    const text = area.info.ecNumbers.map((ec: any) => `${ec.id}: ${keggStore.ecMapping?.get(ec.id)?.names[0] ?? "Unknown"}`);
+    
+    let amountOfLines = area.info.ecNumbers.length;
+
+    if (areaCounts.length > 0) {
+        amountOfLines += areaCounts.length + 1;
+        text.push("\r\n");
+        text.push(area.info.counts[0])
+        text.push(area.info.counts[1])
+    }
+
     const amountOfCharacters = text.reduce((a: number, b: string) => Math.max(a, b.length), 0);
 
     // Caclulate the width an height of the bounding box

@@ -1,7 +1,7 @@
 <template>
     <v-timeline density="compact" side="end" align="start">
-        <upload-stepper-view    :step=1 @update:file-format="" />
-        <selection-stepper-view :step=2 @filtered="onFileFormatChanged" />
+        <upload-stepper-view    :step=1 @update:file-format="onFileFormatChanged" />
+        <selection-stepper-view :step=2 @filtered="onPathwaysFiltered" />
         <analysis-stepper-view  :step=3 :file-format="fileFormat" />
         <export-stepper-view    :step=4 :filtered-pathways="filteredPathways" />
     </v-timeline>

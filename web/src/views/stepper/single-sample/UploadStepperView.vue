@@ -37,6 +37,8 @@ export interface Props {
 
 defineProps<Props>();
 
+const emits = defineEmits(['update:file-format']);
+
 const { reset: resetSingleSampleStore } = useSingleSampleStore();
 const { reset: resetVisualisationStore } = useVisualisationStore();
 
@@ -45,5 +47,6 @@ const fileFormat = ref<FileFormat>(FileFormat.PEPTIDE_LIST);
 watch(() => fileFormat.value, () => {
     resetSingleSampleStore();
     resetVisualisationStore();
+    emits('update:file-format', fileFormat.value);
 });
 </script>
