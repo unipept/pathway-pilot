@@ -90,7 +90,7 @@ const peptideFile = ref<File | undefined>(undefined);
 const sampleName = ref<string>("");
 
 const peptidesList = computed(() => {
-    return peptides.value.split("\n").filter((peptide) => peptide.length > 0);
+    return peptides.value.split(new RegExp("\r?\n")).filter((peptide) => peptide.length > 0);
 });
 
 const isLoading = computed(() => !!props.loading);

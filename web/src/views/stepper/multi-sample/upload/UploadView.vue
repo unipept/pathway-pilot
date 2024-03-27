@@ -151,7 +151,7 @@ const onAddSample = (groupIndex: number) => {
 const onAddSamples = async (groupIndex: number, files: File[]) => {
     const samples = await Promise.all(files.map(async (file) => ({
         name: file.name,
-        content: (await readTextFile(file)).split("\n").filter((peptide) => peptide.length > 0)
+        content: (await readTextFile(file)).split("\r\n").filter((peptide) => peptide.length > 0)
     })));
 
     errors.value = samples.map(s => formatMap.get(props.fileFormat)?.verifier.verify(s.content)).flat();

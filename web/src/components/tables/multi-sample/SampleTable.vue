@@ -98,7 +98,7 @@ const headers = [
         key: "upload_name",
     },
     {
-        title: "peptide count",
+        title: "count",
         align: "start",
         key: "count"
     },
