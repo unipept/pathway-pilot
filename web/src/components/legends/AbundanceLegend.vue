@@ -4,7 +4,7 @@
         <div 
             class="legend my-1"
             :style="{
-                backgroundImage: `linear-gradient(${topItem.color}, ${bottomItem.color})`
+                backgroundImage: `linear-gradient(${topItem.color}, #ffffe0, ${bottomItem.color})`
             }"
         ></div>
         <span>{{ bottomItem.label }}</span>
@@ -29,6 +29,12 @@ defineProps<Props>();
     align-items: center;
     width: fit-content;
     padding: 8px;
+    position: absolute;
+    right: 0;
+    margin: 12px;
+    font-size: 90%;
+    background-color: white;
+    z-index: 1;
 }
 
 .legend {

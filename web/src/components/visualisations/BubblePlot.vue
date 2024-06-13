@@ -7,10 +7,10 @@ import Pathway from "@/logic/entities/Pathway";
 import * as d3 from "d3";
 import { onMounted, ref, watch } from 'vue';
 
-import { DataItem } from "./BubblePlotInfo";
 import { groupColors, pathwayGroups } from "@/types/PathwayGroup";
 import { PathwayTableItem } from "../tables/selection/PathwayTableItem";
 import { computed } from "vue";
+import { onUnmounted } from "vue";
 
 export interface Props {
     modelValue: Pathway | undefined
@@ -221,6 +221,8 @@ const draw = () => {
         .nodes(nodes);
 }
 
+const onResize = () => setTimeout(draw, 100);
+
 watch(() => props.modelValue, (newVal) => {
     removeHighlight();
     addHighlight(newVal?.id);
@@ -232,5 +234,10 @@ watch(() => props.items, () => {
 
 onMounted(() => {
     draw();
+    addEventListener('resize', onResize);
+});
+
+onUnmounted(() => {
+    removeEventListener('resize', onResize);
 });
 </script>

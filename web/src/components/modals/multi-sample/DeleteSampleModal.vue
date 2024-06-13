@@ -15,7 +15,7 @@
                     Cancel
                 </v-btn>
 
-                <v-btn class="ms-3" color="error" @click="onRemove">
+                <v-btn class="ms-3" color="error" @click="onConfirm">
                     Delete sample
                 </v-btn>
             </div>
@@ -36,7 +36,7 @@ export interface Props {
 
 const props = defineProps<Props>();
 
-const emits = defineEmits(['update:model-value', 'remove']);
+const emits = defineEmits(['update:model-value', 'confirm']);
 
 const dialogOpen = ref<boolean>(props.modelValue);
 
@@ -44,8 +44,8 @@ const onClickOutside = () => {
     emits('update:model-value', false);
 };
 
-const onRemove = () => {
-    emits('remove', props.index);
+const onConfirm = () => {
+    emits('confirm', props.index);
     emits('update:model-value', false);
 };
 

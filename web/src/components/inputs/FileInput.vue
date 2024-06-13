@@ -47,12 +47,8 @@ const dragover = ref<boolean>(false);
 const onDrop = (event: any) => {
     dragover.value = false;
 
-    if (event.dataTransfer.files.length > 1) {
-        console.log("TODO: error message");
-    } else {
-        file.value = event.dataTransfer.files[0];
-        emits("upload", file.value);
-    }
+    file.value = event.dataTransfer.files[0];
+    emits("upload", file.value);
 }
 
 const openFilePicker = () => {

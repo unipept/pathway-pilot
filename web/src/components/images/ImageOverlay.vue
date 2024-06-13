@@ -1,17 +1,15 @@
 <template>
-    <svg width="100%" height="100%" version="1.1">
+    <svg width="100%" height="100%" version="1.1" overflow="visible">
         <rect class="border" width="100%" height="100%" fill="none" />
 
         <g v-for="area, i in rectangles.filter(a => isSelectable(a))"
-            class="group"
             :transform="`scale(${scale})`"
-            :onclick="() => onClick(area)"
+            :onclick="() => onClickArea(area)"
             :onmouseenter="() => onMouseEnter(i)"
             :onmouseleave="onMouseLeave"
+            cursor="pointer"
         >
             <rect v-for="rect in splitRectangle(area, area.colors.length)"
-                class="group-item"
-                :class="{ 'group-item-trans': rect.color === 'transparent' }"
                 :x="rect.x1"
                 :y="rect.y1"
                 :width="(rect.x2 - rect.x1)"
@@ -19,18 +17,30 @@
                 :fill="rect.color"
                 :fill-opacity="0.5"
             />
+
+            <rect
+                :x="area.x1"
+                :y="area.y1"
+                :width="(area.x2 - area.x1)"
+                :height="(area.y2 - area.y1)"
+                fill="transparent"
+                :filter="area.id === selectedArea?.id ? 'drop-shadow(0 0 10px rgba(48, 108, 207, 1))' : ''"
+                :stroke="area.id === selectedArea?.id ? '#306ccf' : ''"
+                :stroke-opacity="area.id === selectedArea?.id ? 0.8 : 0"
+                :stroke-width="area.id === selectedArea?.id ? 3 : 0"
+            />
         </g>
 
         <g v-for="area in emptyPolygons"
             :transform="`scale(${scale})`"
-            :onclick="() => onClick(area)"
+            :onclick="() => onClickArea(area)"
         >
             <polygon :points="area.points" :fill="polygons.length > 20 ? '#e3e3e3' : 'transparent'" />
         </g>
 
         <g v-for="area in coloredPolygons"
             :transform="`scale(${scale})`"
-            :onclick="() => onClick(area)"
+            :onclick="() => onClickArea(area)"
         >
             <defs>
                 <linearGradient v-if="area.colors.length > 1" 
@@ -63,6 +73,7 @@
             :onclick="() => onClickCompound(area)"
             :onmouseenter="() => onMouseEnter(i + 123456)"
             :onmouseleave="onMouseLeave"
+            cursor="pointer"
         >
             <circle
                 class="group-item group-item-trans"
@@ -70,8 +81,10 @@
                 :cy="area.y + 1"
                 :r="area.r"
                 fill="white"
-                :stroke="polygons.length > 20 ? '#e3e3e3' : 'black'"
-                :stroke-width="polygons.length > 20 ? 5 : 2"
+                :filter="area.id === selectedCompound?.id ? 'drop-shadow(0 0 10px rgba(48, 108, 207, 1))' : ''"
+                :stroke="area.id === selectedCompound?.id ? '#306ccf' : (polygons.length > 20 ? '#e3e3e3' : 'black')"
+                :stroke-opacity="area.id === selectedCompound?.id ? 0.8 : 0"
+                :stroke-width="area.id === selectedCompound?.id ? 3 : (polygons.length > 20 ? 5 : 2)"
             />
         </g>
 
@@ -83,8 +96,10 @@
                 :y="tt.boundingY"
                 :width="tt.boundingWidth"
                 :height="tt.boundingHeight"
-                fill="white"
+                fill="black"
                 stroke="black"
+                opacity="0.7"
+                rx="15"
             />
 
             <text v-if="areaHover === i"
@@ -93,6 +108,7 @@
                 font-size="26"
                 font-family="monospace"
                 dominant-baseline="hanging"
+                fill="white"
             >
                 <tspan v-for="t, j in tt.text"
                     :x="tt.textX"
@@ -105,20 +121,27 @@
 
 <script setup lang="ts">
 import useKeggStore from '@/stores/KeggStore';
-import { computed, onBeforeMount, ref } from 'vue';
-import Tooltip from '../misc/Tooltip.vue';
+import { on } from 'events';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 
 export interface Props {
-    areas: any[];
-    scale: number;
+    area: any
+    compound: any
 
-    onClick: (area: any) => void;
-    onClickCompound: (compound: any) => void;
+    areas: any[]
+    scale: number
 };
 
 const props = defineProps<Props>();
 
+const emits = defineEmits(['update:area', 'update:compound']);
+
 const keggStore = useKeggStore();
+
+const selectedArea = ref<any>(props.area);
+const selectedCompound = ref<any>(props.compound);
+
+const areaHover = ref<number | undefined>(undefined);
 
 const rectangles = computed(() => props.areas.filter(a => a.shape === 'rect'));
 const circles = computed(() => props.areas.filter(a => a.shape === 'circle'));
@@ -128,23 +151,39 @@ const coloredPolygons = computed(() => polygons.value.filter(a => a.colors.lengt
 const emptyPolygons = computed(() => polygons.value.filter(a => a.colors.length <= 0));
 
 const tooltip = (area: any): any => {
-    // In order to show the tooltip, we need to have the EC mapping
-    if (!keggStore.ecMapping) {
-        return {};
-    }
+    const [ px, py ] = [ 30, 20 ];
+    const lineHeight = 22;
+    const lineDistance = 10;
+    const characterWidth = 15.8;
+    const tooltipOffset = 25;
 
-    const textOffset = 40;
+    const areaCounts = area.info.counts ?? [];
 
     const text = area.info.ecNumbers.map((ec: any) => `${ec.id}: ${keggStore.ecMapping?.get(ec.id)?.names[0] ?? "Unknown"}`);
+    
+    let amountOfLines = area.info.ecNumbers.length;
 
-    const boundingWidth = text.reduce((a: number, b: string) => Math.max(a, b.length), 0) * 16.5;
-    const boundingHeight = area.info.ecNumbers.length * 40;
+    if (areaCounts.length > 0) {
+        amountOfLines += areaCounts.length + 1;
+        text.push("\r\n");
+        text.push(area.info.counts[0])
+        text.push(area.info.counts[1])
+    }
 
-    const boundingX = area.x1 - boundingWidth / 2 + (area.x2 - area.x1) / 2;
-    const boundingY = area.y1 - boundingHeight - 25;
+    const amountOfCharacters = text.reduce((a: number, b: string) => Math.max(a, b.length), 0);
 
-    const textX = boundingX + 10;
-    const textY = boundingY + 10;
+    // Caclulate the width an height of the bounding box
+    const boundingWidth  = 2 * px + characterWidth * amountOfCharacters;
+    const boundingHeight = 2 * py + lineHeight * amountOfLines + lineDistance * (amountOfLines - 1);
+
+    // Calculate the position of the bounding box
+    const boundingX = area.x1 + (area.x2 - area.x1) / 2 - boundingWidth / 2;
+    const boundingY = area.y1 - boundingHeight - tooltipOffset;
+
+    // Calculate the position of the text
+    const textX = boundingX + px;
+    const textY = boundingY + py;
+    const textOffset = lineHeight + lineDistance;
 
     return {
         boundingX: boundingX,
@@ -157,8 +196,6 @@ const tooltip = (area: any): any => {
         text: text,
     }
 }
-
-const areaHover = ref<number | undefined>(undefined);
 
 const isSelectable = (area: any) => {
     return area.info.ecNumbers.length 
@@ -193,6 +230,17 @@ const splitRectangle = (rectangle: any, parts: number) => {
     return rectangles;
 }
 
+const onClick = (area: any, compound: any) => {
+    selectedCompound.value = selectedCompound.value?.id === compound?.id ? undefined : compound;
+    selectedArea.value = selectedArea.value?.id === area?.id ? undefined : area;
+    emits('update:compound', selectedCompound.value);
+    emits('update:area', selectedArea.value);
+}
+
+const onClickArea = (area: any) => onClick(area, undefined);
+
+const onClickCompound = (compound: any) => onClick(undefined, compound);
+
 const onMouseEnter = (areaId: number) => {
     areaHover.value = areaId;
 }
@@ -212,14 +260,5 @@ onBeforeMount(async () => {
     outline-style: solid;
     outline-width: 6px;
     outline-offset: -3px;
-}
-
-.group:hover .group-item {
-    filter: brightness(0.9);
-    cursor: pointer;
-}
-
-.group:hover .group-item-trans {
-    fill: rgb(226, 226, 226);
 }
 </style>

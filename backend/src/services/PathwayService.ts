@@ -45,28 +45,36 @@ export const findPathway = async (pathwayId: string): Promise<Pathway> => {
  */
 const areaToNode = (area: HTMLElement, scale: number = 2): PathwayNode => {
     const attributes = area.attributes;
-    const coords = attributes['data-coords'].split(',');
 
     switch (attributes.shape) {
-        case 'rect': return new RectanglePathwayNode(
-            parseInt(coords[0], 10) * scale,
-            parseInt(coords[1], 10) * scale,
-            parseInt(coords[2], 10) * scale,
-            parseInt(coords[3], 10) * scale,
-            attributes.title
-        );
+        case 'rect': {
+            const coords = attributes['coords'].split(',');
+            return new RectanglePathwayNode(
+                parseInt(coords[0], 10) * scale,
+                parseInt(coords[1], 10) * scale,
+                parseInt(coords[2], 10) * scale,
+                parseInt(coords[3], 10) * scale,
+                attributes.title
+            );
+        }
 
-        case 'circle': return new CirclePathwayNode(
-            parseInt(coords[0], 10) * scale,
-            parseInt(coords[1], 10) * scale,
-            parseInt(coords[2], 10) * scale,
-            attributes.title
-        );
+        case 'circle': {
+            const coords = attributes['coords'].split(',');
+            return new CirclePathwayNode(
+                parseInt(coords[0], 10) * scale,
+                parseInt(coords[1], 10) * scale,
+                parseInt(coords[2], 10) * scale,
+                attributes.title
+            );
+        }
 
-        case 'poly': return new PolygonPathwayNode(
-            coords.map(c => parseInt(c, 10) * scale).join(','),
-            attributes.title
-        );
+        case 'poly': {
+            const coords = attributes['coords'].split(',');
+                return new PolygonPathwayNode(
+                coords.map(c => parseInt(c, 10) * scale).join(','),
+                attributes.title
+            );
+        }
 
         default: throw new Error(`Unknown shape: ${attributes.shape}`);
     }

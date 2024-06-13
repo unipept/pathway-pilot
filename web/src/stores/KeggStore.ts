@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import KeggCommunicator from "@/logic/communicators/KeggCommunicator";
+import KeggCommunicator from "@/logic/communicators/KEGGCommunicator";
 import { ref } from "vue";
 
 const useKeggStore = defineStore('keggStore', () => {
