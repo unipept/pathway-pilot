@@ -98,7 +98,7 @@ const compoundSearch = ref<string>("");
 const enzymeItems = computed(() => [ ...ecs.value ]
     .map((ec: string) => ({
         name: ec,
-        description: keggStore.ecMapping?.get(ec)?.names[0] ?? ""
+        description: keggStore.ecMapping?.get(ec)?.names ?? ""
     }))
 );
 
