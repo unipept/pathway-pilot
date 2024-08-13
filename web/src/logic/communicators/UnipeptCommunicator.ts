@@ -20,7 +20,7 @@ export default class UnipeptCommunicator {
     // Start at the root for both trees, as soon as the trees diverge, add the other tree as a child.
     public async fetchTaxonomy(ids: number[]) {
         const url = `${this.baseUrl}/taxa2tree?input[]=${ids.join("&input[]=")}`;
-        return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+        return fetch(url, { method: 'GET' })
             .then(response => response.json());
     }
 
@@ -31,7 +31,7 @@ export default class UnipeptCommunicator {
             const chunk = items.slice(i, i + chunksize);
 
             const fetchUrl = `${url}?input[]=${chunk.join("&input[]=")}`;
-            await fetch(fetchUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+            await fetch(fetchUrl, { method: 'GET' })
                 .then(response => response.json())
                 .then(data => result.push(...data))
                 .then(() => this.progressListener.onProgressUpdate(i / items.length));
