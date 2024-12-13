@@ -14,9 +14,9 @@
         <template #information>    
             <p>
                 Please input a list of proteins by either pasting the <resource-link url="https://www.uniprot.org/">UniProt</resource-link> accession 
-                identifiers on the right-hand side or selecting a single <i>.txt</i> file. Each line of input will be treated as an individual 
-                UniProt accession id, and it should only contain valid accession numbers. Please refer to the example below for guidance on the expected 
-                input format.
+                identifiers and a single abundance number per identifier (tab-separated) on the right-hand side or selecting a single <i>.txt</i> file. Each line of input will 
+                be treated as an individual UniProt accession id, and it should only contain valid accession numbers. Please refer to the example below 
+                for guidance on the expected input format.
             </p>
 
             <p class="mt-2">
