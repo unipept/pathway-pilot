@@ -64,7 +64,7 @@ const proteinInputFormats = [
 
 const shortDescriptions = new Map<FileFormat, string>([
     [FileFormat.PEPTIDE_LIST, 'A list of peptides, a single sequence per line'],
-    [FileFormat.PROTEIN_LIST, 'A list of proteins, a single UniProt id per line']
+    [FileFormat.PROTEIN_LIST, 'A list of proteins, a single UniProt id + abundance number per line']
 ]); 
 
 watch(() => props.modelValue, (newVal: FileFormat) => {
