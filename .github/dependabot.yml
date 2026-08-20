@@ -20,4 +20,6 @@ updates:
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: weekly
+      interval: monthly
+      time: "13:00"
+      timezone: "Europe/Brussels"
