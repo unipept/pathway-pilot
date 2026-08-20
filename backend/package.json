@@ -21,6 +21,6 @@
     "axios": "^1.2.5",
     "cors": "^2.8.6",
     "express": "^4.18.2",
-    "node-html-parser": "^6.1.4"
+    "node-html-parser": "^9.0.1"
   }
 }
