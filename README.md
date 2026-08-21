@@ -24,13 +24,33 @@ for taxonomy and protein lookups.
 
 ```bash
 cd backend
-cp .env.example .env    # the defaults work against the committed data/ tree
+cp .env.example .env      # the defaults are ready to use
 npm ci
-npm run serve
+npm run build
+npm run refresh-data      # first time only: fetches ~8 MB from KEGG, takes ~3 min
+npm start
 ```
+
+`backend/data/` holds KEGG's enzyme, orthology, reaction, compound, module and pathway
+tables. It is **not tracked in git** — it is refreshed from
+[rest.kegg.jp](https://rest.kegg.jp), so `npm run refresh-data` seeds it on a fresh
+checkout and updates it later. The server reads it at startup and will not start without
+it.
 
 The server listens on the port set in `.env` (`3000` by default). All 26 configuration
 variables are documented in [`backend/.env.example`](backend/.env.example).
+
+For development with reload, `npm run serve` runs the TypeScript directly instead of
+`npm run build && npm start`.
+
+To skip the KEGG fetch entirely, generate a throwaway stand-in — enough to boot and answer
+mapping queries, not a real dataset:
+
+```bash
+npm run fixture
+DATA_DIR=.fixture/ LINK_DIR=.fixture/link/ npm run serve
+npm run fixture -- --clean    # when you are done
+```
 
 ### Frontend
 

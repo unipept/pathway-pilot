@@ -1,0 +1,120 @@
+# Does a real KEGG refresh and boots the backend against the result.
+#
+# CI's `backend · boots` job runs against a committed fixture, so it is fast and
+# needs no network -- but that means it cannot notice if KEGG changes a format
+# and `npm run refresh-data` starts producing files the parsers choke on. This
+# job is where that gets caught: once a month, against the real thing, rather
+# than on every pull request.
+#
+# It mirrors what pathwaypilot-refresh.timer does on the server, so a failure
+# here is an early warning that the next scheduled refresh in production will
+# fail too.
+
+name: KEGG refresh check
+
+on:
+  schedule:
+    # cron cannot express "first Monday of the month": naming both a day-of-month
+    # and a day-of-week makes cron fire when *either* matches. So run every Monday
+    # and let the job bail out unless it is also the first week.
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    name: refresh from KEGG and boot
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Is this the first Monday of the month?
+        id: gate
+        working-directory: .
+        run: |
+          # workflow_dispatch always runs; the schedule only on days 1-7.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$(date -u +%-d)" -le 7 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Not the first Monday -- skipping."
+          fi
+
+      - uses: actions/checkout@v7
+        if: steps.gate.outputs.run == 'true'
+
+      - uses: actions/setup-node@v7
+        if: steps.gate.outputs.run == 'true'
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: npm ci
+
+      - name: Set up environment
+        if: steps.gate.outputs.run == 'true'
+        run: cp .env.example .env
+
+      - name: Refresh from KEGG
+        if: steps.gate.outputs.run == 'true'
+        # The real thing: 19 sequential requests to rest.kegg.jp, ~3 minutes.
+        # A non-zero exit means a KEGG endpoint moved or started refusing us.
+        run: |
+          npm run build
+          npm run refresh-data
+
+      - name: Boot against the freshly fetched data
+        if: steps.gate.outputs.run == 'true'
+        # Fetching successfully is not enough -- the files also have to parse.
+        # A KEGG format change shows up here rather than in the refresh.
+        run: |
+          set -o pipefail
+
+          npm start > server.log 2>&1 &
+          SERVER_PID=$!
+
+          booted=false
+          for i in $(seq 1 120); do
+            if grep -q "Server is running" server.log; then
+              booted=true
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$booted" != "true" ]; then
+            echo "Backend did not boot on freshly fetched KEGG data"
+            tail -50 server.log
+            kill "$SERVER_PID" 2>/dev/null || true
+            exit 1
+          fi
+
+          mapping=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/mapping/ec/1.1.1.1)
+          # /pathway/:id scrapes www.kegg.jp rather than reading local data, so
+          # it belongs in this job -- where the network is expected -- and not
+          # in the hermetic CI smoke test.
+          pathway=$(curl -s -o /dev/null --max-time 60 -w '%{http_code}' http://localhost:3000/pathway/map00010)
+          kill "$SERVER_PID" 2>/dev/null || true
+
+          echo "/mapping/ec/1.1.1.1 -> $mapping"
+          echo "/pathway/map00010   -> $pathway"
+
+          [ "$mapping" = "200" ] || { echo "mapping route failed"; tail -50 server.log; exit 1; }
+          [ "$pathway" = "200" ] || { echo "pathway route failed"; tail -50 server.log; exit 1; }
+
+      - name: Report what changed
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          echo "### KEGG refresh check passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '| file | bytes |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|---|---|' >> "$GITHUB_STEP_SUMMARY"
+          for f in data/* data/link/*; do
+            [ -f "$f" ] && echo "| \`${f#data/}\` | $(wc -c < "$f") |" >> "$GITHUB_STEP_SUMMARY"
+          done
