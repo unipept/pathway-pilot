@@ -1,7 +1,7 @@
 <template>
     <v-card>
         <v-card-title>Your selected node is linked to {{ totalAnnotations }} annotations</v-card-title>
-        <v-card-text class="mt-n2 text-subtitle-1">
+        <v-card-text class="mt-n2 text-body-large">
             Your selected node is linked to 
             <b :style="{ color: '#ffb856' }">{{ ecAnnotations.length }} EC {{ ecAnnotations.length === 1 ? 'number' : 'numbers' }}</b>, 
             <b :style="{ color: '#56b9ff' }">{{ koAnnotations.length }} KO {{ koAnnotations.length === 1 ? 'number' : 'numbers' }}</b> and 

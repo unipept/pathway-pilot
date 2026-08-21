@@ -1,0 +1,18 @@
+/**
+ * src/styles/reset.scss
+ *
+ * Vuetify 3 shipped `* { padding: 0; margin: 0 }` as part of its CSS reset.
+ * Vuetify 4 cut the reset down to `html`/`body`, so bare elements pick the
+ * browser's default margins back up: headings fall out of line with their
+ * timeline dots, and stray whitespace appears between blocks.
+ *
+ * Re-declared in Vuetify's own reset layer, which -- with the layer order
+ * pinned in index.html -- is the lowest layer. Component styles therefore
+ * still win over it, exactly as they did under v3.
+ */
+@layer vuetify-core.reset {
+    * {
+        padding: 0;
+        margin: 0;
+    }
+}

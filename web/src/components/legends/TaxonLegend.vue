@@ -1,6 +1,6 @@
 <template>
     <div v-if="!empty" class="legend-container">
-        <span v-if="title" class="text-h6">{{ title }}</span>
+        <span v-if="title" class="text-title-large font-weight-medium">{{ title }}</span>
         <div class="d-flex" v-for="item in items">
             <v-icon :color="item.color">mdi-square</v-icon>
             <span class="ms-3">{{ item.label }}</span>
