@@ -1,3 +1,5 @@
+import path from 'path';
+
 import ReaderMap from './ReaderMap';
 import pathwayMap from './PathwayMap';
 import moduleMap from './ModuleMap';
@@ -56,12 +58,11 @@ class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
             const [ reactionId, pathwayId ] = line.split('\t');
 
             const reaction = this.get(reactionId);
-            if (reaction && !reaction.pathways.map(p => p.id).includes(pathwayId)) {
+            if (!reaction) {
+                console.log(`Reaction id ${reactionId} not found (${path.basename(pathwayLinkFile)})`);
+            } else if (!reaction.pathways.map(p => p.id).includes(pathwayId)) {
                 const pathway = pathwayMap.get(pathwayId);
                 reaction.pathways.push({ id: pathwayId, name: pathway?.name ?? '' });
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`Reaction id ${reactionId} not found`);
             }
         });
     }
@@ -71,12 +72,11 @@ class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
             const [ reactionId, moduleId ] = line.split('\t');
 
             const reaction = this.get(reactionId);
-            if (reaction && !reaction.modules.map(m => m.id).includes(moduleId)) {
+            if (!reaction) {
+                console.log(`Reaction id ${reactionId} not found (${path.basename(moduleLinkFile)})`);
+            } else if (!reaction.modules.map(m => m.id).includes(moduleId)) {
                 const module = moduleMap.get(moduleId);
                 reaction.modules.push({ id: moduleId, name: module?.name ?? '' });
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`Reaction id ${reactionId} not found`);
             }
         });
     }
@@ -86,11 +86,10 @@ class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
             const [ ecNumber, reactionId ] = line.split('\t');
 
             const reaction = this.get(reactionId);
-            if (reaction && !reaction.ecNumbers.includes(ecNumber)) {
+            if (!reaction) {
+                console.log(`Reaction id ${reactionId} not found (${path.basename(ecLinkFile)})`);
+            } else if (!reaction.ecNumbers.includes(ecNumber)) {
                 reaction.ecNumbers.push(ecNumber);
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`Reaction id ${reactionId} not found`);
             }
         });
     }

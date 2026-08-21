@@ -1,3 +1,5 @@
+import path from 'path';
+
 import ReaderMap from './ReaderMap';
 import pathwayMap from './PathwayMap';
 import moduleMap from './ModuleMap';
@@ -60,12 +62,11 @@ class EcMap extends ReaderMap<EcKey, EcValue> {
             const [ ecNumber, pathwayId ] = line.split('\t');
 
             const ec = this.get(ecNumber);
-            if (ec && !ec.pathways.map(p => p.id).includes(pathwayId)) {
+            if (!ec) {
+                console.log(`EC number ${ecNumber} not found (${path.basename(pathwayLinkFile)})`);
+            } else if (!ec.pathways.map(p => p.id).includes(pathwayId)) {
                 const pathway = pathwayMap.get(pathwayId);
                 ec.pathways.push({ id: pathwayId, name: pathway?.name ?? '' });
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`EC number ${ecNumber} not found`);
             }
         });
     }
@@ -75,12 +76,11 @@ class EcMap extends ReaderMap<EcKey, EcValue> {
             const [ ecNumber, moduleId ] = line.split('\t');
 
             const ec = this.get(ecNumber);
-            if (ec && !ec.modules.map(m => m.id).includes(moduleId)) {
+            if (!ec) {
+                console.log(`EC number ${ecNumber} not found (${path.basename(moduleLinkFile)})`);
+            } else if (!ec.modules.map(m => m.id).includes(moduleId)) {
                 const module = moduleMap.get(moduleId);
                 ec.modules.push({ id: moduleId, name: module?.name ?? '' });
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`EC number ${ecNumber} not found`);
             }
         });
     }
@@ -90,11 +90,10 @@ class EcMap extends ReaderMap<EcKey, EcValue> {
             const [ ecNumber, koNumber ] = line.split('\t');
 
             const ec = this.get(ecNumber);
-            if (ec && !ec.koNumbers.includes(koNumber)) {
+            if (!ec) {
+                console.log(`EC number ${ecNumber} not found (${path.basename(koLinkFile)})`);
+            } else if (!ec.koNumbers.includes(koNumber)) {
                 ec.koNumbers.push(koNumber);
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`EC number ${ecNumber} not found`);
             }
         });
     }
@@ -104,11 +103,10 @@ class EcMap extends ReaderMap<EcKey, EcValue> {
             const [ ecNumber, reactionId ] = line.split('\t');
 
             const ec = this.get(ecNumber);
-            if (ec && !ec.reactionIds.includes(reactionId)) {
+            if (!ec) {
+                console.log(`EC number ${ecNumber} not found (${path.basename(reactionLinkFile)})`);
+            } else if (!ec.reactionIds.includes(reactionId)) {
                 ec.reactionIds.push(reactionId);
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`EC number ${ecNumber} not found`);
             }
         });
     }

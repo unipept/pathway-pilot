@@ -1,3 +1,5 @@
+import path from "path";
+
 import ReaderMap from "./ReaderMap";
 import config from "../config/config";
 
@@ -59,11 +61,10 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
             const [ ecNumber, pathwayId ] = line.split('\t');
 
             const pathway = this.get(pathwayId);
-            if (pathway && !pathway.ecNumbers.includes(ecNumber)) {
+            if (!pathway) {
+                console.log(`Pathway ${pathwayId} not found (${path.basename(ecLinkFile)})`);
+            } else if (!pathway.ecNumbers.includes(ecNumber)) {
                 pathway.ecNumbers.push(ecNumber);
-            } else {
-                // TODO: add logging or error handling
-                console.log(`Pathway ${pathwayId} not found`);
             }
         });
     }
@@ -73,11 +74,10 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
             const [ koNumber, pathwayId ] = line.split('\t');
 
             const pathway = this.get(pathwayId);
-            if (pathway && !pathway.koNumbers.includes(koNumber)) {
+            if (!pathway) {
+                console.log(`Pathway ${pathwayId} not found (${path.basename(koLinkFile)})`);
+            } else if (!pathway.koNumbers.includes(koNumber)) {
                 pathway.koNumbers.push(koNumber);
-            } else {
-                // TODO: add logging or error handling
-                console.log(`Pathway ${pathwayId} not found`);
             }
         });
     }
@@ -87,11 +87,10 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
             const [ reactionId, pathwayId ] = line.split('\t');
 
             const pathway = this.get(pathwayId);
-            if (pathway && !pathway.reactionIds.includes(reactionId)) {
+            if (!pathway) {
+                console.log(`Pathway ${pathwayId} not found (${path.basename(reactionLinkFile)})`);
+            } else if (!pathway.reactionIds.includes(reactionId)) {
                 pathway.reactionIds.push(reactionId);
-            } else {
-                 // TODO: add logging or error handling
-                 console.log(`Pathway ${pathwayId} not found`);
             }
         });
     }
@@ -101,11 +100,10 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
             const [ compoundId, pathwayId ] = line.split('\t');
 
             const pathway = this.get(pathwayId);
-            if (pathway && !pathway.compoundIds.includes(compoundId)) {
+            if (!pathway) {
+                console.log(`Pathway ${pathwayId} not found (${path.basename(compoundLinkFile)})`);
+            } else if (!pathway.compoundIds.includes(compoundId)) {
                 pathway.compoundIds.push(compoundId);
-            } else {
-                // TODO: add logging or error handling
-                console.log(`Pathway ${pathwayId} not found`);
             }
         });
     }
