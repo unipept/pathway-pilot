@@ -6,20 +6,13 @@
  * browser's default margins back up: headings fall out of line with their
  * timeline dots, and stray whitespace appears between blocks.
  *
- * Only the tags this app renders itself are listed. A blanket `*` is not safe
- * here -- this layer outranks the per-component stylesheets emitted by
- * vite-plugin-vuetify, so it would flatten VCard/VBtn padding too. `ul` is
- * likewise left out because VList renders one.
+ * Re-declared in Vuetify's own reset layer, which -- with the layer order
+ * pinned in index.html -- is the lowest layer. Component styles therefore
+ * still win over it, exactly as they did under v3.
  */
 @layer vuetify-core.reset {
-    h1, h2, h3, h4, h5, h6, p, ol, dl, dd, blockquote, figure, pre {
+    * {
         padding: 0;
-        margin: 0;
-    }
-
-    /* UA gives checkbox/radio inputs a 3px 3px 0 5px margin; v3 zeroed it.
-       Margin only -- padding here belongs to the field styles. */
-    input {
         margin: 0;
     }
 }
