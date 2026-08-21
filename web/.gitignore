@@ -1,2 +1,7 @@
 node_modules
 dist
+
+# Scratch data used while developing against a pathway map by hand. Nothing in
+# src/ reads it, and it is not part of the build -- keep it local rather than
+# in the repository.
+data/
