@@ -53,7 +53,7 @@ printf '%s\n' \
     $'K00001\tE1.1.1.1, adh; alcohol dehydrogenase [EC:1.1.1.1]' \
     $'K00844\tHK; hexokinase [EC:2.7.1.1]'                       > "$OUT/ko"
 printf '%s\n' \
-    $'R00623\talcohol dehydrogenase reaction' \
+    $'R00623\talcohol dehydrogenase reaction; aldehyde reductase reaction' \
     $'R00299\thexokinase reaction'                               > "$OUT/reaction"
 printf '%s\n' \
     $'C00001\tH2O; Water' \
@@ -77,7 +77,7 @@ printf '%s\n' $'R00623\tC00001'                        > "$OUT/link/reaction2com
 printf '%s\n' $'R00623\tmap00010'                      > "$OUT/link/reaction2pathway"
 printf '%s\n' $'R00299\tM00001'                        > "$OUT/link/reaction2module"
 printf '%s\n' $'C00022\tmap00010'                      > "$OUT/link/compound2pathway"
-printf '%s\n' $'C00267\tM00001'                        > "$OUT/link/compound2module"
+printf '%s\n' $'C00267\tM00001' $'C00022\tM00001'      > "$OUT/link/compound2module"
 
 echo "Wrote $(find "$OUT" -type f | wc -l | tr -d ' ') files to $OUT"
 echo "Point the backend at it with:"
