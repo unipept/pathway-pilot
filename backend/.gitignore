@@ -2,7 +2,7 @@
 build/
 
 # KEGG data is server-side state, refreshed by `npm run refresh-data`
-# (monthly via pathwaypilot-refresh.timer). See docs/deployment.md.
+# (monthly via pathwaypilot-refresh.timer). See deploy/README.md.
 # A throwaway stand-in can be generated with `npm run fixture` (gitignored).
 data/
 
