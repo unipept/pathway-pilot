@@ -12,8 +12,6 @@ import {
     findCompoundMappings
 } from "../services/MappingService";
 
-// TODO: Error handling
-
 /**
  * Get pathway by mapId
  * 
@@ -22,11 +20,7 @@ import {
  * @returns   The resulting pathway
  */
 export const getPathwayMapping = async (req: Request<{ pathwayId: string }>, res: Response) => {
-    try {
-        return res.status(200).json(await findPathwayMapping(req.params.pathwayId))
-    } catch (err) {
-        console.log(err);
-    }
+    return res.status(200).json(await findPathwayMapping(req.params.pathwayId))
 }
 
 /**
@@ -37,12 +31,8 @@ export const getPathwayMapping = async (req: Request<{ pathwayId: string }>, res
  * @returns     The resulting pathway mapping
  */
 export const getPathwayMappings = async (req: Request, res: Response) => {
-    try {
-        const mapping = await findPathwayMappings();
-        return res.status(200).json(Object.fromEntries(mapping));
-    } catch (err) {
-        console.log(err);
-    }
+    const mapping = await findPathwayMappings();
+    return res.status(200).json(Object.fromEntries(mapping));
 }
 
 /**
@@ -53,11 +43,7 @@ export const getPathwayMappings = async (req: Request, res: Response) => {
  * @returns   The resulting KO information
  */
 export const getKoMapping = async (req: Request<{ koNumber: string }>, res: Response) => {
-    try {
-        return res.status(200).json(await findKoMapping(req.params.koNumber))
-    } catch (err) {
-        console.log(err);
-    }
+    return res.status(200).json(await findKoMapping(req.params.koNumber))
 }
 
 /**
@@ -68,12 +54,8 @@ export const getKoMapping = async (req: Request<{ koNumber: string }>, res: Resp
  * @returns     The resulting KO mapping
  */
 export const getKoMappings = async (req: Request, res: Response) => {
-    try {
-        const mapping = await findKoMappings();
-        return res.status(200).json(Object.fromEntries(mapping));
-    } catch (err) {
-        console.log(err);
-    }
+    const mapping = await findKoMappings();
+    return res.status(200).json(Object.fromEntries(mapping));
 }
 
 /**
@@ -84,11 +66,7 @@ export const getKoMappings = async (req: Request, res: Response) => {
  * @returns   The resulting EC information
  */
 export const getEcMapping = async (req: Request<{ ecNumber: string }>, res: Response) => {
-    try {
-        return res.status(200).json(await findEcMapping(req.params.ecNumber))
-    } catch (err) {
-        console.log(err);
-    }
+    return res.status(200).json(await findEcMapping(req.params.ecNumber))
 }
 
 /**
@@ -99,12 +77,8 @@ export const getEcMapping = async (req: Request<{ ecNumber: string }>, res: Resp
  * @returns     The resulting EC mapping
  */
 export const getEcMappings = async (req: Request, res: Response) => {
-    try {
-        const mapping = await findEcMappings();
-        return res.status(200).json(Object.fromEntries(mapping));
-    } catch (err) {
-        console.log(err);
-    }
+    const mapping = await findEcMappings();
+    return res.status(200).json(Object.fromEntries(mapping));
 }
 
 /**
@@ -115,11 +89,7 @@ export const getEcMappings = async (req: Request, res: Response) => {
  * @returns   The resulting Reaction information
  */
 export const getReactionMapping = async (req: Request<{ reactionId: string }>, res: Response) => {
-    try {
-        return res.status(200).json(await findReactionMapping(req.params.reactionId))
-    } catch (err) {
-        console.log(err);
-    }
+    return res.status(200).json(await findReactionMapping(req.params.reactionId))
 }
 
 /**
@@ -130,12 +100,8 @@ export const getReactionMapping = async (req: Request<{ reactionId: string }>, r
  * @returns     The resulting Reaction mapping
  */
 export const getReactionMappings = async (req: Request, res: Response) => {
-    try {
-        const mapping = await findReactionMappings();
-        return res.status(200).json(Object.fromEntries(mapping));
-    } catch (err) {
-        console.log(err);
-    }
+    const mapping = await findReactionMappings();
+    return res.status(200).json(Object.fromEntries(mapping));
 }
 
 /**
@@ -146,11 +112,7 @@ export const getReactionMappings = async (req: Request, res: Response) => {
  * @returns   The resulting compound information
  */
 export const getCompoundMapping = async (req: Request<{ compoundId: string }>, res: Response) => {
-    try {
-        return res.status(200).json(await findCompoundMapping(req.params.compoundId))
-    } catch (err) {
-        console.log(err);
-    }
+    return res.status(200).json(await findCompoundMapping(req.params.compoundId))
 }
 
 /**
@@ -161,10 +123,6 @@ export const getCompoundMapping = async (req: Request<{ compoundId: string }>, r
  * @returns     The resulting compound mapping
  */
 export const getCompoundMappings = async (req: Request, res: Response) => {
-    try {
-        const mapping = await findCompoundMappings();
-        return res.status(200).json(Object.fromEntries(mapping));
-    } catch (err) {
-        console.log(err);
-    }
+    const mapping = await findCompoundMappings();
+    return res.status(200).json(Object.fromEntries(mapping));
 }
