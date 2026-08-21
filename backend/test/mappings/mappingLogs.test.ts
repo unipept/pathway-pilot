@@ -17,11 +17,11 @@ describe('mapping link file logging', () => {
             logs.push(args.map(String).join(' '));
         });
 
-        await import('../src/mappings/EcMap');
-        await import('../src/mappings/PathwayMap');
-        await import('../src/mappings/KoMap');
-        await import('../src/mappings/CompoundMap');
-        await import('../src/mappings/ReactionMap');
+        await import('../../src/mappings/EcMap');
+        await import('../../src/mappings/PathwayMap');
+        await import('../../src/mappings/KoMap');
+        await import('../../src/mappings/CompoundMap');
+        await import('../../src/mappings/ReactionMap');
 
         // The fixture has exactly one dangling reference: compound2module
         // links C00267, which is not in the compound entity table. That one
@@ -38,7 +38,7 @@ describe('mapping link file logging', () => {
         // Built directly against temp files, rather than the fixture, so the
         // missing id is under this test's control. KoMap is exported as a
         // class and takes all five file paths as constructor parameters.
-        const { KoMap } = await import('../src/mappings/KoMap');
+        const { KoMap } = await import('../../src/mappings/KoMap');
 
         const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'komap-log-'));
 

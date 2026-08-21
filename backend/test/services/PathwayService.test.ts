@@ -11,10 +11,10 @@ vi.mock('axios', () => ({
 }));
 
 import axios from 'axios';
-import { findPathway } from '../src/services/PathwayService';
-import { RectanglePathwayNode, CirclePathwayNode, PolygonPathwayNode } from '../src/models/PathwayNode';
+import { findPathway } from '../../src/services/PathwayService';
+import { RectanglePathwayNode, CirclePathwayNode, PolygonPathwayNode } from '../../src/models/PathwayNode';
 
-const fixtureHtml = fs.readFileSync(path.join(__dirname, 'fixtures/pathway-page.html'), 'utf-8');
+const fixtureHtml = fs.readFileSync(path.join(__dirname, '../fixtures/pathway-page.html'), 'utf-8');
 const fixturePng = Buffer.from('not-a-real-png');
 
 describe('findPathway', () => {

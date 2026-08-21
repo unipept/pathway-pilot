@@ -10,14 +10,14 @@ import request from 'supertest';
 // CompoundMap's default export with an empty Map here doesn't affect what
 // any other test file sees of it.
 //
-// The ready path lives in app.test.ts instead of alongside this test: the
+// The ready path lives in ../app.test.ts instead of alongside this test: the
 // mock below applies to every test in this file, so a ready-path assertion
 // here would see maps.compound as 0 and fail its toBeGreaterThan(0) check.
-vi.mock('../src/mappings/CompoundMap', () => ({
+vi.mock('../../src/mappings/CompoundMap', () => ({
     default: new Map(),
 }));
 
-import app from '../src/app';
+import app from '../../src/app';
 
 describe('GET /health when a map is empty', () => {
     it('answers 503 with status degraded and names exactly the empty map', async () => {

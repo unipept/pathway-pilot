@@ -4,7 +4,7 @@ import path from 'path';
 
 // KeggFetcher writes to the paths held in config.*DataFile / config.*LinkFile.
 // Under vitest.config.ts those resolve into backend/.fixture/ - the same
-// directory EcMap.test.ts and friends read from. Letting KeggFetcher write
+// directory ../mappings/EcMap.test.ts and friends read from. Letting KeggFetcher write
 // for real in this file would race with (and corrupt) that shared fixture,
 // so every *DataFile / *LinkFile path is redirected into a throwaway temp
 // dir before src/cronjobs/KeggFetcher is ever imported.
@@ -48,15 +48,15 @@ const { tmpDir, mockConfig } = vi.hoisted(() => {
     };
 });
 
-vi.mock('../src/config/config', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('../src/config/config')>();
+vi.mock('../../src/config/config', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('../../src/config/config')>();
 
     return { default: { ...actual.default, ...mockConfig } };
 });
 
 // axios is mocked so fetchFiles() never reaches rest.kegg.jp - an explicit
 // acceptance criterion, not just a convenience. Same pattern as
-// PathwayService.test.ts.
+// ../services/PathwayService.test.ts.
 vi.mock('axios', () => ({
     default: {
         get: vi.fn(),
@@ -64,7 +64,7 @@ vi.mock('axios', () => ({
 }));
 
 import axios from 'axios';
-import KeggFetcher from '../src/cronjobs/KeggFetcher';
+import KeggFetcher from '../../src/cronjobs/KeggFetcher';
 
 // The 19 fetches KeggFetcher.fetchFiles() runs, in the exact order it runs
 // them (see the `steps` array in src/cronjobs/KeggFetcher.ts). Each raw
@@ -145,7 +145,7 @@ const mockAllRequestsSucceed = () => {
     }
 };
 
-const fixtureEcFile = path.join(__dirname, '../.fixture/ec');
+const fixtureEcFile = path.join(__dirname, '../../.fixture/ec');
 
 describe('KeggFetcher#fetchFiles', () => {
     let fixtureBefore: string;
@@ -168,7 +168,7 @@ describe('KeggFetcher#fetchFiles', () => {
         // The whole point of the config mock above is that KeggFetcher never
         // writes into backend/.fixture/. Assert that directly, every time,
         // so a regression in the mocking fails loudly here instead of
-        // corrupting EcMap.test.ts and friends.
+        // corrupting ../mappings/EcMap.test.ts and friends.
         expect(fs.readFileSync(fixtureEcFile, 'utf-8')).toBe(fixtureBefore);
     });
 

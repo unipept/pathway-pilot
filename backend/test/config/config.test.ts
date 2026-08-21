@@ -3,13 +3,13 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 
-import { missingEnvVars, REQUIRED_ENV_VARS } from '../src/config/config';
+import { missingEnvVars, REQUIRED_ENV_VARS } from '../../src/config/config';
 
 // Parsing .env.example instead of hand-writing all ~27 names keeps this test
 // honest about what "complete" means, and lets the same env double as an
 // assertion (see below) that .env.example actually documents every required
 // variable.
-const completeEnv = dotenv.parse(fs.readFileSync(path.join(__dirname, '../.env.example')));
+const completeEnv = dotenv.parse(fs.readFileSync(path.join(__dirname, '../../.env.example')));
 
 describe('missingEnvVars', () => {
     it('returns an empty array for a complete environment, so .env.example documents every required variable', () => {

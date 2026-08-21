@@ -9,13 +9,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 // same reason KeggFetcher.test.ts does this for its own mock state.
 const { fetchFiles } = vi.hoisted(() => ({ fetchFiles: vi.fn() }));
 
-vi.mock('../src/cronjobs/KeggFetcher', () => ({
+vi.mock('../../src/cronjobs/KeggFetcher', () => ({
     default: class {
         fetchFiles = fetchFiles;
     },
 }));
 
-import { main } from '../src/cronjobs/refresh';
+import { main } from '../../src/cronjobs/refresh';
 
 describe('refresh entrypoint', () => {
     afterEach(() => {

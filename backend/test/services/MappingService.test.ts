@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vitest';
 // findEcMappings). This covers the other eight find* functions -- one
 // known id and one unknown id per single-id function, plus a populated-map
 // assertion for each collection function -- against the same fixture the
-// map-level tests (KoMap.test.ts, ReactionMap.test.ts, etc.) already use.
-import NotFoundError from '../src/errors/NotFoundError';
+// map-level tests (../mappings/KoMap.test.ts, ../mappings/ReactionMap.test.ts, etc.) already use.
+import NotFoundError from '../../src/errors/NotFoundError';
 import {
     findPathwayMapping,
     findPathwayMappings,
@@ -15,7 +15,7 @@ import {
     findReactionMappings,
     findCompoundMapping,
     findCompoundMappings,
-} from '../src/services/MappingService';
+} from '../../src/services/MappingService';
 
 describe('findPathwayMapping', () => {
     it('returns the entry for a known pathway id', async () => {
