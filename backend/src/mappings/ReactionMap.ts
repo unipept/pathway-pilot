@@ -21,7 +21,7 @@ export type ReactionValue = {
     ecNumbers: string[];
 };
 
-class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
+export class ReactionMap extends ReaderMap<ReactionKey, ReactionValue> {
     constructor(
         descriptionFile: string = config.reactionDataFile,
         pathwayLinkFile: string = config.reactionPathwayLinkFile,
