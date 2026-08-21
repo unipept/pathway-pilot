@@ -37,7 +37,6 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
         this.handleModuleLinkFile(moduleLinkFile);
         this.handleEcLinkFile(ecLinkFile);
         this.handleReactionLinkFile(reactionLinkFile);
-        console.log(this.get('K01807'));
     }
 
     private handleDescriptionFile(descriptionFile: string) {
