@@ -1,3 +1,5 @@
+import path from 'path';
+
 import ReaderMap from './ReaderMap';
 import pathwayMap from './PathwayMap';
 import moduleMap from './ModuleMap';
@@ -66,12 +68,11 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
             const [ koNumber, pathwayId ] = line.split('\t');
 
             const ko = this.get(koNumber);
-            if (ko && !ko.pathways.map(p => p.id).includes(pathwayId)) {
+            if (!ko) {
+                console.log(`KO number ${koNumber} not found (${path.basename(pathwayLinkFile)})`);
+            } else if (!ko.pathways.map(p => p.id).includes(pathwayId)) {
                 const pathway = pathwayMap.get(pathwayId);
                 ko.pathways.push({ id: pathwayId, name: pathway?.name ?? '' });
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`KO number ${koNumber} not found`);
             }
         });
     }
@@ -81,12 +82,11 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
             const [ koNumber, moduleId ] = line.split('\t');
 
             const ko = this.get(koNumber);
-            if (ko && !ko.modules.map(m => m.id).includes(moduleId)) {
+            if (!ko) {
+                console.log(`KO number ${koNumber} not found (${path.basename(moduleLinkFile)})`);
+            } else if (!ko.modules.map(m => m.id).includes(moduleId)) {
                 const module = moduleMap.get(moduleId);
                 ko.modules.push({ id: moduleId, name: module?.name ?? '' });
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`KO number ${koNumber} not found`);
             }
         });
     }
@@ -96,11 +96,10 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
             const [ ecNumber, koNumber ] = line.split('\t');
 
             const ko = this.get(koNumber);
-            if (ko && !ko.ecNumbers.includes(ecNumber)) {
+            if (!ko) {
+                console.log(`KO number ${koNumber} not found (${path.basename(ecLinkFile)})`);
+            } else if (!ko.ecNumbers.includes(ecNumber)) {
                 ko.ecNumbers.push(ecNumber);
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`KO number ${koNumber} not found`);
             }
         });
     }
@@ -110,11 +109,10 @@ export class KoMap extends ReaderMap<KoKey, KoValue> {
             const [ koNumber, reactionId ] = line.split('\t');
 
             const ko = this.get(koNumber);
-            if (ko && !ko.reactionIds.includes(reactionId)) {
+            if (!ko) {
+                console.log(`KO number ${koNumber} not found (${path.basename(reactionLinkFile)})`);
+            } else if (!ko.reactionIds.includes(reactionId)) {
                 ko.reactionIds.push(reactionId);
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`KO number ${koNumber} not found`);
             }
         });
     }

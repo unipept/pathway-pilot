@@ -1,3 +1,5 @@
+import path from 'path';
+
 import ReaderMap from './ReaderMap';
 import pathwayMap from './PathwayMap';
 import moduleMap from './ModuleMap';
@@ -60,12 +62,11 @@ class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
             const [ compoundId, pathwayId ] = line.split('\t');
 
             const compound = this.get(compoundId);
-            if (compound && !compound.pathways.map(p => p.id).includes(pathwayId)) {
+            if (!compound) {
+                console.log(`Compound id ${compoundId} not found (${path.basename(pathwayLinkFile)})`);
+            } else if (!compound.pathways.map(p => p.id).includes(pathwayId)) {
                 const pathway = pathwayMap.get(pathwayId);
                 compound.pathways.push({ id: pathwayId, name: pathway?.name ?? '' });
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`Compound id ${compoundId} not found`);
             }
         });
     }
@@ -75,12 +76,11 @@ class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
             const [ compoundId, moduleId ] = line.split('\t');
 
             const compound = this.get(compoundId);
-            if (compound && !compound.modules.map(m => m.id).includes(moduleId)) {
+            if (!compound) {
+                console.log(`Compound id ${compoundId} not found (${path.basename(moduleLinkFile)})`);
+            } else if (!compound.modules.map(m => m.id).includes(moduleId)) {
                 const module = moduleMap.get(moduleId);
                 compound.modules.push({ id: moduleId, name: module?.name ?? '' });
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`Compound id ${compoundId} not found`);
             }
         });
     }
@@ -90,11 +90,10 @@ class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
             const [ ecNumber, compoundId ] = line.split('\t');
 
             const compound = this.get(compoundId);
-            if (compound && !compound.ecNumbers.includes(ecNumber)) {
+            if (!compound) {
+                console.log(`Compound id ${compoundId} not found (${path.basename(ecLinkFile)})`);
+            } else if (!compound.ecNumbers.includes(ecNumber)) {
                 compound.ecNumbers.push(ecNumber);
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`Compound id ${compoundId} not found`);
             }
         });
     }
@@ -104,11 +103,10 @@ class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
             const [ reactionId, compoundId ] = line.split('\t');
 
             const compound = this.get(compoundId);
-            if (compound && !compound.reactionIds.includes(reactionId)) {
+            if (!compound) {
+                console.log(`Compound id ${compoundId} not found (${path.basename(reactionLinkFile)})`);
+            } else if (!compound.reactionIds.includes(reactionId)) {
                 compound.reactionIds.push(reactionId);
-            } else {
-                // TODO: add logging or error handling or add without description
-                console.log(`Compound id ${compoundId} not found`);
             }
         });
     }
