@@ -11,7 +11,6 @@
         density="compact"
         @click:row="onRowClicked"
         @update:options="pageOptions = $event"
-        @update:page=""
     >
         <template #item.checkbox="{ item }">
             <div v-if="rowActive(item)" class="active">

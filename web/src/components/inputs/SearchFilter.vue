@@ -20,6 +20,7 @@
 
     <div class="d-flex flex-wrap">
         <v-chip v-for="item, i in filter"
+            :key="item.name"
             class="mb-2"
             :class="{ 'me-2': i !== filter.length - 1 }"
             :color="item.color"

@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title>Enzyme: {{ ecNumber }}</v-card-title>
         <v-card-subtitle class="mt-n2 text-body-large">
-            <span v-for="name of ecNames">
+            <span v-for="name of ecNames" :key="name">
                 {{ name }} <br>
             </span>
         </v-card-subtitle>

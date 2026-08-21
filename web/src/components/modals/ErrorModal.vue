@@ -12,7 +12,7 @@
                     <v-icon class="ms-3" @click="onClickOutside">mdi-close</v-icon>
                 </div>
                 <div class="mt-3 overflow-container">
-                    <div v-for="error of errors">
+                    <div v-for="error of errors" :key="`${error.line}-${error.message}`">
                         <b>line {{ error.line }}</b>: {{ error.message }}.
                     </div>
                 </div>

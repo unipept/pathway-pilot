@@ -2,7 +2,7 @@
     <div class="d-flex flex-column">
         <div class="d-flex">
             <div v-if="depth > 0" class="d-flex">
-                <div v-for="line in lines">
+                <div v-for="(line, i) in lines" :key="i">
                     <line-icon  v-if="line" :size="size" />
                     <empty-icon v-else      :size="size" />
                 </div>
@@ -53,6 +53,7 @@
 
         <div v-if="isExpanded">
             <treeview v-for="child, i in node.children"
+                :key="child.id"
                 v-model="selectedItems"
                 :node="child"
                 :lines="depth > 0 ? [ ...lines, !last ] : lines"

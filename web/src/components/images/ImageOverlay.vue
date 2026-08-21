@@ -3,6 +3,7 @@
         <rect class="border" width="100%" height="100%" fill="none" />
 
         <g v-for="area, i in rectangles.filter(a => isSelectable(a))"
+            :key="area.id"
             :transform="`scale(${scale})`"
             :onclick="() => onClickArea(area)"
             :onmouseenter="() => onMouseEnter(i)"
@@ -10,6 +11,7 @@
             cursor="pointer"
         >
             <rect v-for="rect in splitRectangle(area, area.colors.length)"
+                :key="`${rect.x1}-${rect.y1}-${rect.color}`"
                 :x="rect.x1"
                 :y="rect.y1"
                 :width="(rect.x2 - rect.x1)"
@@ -32,6 +34,7 @@
         </g>
 
         <g v-for="area in emptyPolygons"
+            :key="area.id"
             :transform="`scale(${scale})`"
             :onclick="() => onClickArea(area)"
         >
@@ -39,6 +42,7 @@
         </g>
 
         <g v-for="area in coloredPolygons"
+            :key="area.id"
             :transform="`scale(${scale})`"
             :onclick="() => onClickArea(area)"
         >
@@ -46,7 +50,7 @@
                 <linearGradient v-if="area.colors.length > 1" 
                     id="multi-gradient" x1="0%" y1="0%" x2="100%" y2="0%"
                 >
-                    <template v-for="(color, i) in area.colors">
+                    <template v-for="(color, i) in area.colors" :key="`${i}-${color}`">
                         <stop
                             :offset="`${i * 100 / area.colors.length}%`"
                             :stop-color="color"
@@ -68,6 +72,7 @@
         </g>
 
         <g v-for="area, i in circles"
+            :key="area.id"
             class="group"
             :transform="`scale(${scale})`"
             :onclick="() => onClickCompound(area)"
@@ -89,6 +94,7 @@
         </g>
 
         <g v-for="tt, i in rectangles.filter(a => isSelectable(a)).map(a => tooltip(a))"
+            :key="i"
             :transform="`scale(${scale})`"
         >
             <rect v-if="areaHover === i"
@@ -111,6 +117,7 @@
                 fill="white"
             >
                 <tspan v-for="t, j in tt.text"
+                    :key="`${j}-${t}`"
                     :x="tt.textX"
                     :y="tt.textY + tt.textOffset * j"
                 > {{ t }} </tspan>

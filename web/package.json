@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ignore-path .gitignore",
-    "lint:fix": "eslint . --fix --ignore-path .gitignore"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
@@ -24,6 +24,7 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/d3": "^7.4.3",
     "@types/node": "^26.2.0",
     "@types/webfontloader": "^1.6.38",
@@ -31,6 +32,7 @@
     "@vue/eslint-config-typescript": "^14.9.0",
     "eslint": "^10.8.1",
     "eslint-plugin-vue": "^10.10.0",
+    "globals": "^17.11.0",
     "sass": "^1.102.0",
     "sass-embedded": "^1.103.1",
     "typescript": "^5.9.3",

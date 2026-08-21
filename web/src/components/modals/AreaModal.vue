@@ -8,14 +8,14 @@
             @click:close="onClickOutside"
         >
             <template #tabs>
-                <page-tabs-item v-for="(item, i) of tabs" :value=i>
+                <page-tabs-item v-for="(item, i) of tabs" :key="i" :value=i>
                     {{ item.name }}
                 </page-tabs-item>
             </template>
 
             <template #content>
                 <v-window v-model="currentTab">
-                    <v-window-item v-for="(item, i) of tabs" :value=i>
+                    <v-window-item v-for="(item, i) of tabs" :key="i" :value=i>
                         <component :is="item.component" v-bind="item.props" />
                     </v-window-item>
                 </v-window>
