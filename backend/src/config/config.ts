@@ -3,7 +3,7 @@ import path from 'path';
 
 dotenv.config();
 
-const REQUIRED_ENV_VARS = [
+export const REQUIRED_ENV_VARS = [
     'PORT',
     'KEGG_API_ENDPOINT__BASE',
     'KEGG_API_ENDPOINT__PATHWAY',
@@ -32,10 +32,16 @@ const REQUIRED_ENV_VARS = [
     'COMPOUND_MODULE_LINK_FILE'
 ];
 
-const missingEnvVars = REQUIRED_ENV_VARS.filter((name) => !process.env[name]);
+// Takes the environment as a parameter, rather than reading process.env
+// directly, so this predicate can be exercised from a test without the
+// module-load side effect below (which calls process.exit(1)).
+export const missingEnvVars = (env: NodeJS.ProcessEnv): string[] =>
+    REQUIRED_ENV_VARS.filter((name) => !env[name]);
 
-if (missingEnvVars.length > 0) {
-    console.error(`Missing required environment variables:\n  ${missingEnvVars.join(', ')}\nSee backend/.env.example`);
+const missing = missingEnvVars(process.env);
+
+if (missing.length > 0) {
+    console.error(`Missing required environment variables:\n  ${missing.join(', ')}\nSee backend/.env.example`);
     process.exit(1);
 }
 
