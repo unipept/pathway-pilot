@@ -9,7 +9,7 @@
 # Restart: sudo systemctl restart pathwaypilot-api
 #
 # ExecStart needs a system-wide node: systemd does not run a login shell, so
-# nvm's node is not on PATH here. See docs/deployment.md.
+# nvm's node is not on PATH here. See deploy/README.md.
 
 [Unit]
 Description=PathwayPilot backend API
