@@ -3,7 +3,7 @@
         <v-data-table
             :headers="headers"
             :items="tableItems"
-            item-value="raw_input"
+            item-value="upload_name"
             density="compact"
         >
             <template #no-data>
@@ -15,11 +15,11 @@
             </template>
 
             <template #item="{ index, item }">
-                <sample-table-row 
-                    :loading="item.value.loading"
-                    :upload-name="item.value.upload_name"
-                    :name="item.value.sample_name"
-                    :size="item.value.count"
+                <sample-table-row
+                    :loading="item.loading"
+                    :upload-name="item.upload_name"
+                    :name="item.sample_name"
+                    :size="item.count"
                     :index="index"
                     @remove="onRemoveSample"
                     @update="onUpdateSampleName"
@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 import { SampleTableItem } from './SampleTableItem';
+import type { DataTableHeader } from 'vuetify';
 import { computed } from 'vue';
 import SampleTableRow from './SampleTableRow.vue';
 import FileUploadButton from '@/components/inputs/FileUploadButton.vue';
@@ -54,13 +55,20 @@ export interface Props {
     max: number
 }
 
+interface SampleTableRowItem {
+    upload_name: string
+    sample_name: string
+    count: string
+    loading: number | false
+}
+
 const props = withDefaults(defineProps<Props>(), {
     max: 4
 })
 
 const emits = defineEmits([ 'remove:sample', 'add:sample', 'add:samples', 'update:sample' ]);
 
-const tableItems = computed(() => [ ...props.items ]
+const tableItems = computed<SampleTableRowItem[]>(() => [ ...props.items ]
     .map((item: SampleTableItem) => ({
         upload_name: item.uploadName,
         sample_name: item.name,
@@ -85,7 +93,7 @@ const onUpdateSampleName = (sampleIndex: number, name: string) => {
     emits('update:sample', sampleIndex, name);
 }
 
-const headers = [
+const headers: DataTableHeader<SampleTableRowItem>[] = [
     {
         title: "status",
         align: "center",

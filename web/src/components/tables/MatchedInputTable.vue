@@ -6,17 +6,17 @@
         :must-sort=true
         :page="page"
         items-per-page="5"
-        item-value="raw_input"
+        item-value="taxon_id"
         density="compact"
         @update:options="pageOptions = $event"
         @update:page=""
     >
         <template #item="{ index, item }">
             <matched-input-table-row
-                :group="item.value.group"
-                :taxon="{ id: item.value.taxon_id, name: item.value.taxon_name, rank: item.value.taxon_rank }"
-                :node-annotations="item.value.node_annotations"
-                :matched-annotations="item.value.matched_annotations"
+                :group="item.group"
+                :taxon="{ id: item.taxon_id, name: item.taxon_name, rank: item.taxon_rank }"
+                :node-annotations="item.node_annotations"
+                :matched-annotations="item.matched_annotations"
             />
         </template>
 
@@ -46,6 +46,7 @@
 
 <script setup lang="ts">
 import { MatchedInputTableItem } from './MatchedInputTableItem';
+import type { DataTableHeader, DataTableSortItem } from 'vuetify';
 import { computed, ref } from 'vue';
 import MatchedInputTableRow from './MatchedInputTableRow.vue';
 import Taxon from '@/logic/entities/Taxon';
@@ -57,19 +58,21 @@ export interface Props {
 const props = defineProps<Props>();
 
 const page = ref(1);
-const pageOptions = ref({
+const pageOptions = ref<{ pageCount: number, sortBy: DataTableSortItem[] }>({
     pageCount: 1,
     sortBy: [{ key: 'taxon_id', order: 'asc' }]
 });
 
 const hasItems = computed(() => props.items.length > 0);
 
-const headers = [
-    ...(props.items.some(i => i.group) ? [{
-        title: "Sample group",
-        align: "start",
-        key: "group",
-    }] : []),
+const groupHeader: DataTableHeader<MatchedInputTableItem>[] = props.items.some(i => i.group) ? [{
+    title: "Sample group",
+    align: "start",
+    key: "group",
+}] : [];
+
+const headers: DataTableHeader<MatchedInputTableItem>[] = [
+    ...groupHeader,
     {
         title: "Taxon id",
         align: "start",

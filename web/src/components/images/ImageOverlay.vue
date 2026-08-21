@@ -132,6 +132,23 @@ export interface Props {
     scale: number
 };
 
+interface PolygonArea {
+    id: string
+    points: string
+    colors: string[]
+};
+
+interface Tooltip {
+    boundingX: number
+    boundingY: number
+    boundingWidth: number
+    boundingHeight: number
+    textX: number
+    textY: number
+    textOffset: number
+    text: string[]
+};
+
 const props = defineProps<Props>();
 
 const emits = defineEmits(['update:area', 'update:compound']);
@@ -147,10 +164,10 @@ const rectangles = computed(() => props.areas.filter(a => a.shape === 'rect'));
 const circles = computed(() => props.areas.filter(a => a.shape === 'circle'));
 
 const polygons = computed(() => props.areas.filter(a => a.shape === 'poly'));
-const coloredPolygons = computed(() => polygons.value.filter(a => a.colors.length > 0));
+const coloredPolygons = computed<PolygonArea[]>(() => polygons.value.filter(a => a.colors.length > 0));
 const emptyPolygons = computed(() => polygons.value.filter(a => a.colors.length <= 0));
 
-const tooltip = (area: any): any => {
+const tooltip = (area: any): Tooltip => {
     const [ px, py ] = [ 30, 20 ];
     const lineHeight = 22;
     const lineDistance = 10;
