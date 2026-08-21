@@ -52,7 +52,7 @@ Explain *why* in the body where the reason is not obvious from the diff.
 There is currently no test suite. That means the checks above verify that the code
 compiles and builds, not that it behaves correctly — so please exercise your change in
 the running app before opening a pull request, and say in the description what you
-checked. The sample files in `test-data/` cover every supported input format.
+checked.
 
 ## Reporting problems
 

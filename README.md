@@ -12,8 +12,7 @@ PathwayPilot is available as a webapplication via [pathwaypilot.ugent.be](https:
 |---|---|
 | `web/`        | the Vue 3 + Vuetify frontend — this is the application users see |
 | `backend/`    | an Express + TypeScript API that proxies and caches KEGG data |
-| `script/`     | one-off Python tooling used to prepare KEGG import files |
-| `test-data/`  | sample input files in each supported format, useful for manual testing |
+| `deploy/`     | systemd units, the nginx site and the pull-based deploy script — see [`deploy/README.md`](deploy/README.md) |
 
 The frontend talks to `backend/` for KEGG pathway maps and annotation mappings, and
 calls the [Unipept](https://unipept.ugent.be) and
@@ -70,13 +69,36 @@ cp .env.example .env.local     # then uncomment VITE_API_BASE_URL
 
 ### Running the checks
 
-These are the same commands CI runs on every pull request:
+Three jobs are required status checks on `main`:
 
 ```bash
 cd web     && npm run build     # typechecks with vue-tsc, then builds
-cd web     && npm run lint      # reports; `npm run lint:fix` rewrites
-cd backend && npx tsc --noEmit
+cd backend && npx tsc --noEmit  # typecheck
 ```
+
+The third, `backend · boots`, boots the backend against the fixture and curls it — the
+same fixture flow described above under **Backend**:
+
+```bash
+npm run fixture
+DATA_DIR=.fixture/ LINK_DIR=.fixture/link/ npm run serve
+```
+
+`npm run lint` in `web/` is recommended but does not gate pull requests — it is not part
+of CI. `npm run lint:fix` rewrites what it can.
+
+A separate scheduled workflow, "KEGG refresh check", does a real monthly refresh from
+`rest.kegg.jp` and boots against the result; it is an early warning that KEGG changed
+format, not something a contributor needs to run.
+
+## Deployment
+
+PathwayPilot runs on a single machine: nginx serves the built frontend from `web/dist`
+and proxies `/api` to a Node process managed by systemd. Deploys are pull-based — GitHub
+cannot reach the server, so `deploy/deploy.sh` is run on the box and fetches from GitHub,
+which means nothing needs inbound SSH or a credential in the repo. A systemd timer
+refreshes the KEGG data monthly. See [`deploy/README.md`](deploy/README.md) for the full
+guide.
 
 ## Contributing
 
