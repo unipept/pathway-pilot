@@ -1,0 +1,100 @@
+# nginx site for PathwayPilot.
+#
+# This is the file already running on the server
+# (/etc/nginx/sites-available/pathwp-web) with the app-specific pieces added:
+# gzip, immutable caching for hashed assets, a correct SPA fallback, and proxy
+# timeouts sized to the backend. TLS, server names and the :80 redirect are
+# kept exactly as Certbot wrote them.
+#
+# Install:
+#   sudo cp deploy/nginx.conf.example /etc/nginx/sites-available/pathwp-web
+#   sudo ln -s /etc/nginx/sites-available/pathwp-web /etc/nginx/sites-enabled/   # already linked
+#   sudo nginx -t && sudo systemctl reload nginx
+#
+# `root` points straight at the `dist/` that `deploy.sh` builds inside the
+# checkout, so nginx can never serve a stale copy someone forgot to sync. That
+# needs nginx to be able to traverse into the checkout:
+#
+#   sudo -u www-data test -x /home/pathwp && sudo -u www-data ls /home/pathwp/pathway-pilot/web/dist
+#
+# The old document root, /var/www/pathwp-web/dist, is no longer used.
+
+server {
+    listen 443 ssl; # managed by Certbot
+
+    server_name pathwp.ugent.be pathwaypilot.ugent.be;
+
+    root /home/pathwp/pathway-pilot/web/dist;
+    index index.html;
+
+    ssl_certificate /etc/letsencrypt/live/pathwp.ugent.be/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/pathwp.ugent.be/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+    # The bundle is a few hundred KB of JS before compression.
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
+    # Vite emits content-hashed filenames, so assets can be cached hard.
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # index.html must never be cached, or a deploy ships stale asset refs.
+    location = /index.html {
+        add_header Cache-Control "no-store";
+    }
+
+    location /api/ {
+        # Trailing slashes on both sides strip the /api prefix, so
+        # /api/pathway/map00053 reaches the backend as /pathway/map00053.
+        proxy_pass http://127.0.0.1:3000/;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # A cold backend builds its mapping tables before answering, and a
+        # pathway request fetches from KEGG, so allow well past the default 60s.
+        proxy_connect_timeout 10s;
+        proxy_read_timeout    300s;
+        proxy_send_timeout    300s;
+
+        # Responses are large and already complete; stream them straight out.
+        proxy_buffering off;
+    }
+
+    # Single-page app: unknown paths are Vue routes, not missing files.
+    # The fallback needs the leading slash — a bare `index.html` is resolved
+    # relative to the request, so /some/deep/route 404s instead of booting
+    # the app.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    access_log /var/log/nginx/pathwaypilot.access.log;
+    error_log  /var/log/nginx/pathwaypilot.error.log;
+}
+
+server {
+    listen 80;
+
+    server_name pathwp.ugent.be pathwaypilot.ugent.be;
+
+    if ($host = pathwaypilot.ugent.be) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    if ($host = pathwp.ugent.be) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    return 404; # managed by Certbot
+}

@@ -1,0 +1,39 @@
+# One-shot KEGG data refresh. Triggered by pathwaypilot-refresh.timer;
+# can also be run by hand:
+#
+#   sudo systemctl start pathwaypilot-refresh
+#   journalctl -u pathwaypilot-refresh -n 50
+#
+# ExecStart needs a system-wide node, same as the API unit.
+
+[Unit]
+Description=Refresh PathwayPilot's KEGG data files
+Documentation=https://github.com/unipept/pathway-pilot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=pathwp
+Group=pathwp
+
+WorkingDirectory=/home/pathwp/pathway-pilot/backend
+EnvironmentFile=/home/pathwp/pathway-pilot/backend/.env
+ExecStart=/usr/bin/node build/cronjobs/refresh.js
+
+# A full refresh is 19 sequential requests to KEGG and takes around three
+# minutes; allow generously for a slow day rather than killing it midway.
+TimeoutStartSec=1800
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pathwaypilot-refresh
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+# read-only rather than true, because the checkout is under /home. The one
+# directory this job writes is carved back out below — ReadWritePaths= takes
+# precedence over both ProtectSystem= and ProtectHome=.
+ProtectHome=read-only
+ReadWritePaths=/home/pathwp/pathway-pilot/backend/data
