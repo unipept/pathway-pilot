@@ -9,9 +9,8 @@
         item-value="taxon_id"
         density="compact"
         @update:options="pageOptions = $event"
-        @update:page=""
     >
-        <template #item="{ index, item }">
+        <template #item="{ item }">
             <matched-input-table-row
                 :group="item.group"
                 :taxon="{ id: item.taxon_id, name: item.taxon_name, rank: item.taxon_rank }"
