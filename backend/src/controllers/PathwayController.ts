@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 
 import { findPathway } from "../services/PathwayService";
 
-// TODO: Error handling
-
 /**
  * Get pathway by pathwayId
  * 
@@ -12,10 +10,6 @@ import { findPathway } from "../services/PathwayService";
  * @returns   The resulting pathway
  */
 export const getPathway = async (req: Request<{ pathwayId: string }>, res: Response) => {
-    try {
-        const pathway = await findPathway(req.params.pathwayId);
-        return res.status(200).json(pathway);
-    } catch (err) {
-        console.log(err);
-    }
+    const pathway = await findPathway(req.params.pathwayId);
+    return res.status(200).json(pathway);
 }

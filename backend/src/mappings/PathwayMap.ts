@@ -40,7 +40,6 @@ export class PathwayMap extends ReaderMap<PathwayKey, PathwayValue> {
     private handleDescriptionFile(descriptionFile: string) {
         this.readlines(descriptionFile, (line: string) => {
             const [ pathwayId, description ] = line.split('\t');
-            console.log(pathwayId);
             const [ category, subCategory ] = categoryMap.get(pathwayId) ?? [ "Unknown", "Unknown" ];
 
             this.set(pathwayId, { 

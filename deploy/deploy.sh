@@ -15,7 +15,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SERVICE="${SERVICE:-pathwaypilot-api}"
 BRANCH="${BRANCH:-main}"
-HEALTH_URL="${HEALTH_URL:-http://127.0.0.1:3000/mapping/ec/1.1.1.1}"
+HEALTH_URL="${HEALTH_URL:-http://127.0.0.1:3000/health}"
 HEALTH_TIMEOUT="${HEALTH_TIMEOUT:-300}"
 # RESTART=0 builds everything and stops there, leaving whatever is serving in
 # place. Used during the migration onto systemd, where the old process still

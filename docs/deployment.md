@@ -95,7 +95,7 @@ sudo -u pathwp env RESTART=0 ./deploy/deploy.sh   # env: sudoers may strip a bar
 sudo -u pathwp -i forever list               # note what is running — there are two monitors
 sudo -u pathwp -i forever stopall
 sudo systemctl enable --now pathwaypilot-api
-curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:3000/mapping/ec/1.1.1.1
+curl -s http://127.0.0.1:3000/health          # readiness + table sizes
 
 # 7. nginx — same site name, so the sites-enabled symlink and the Certbot
 #    renewal hooks keep working. Keep a copy of the old file first.
@@ -206,11 +206,19 @@ journalctl -u pathwaypilot-api -f          # follow the log
 journalctl -u pathwaypilot-api --since '1 hour ago'
 systemctl list-timers pathwaypilot-refresh.timer
 
-curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:3000/mapping/ec/1.1.1.1
+curl -s http://127.0.0.1:3000/health          # readiness + table sizes
 ```
 
-There is no dedicated health endpoint yet, so the deploy script and the check above use
-a cheap real request instead.
+`GET /health` reports readiness and the size of each mapping table:
+
+```json
+{"status":"ok","uptimeSeconds":41,
+ "maps":{"compound":19863,"ec":8452,"ko":26934,"module":478,"pathway":563,"reaction":12871}}
+```
+
+It answers 200 when every table has entries and 503 when one is empty. The counts are the
+useful part day to day: a KEGG refresh that half-failed leaves the service up and answering,
+but with tables smaller than they were, and this is where that shows.
 
 ## Known rough edges
 
@@ -218,9 +226,7 @@ a cheap real request instead.
   answers anything — expect tens of seconds. `TimeoutStartSec=300` in the unit and the
   polling loop in `deploy.sh` both allow for it. Restarts are not instant and briefly
   return 502 through nginx.
-- **Startup is noisy.** Roughly ten thousand lines of pathway ids go to stdout on every
-  start, and now land in the journal. Harmless, but it makes `journalctl` less useful
-  than it should be.
+
 - **Production and development take different paths.** `npm start` runs compiled output;
   `npm run serve` runs TypeScript through ts-node for local development. Keeping ts-node
   off the production path is deliberate — a break in that toolchain took `npm run serve`
