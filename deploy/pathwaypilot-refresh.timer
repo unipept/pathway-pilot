@@ -1,4 +1,4 @@
-# Monthly KEGG refresh, on the first Monday of the month.
+# Monthly KEGG refresh, on the first Monday of the month at 13:00 local time.
 #
 # Install:
 #   sudo cp deploy/pathwaypilot-refresh.{service,timer} /etc/systemd/system/
@@ -12,14 +12,19 @@ Description=Monthly KEGG data refresh for PathwayPilot
 Documentation=https://github.com/unipept/pathway-pilot
 
 [Timer]
-# First Monday of every month at 03:00. The day-of-month range is what makes
+# First Monday of every month at 13:00. The day-of-month range is what makes
 # it monthly: `Mon` alone would fire every week, and a bare day-of-month would
 # drift across weekdays.
-OnCalendar=Mon *-*-1..7 03:00
+#
+# This is 13:00 in the *system* timezone. Confirm the box is on Europe/Brussels
+# with `timedatectl`. On systemd 252 and newer the zone can be pinned here
+# instead — `OnCalendar=Mon *-*-1..7 13:00 Europe/Brussels` — but that line
+# fails to parse on older systemd, which would stop the timer loading at all.
+OnCalendar=Mon *-*-1..7 13:00
 # Run on next boot if the machine was down when it was due.
 Persistent=true
-# Spread the load so every deployment does not hit KEGG on the same second.
-RandomizedDelaySec=30m
+# Keep the window narrow so the refresh stays inside the early afternoon.
+RandomizedDelaySec=5m
 
 [Install]
 WantedBy=timers.target
