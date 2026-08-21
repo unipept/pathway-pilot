@@ -21,7 +21,7 @@ import {
  * @param res The response
  * @returns   The resulting pathway
  */
-export const getPathwayMapping = async (req: Request, res: Response) => {
+export const getPathwayMapping = async (req: Request<{ pathwayId: string }>, res: Response) => {
     try {
         return res.status(200).json(await findPathwayMapping(req.params.pathwayId))
     } catch (err) {
@@ -52,7 +52,7 @@ export const getPathwayMappings = async (req: Request, res: Response) => {
  * @param res The response
  * @returns   The resulting KO information
  */
-export const getKoMapping = async (req: Request, res: Response) => {
+export const getKoMapping = async (req: Request<{ koNumber: string }>, res: Response) => {
     try {
         return res.status(200).json(await findKoMapping(req.params.koNumber))
     } catch (err) {
@@ -83,7 +83,7 @@ export const getKoMappings = async (req: Request, res: Response) => {
  * @param res The response
  * @returns   The resulting EC information
  */
-export const getEcMapping = async (req: Request, res: Response) => {
+export const getEcMapping = async (req: Request<{ ecNumber: string }>, res: Response) => {
     try {
         return res.status(200).json(await findEcMapping(req.params.ecNumber))
     } catch (err) {
@@ -114,7 +114,7 @@ export const getEcMappings = async (req: Request, res: Response) => {
  * @param res The response
  * @returns   The resulting Reaction information
  */
-export const getReactionMapping = async (req: Request, res: Response) => {
+export const getReactionMapping = async (req: Request<{ reactionId: string }>, res: Response) => {
     try {
         return res.status(200).json(await findReactionMapping(req.params.reactionId))
     } catch (err) {
@@ -145,7 +145,7 @@ export const getReactionMappings = async (req: Request, res: Response) => {
  * @param res The response
  * @returns   The resulting compound information
  */
-export const getCompoundMapping = async (req: Request, res: Response) => {
+export const getCompoundMapping = async (req: Request<{ compoundId: string }>, res: Response) => {
     try {
         return res.status(200).json(await findCompoundMapping(req.params.compoundId))
     } catch (err) {
