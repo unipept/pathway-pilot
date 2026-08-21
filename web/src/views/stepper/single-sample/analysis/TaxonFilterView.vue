@@ -1,7 +1,7 @@
 <template>
     <v-card flat height="100%">
         <v-card-title>
-            <h3 class="text-h5">Use the taxonomy to filter your sample</h3>
+            <h3 class="text-headline-small">Use the taxonomy to filter your sample</h3>
         </v-card-title>
 
         <v-card-text v-if="selectedPathway">

@@ -4,7 +4,7 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -20,7 +20,7 @@
     "roboto-fontface": "*",
     "vue": "^3.5.41",
     "vue-router": "^5.2.0",
-    "vuetify": "^3.13.2",
+    "vuetify": "^4.1.10",
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {

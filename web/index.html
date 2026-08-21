@@ -6,6 +6,21 @@
   <link rel="icon" href="/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pathway Pilot</title>
+
+  <!--
+    Vuetify 4 ships its CSS in cascade layers and declares their order at the top
+    of vuetify/styles. vite-plugin-vuetify emits each component stylesheet
+    separately though, and those land in the bundle *before* that declaration, so
+    the browser falls back to first-appearance order and registers
+    vuetify-components ahead of vuetify-core. That lets Vuetify's own reset
+    (button { font-size: inherit }) outrank its own component rules, so buttons
+    inherit the body font size and their em-sized icons scale wrong.
+
+    Declaring the order here pins it before any bundled stylesheet loads. It has
+    to live in the HTML: as a standalone statement in a .scss entry it is empty,
+    and the CSS minifier drops it.
+  -->
+  <style>@layer vuetify-core,vuetify-components,vuetify-overrides,vuetify-utilities,vuetify-final;</style>
 </head>
 
 <body>

@@ -1,7 +1,7 @@
 <template>
     <v-card class="mt-3">
         <v-card-title>Matched organisms</v-card-title>
-        <v-card-text class="mt-n2 text-subtitle-1">
+        <v-card-text class="mt-n2 text-body-large">
             The following entries contain a match against the selected node. The matched annotations are highlighted for each 
             entry in the Annotations column.
         </v-card-text>

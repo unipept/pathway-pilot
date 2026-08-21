@@ -1,7 +1,7 @@
 <template>
     <v-card>
         <v-card-title>Reaction: {{ reactionId }}</v-card-title>
-        <v-card-subtitle class="mt-n2 text-subtitle-1">
+        <v-card-subtitle class="mt-n2 text-body-large">
             <span v-for="name of reactionNames" :key="name">
                 {{ name }} <br>
             </span>
