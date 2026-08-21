@@ -30,9 +30,9 @@ cd "$ROOT"
 # ---------------------------------------------------------------------------
 log "Checking the working tree is clean"
 # A deploy that quietly discards someone's hotfix is worse than one that stops.
-# backend/data is excluded: those files are tracked, but the refresh timer
-# rewrites them in place, so on a server that has ever refreshed they are
-# always modified. That is expected state, not an edit someone made.
+# backend/data is excluded for belt-and-braces only: it is gitignored, so
+# `git status --porcelain` already can't see anything under it. The exclude
+# costs nothing and keeps this check honest if that ever changes.
 [ -z "$(git status --porcelain -- . ':(exclude)backend/data')" ] \
     || die "working tree has local changes; commit, stash or revert them first"
 
@@ -43,24 +43,7 @@ log "Pulling $BRANCH"
 git fetch --quiet origin "$BRANCH"
 git checkout --quiet "$BRANCH"
 
-# Park the refreshed data outside git for the duration of the fast-forward:
-# otherwise a commit that touches backend/data cannot be merged over locally
-# modified files. The server's copy is newer than anything committed, so it
-# goes back afterwards.
-DATA_STASH=""
-if ! git diff --quiet -- backend/data; then
-    DATA_STASH="$(mktemp -d)"
-    cp -a backend/data/. "$DATA_STASH/"
-    git checkout --quiet -- backend/data
-fi
-
 git merge --ff-only --quiet "origin/$BRANCH" || die "cannot fast-forward $BRANCH; the local branch has diverged"
-
-if [ -n "$DATA_STASH" ]; then
-    cp -a "$DATA_STASH/." backend/data/
-    rm -rf "$DATA_STASH"
-    echo "    kept the server's refreshed backend/data"
-fi
 
 AFTER="$(git rev-parse --short HEAD)"
 if [ "$BEFORE" = "$AFTER" ]; then
@@ -82,9 +65,10 @@ npm prune --omit=dev
 
 # ---------------------------------------------------------------------------
 log "Seeding KEGG data if absent"
-# backend/data ships in the repository, so a fresh checkout already has a
-# usable (if stale) snapshot and this is normally a no-op. It still matters if
-# the directory was ever emptied by hand: the API cannot start without it.
+# backend/data is gitignored, so a fresh checkout has none: this is what seeds
+# it on first deploy. On a server that already has data it is normally a
+# no-op, but it also covers the directory ever being emptied by hand — the
+# API cannot start without it.
 if [ -z "$(ls -A data 2>/dev/null || true)" ]; then
     echo "    data/ is empty — running a full refresh (about three minutes)"
     npm run refresh-data

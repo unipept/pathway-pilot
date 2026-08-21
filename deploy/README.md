@@ -135,12 +135,13 @@ It is safe to re-run, and re-running with no new commits simply rebuilds.
 
 ## The KEGG data
 
-`backend/data/` is roughly 8 MB of tables fetched from `rest.kegg.jp`. A snapshot of it
-**is tracked in git**, so a fresh checkout starts without a refresh, but on the server
-those files are live state: the refresh timer rewrites them in place, which leaves the
-working tree permanently modified under `backend/data`. `deploy.sh` knows this — it
-ignores that directory when it checks the tree is clean, and copies the server's
-(newer) files back over anything a pull brings in.
+`backend/data/` is roughly 8 MB of tables fetched from `rest.kegg.jp`. It is **not
+tracked in git** (gitignored at `backend/.gitignore:7`) — it is server-side state,
+seeded by `npm run refresh-data` and rewritten in place monthly by the timer.
+`deploy.sh` already calls `npm run refresh-data` when `data/` is empty, so a fresh
+checkout seeds itself on first deploy. Being untracked also means it is simply invisible
+to git: there is nothing for a pull to conflict with and nothing for the tree-cleanliness
+check to trip over.
 
 The timer refreshes it on the first Monday of each month at 13:00:
 
@@ -189,9 +190,8 @@ cd ../web && sudo -u pathwp npm ci && sudo -u pathwp npm run build
 sudo systemctl restart pathwaypilot-api
 ```
 
-A rollback does move `backend/data/` back to the snapshot committed at that revision.
-The data is not version-specific, so this only costs you freshness — run
-`sudo systemctl start pathwaypilot-refresh` afterwards if it matters.
+A rollback does **not** touch `backend/data/` — it is untracked, so a checkout leaves it
+exactly as it is. No refresh is needed afterwards.
 
 To get back onto the branch afterwards: `git checkout main`, then run `deploy.sh`.
 
