@@ -1,0 +1,50 @@
+# PathwayPilot backend API.
+#
+# Install:
+#   sudo cp deploy/pathwaypilot-api.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now pathwaypilot-api
+#
+# Logs:    journalctl -u pathwaypilot-api -f
+# Restart: sudo systemctl restart pathwaypilot-api
+#
+# ExecStart needs a system-wide node: systemd does not run a login shell, so
+# nvm's node is not on PATH here. See docs/deployment.md.
+
+[Unit]
+Description=PathwayPilot backend API
+Documentation=https://github.com/unipept/pathway-pilot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pathwp
+Group=pathwp
+
+WorkingDirectory=/home/pathwp/pathway-pilot/backend
+EnvironmentFile=/home/pathwp/pathway-pilot/backend/.env
+ExecStart=/usr/bin/node build/index.js
+
+# The mapping tables are built at import time and take a while on this
+# dataset, so give startup room before deciding the unit has failed.
+TimeoutStartSec=300
+
+Restart=always
+RestartSec=5
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pathwaypilot-api
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+# The checkout lives under /home, so ProtectHome=true would hide the service's
+# own tree from it. read-only still shuts it out of every other home directory,
+# and the API needs nothing more: it only ever reads. Only the refresh job
+# writes, and only into backend/data.
+ProtectHome=read-only
+
+[Install]
+WantedBy=multi-user.target
