@@ -24,6 +24,7 @@ updates:
           - "@vue/*"
           - "@vitejs/*"
           - "vite"
+          - "eslint*"
 
   - package-ecosystem: github-actions
     directory: "/"
