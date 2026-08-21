@@ -11,7 +11,7 @@ import { findPathway } from "../services/PathwayService";
  * @param res The response
  * @returns   The resulting pathway
  */
-export const getPathway = async (req: Request, res: Response) => {
+export const getPathway = async (req: Request<{ pathwayId: string }>, res: Response) => {
     try {
         const pathway = await findPathway(req.params.pathwayId);
         return res.status(200).json(pathway);
