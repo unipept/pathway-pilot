@@ -16,10 +16,16 @@ Documentation=https://github.com/unipept/pathway-pilot
 # it monthly: `Mon` alone would fire every week, and a bare day-of-month would
 # drift across weekdays.
 #
-# This is 13:00 in the *system* timezone. Confirm the box is on Europe/Brussels
-# with `timedatectl`. On systemd 252 and newer the zone can be pinned here
-# instead — `OnCalendar=Mon *-*-1..7 13:00 Europe/Brussels` — but that line
-# fails to parse on older systemd, which would stop the timer loading at all.
+# 13:00 here is 13:00 in the *system* timezone, and the server must therefore
+# be on Europe/Brussels:
+#
+#   timedatectl                                  # must say Europe/Brussels
+#   sudo timedatectl set-timezone Europe/Brussels
+#
+# Pinning the zone in this line instead (`… 13:00 Europe/Brussels`) needs
+# systemd 252; this host runs 249, where that syntax does not parse and the
+# timer would not load at all. Setting the system zone also means the schedule
+# follows DST by itself, which a fixed UTC hour would not.
 OnCalendar=Mon *-*-1..7 13:00
 # Run on next boot if the machine was down when it was due.
 Persistent=true

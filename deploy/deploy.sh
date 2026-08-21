@@ -17,6 +17,10 @@ SERVICE="${SERVICE:-pathwaypilot-api}"
 BRANCH="${BRANCH:-main}"
 HEALTH_URL="${HEALTH_URL:-http://127.0.0.1:3000/mapping/ec/1.1.1.1}"
 HEALTH_TIMEOUT="${HEALTH_TIMEOUT:-300}"
+# RESTART=0 builds everything and stops there, leaving whatever is serving in
+# place. Used during the migration onto systemd, where the old process still
+# holds port 3000 and starting the unit would only fail.
+RESTART="${RESTART:-1}"
 
 log() { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
 die() { printf '\n\033[31mFAILED: %s\033[0m\n' "$*" >&2; exit 1; }
@@ -96,8 +100,16 @@ npm run build
 [ -f dist/index.html ] || die "web build produced no dist/index.html"
 
 # ---------------------------------------------------------------------------
-log "Restarting $SERVICE"
 cd "$ROOT"
+
+if [ "$RESTART" = "0" ]; then
+    log "Built $AFTER — not restarting (RESTART=0)"
+    echo "    backend:  $ROOT/backend/build"
+    echo "    frontend: $ROOT/web/dist (served by nginx)"
+    exit 0
+fi
+
+log "Restarting $SERVICE"
 sudo systemctl restart "$SERVICE"
 
 # ---------------------------------------------------------------------------

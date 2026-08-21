@@ -12,14 +12,14 @@ repository.
                     ┌──────────────────────── the server ───────────────────────┐
                     │                                                            │
   browser ────────▶ │  nginx :80/:443                                            │
-                    │    ├── /            → /opt/pathwaypilot/web/dist  (static) │
+                    │    ├── /            → ~pathwp/pathway-pilot/web/dist     │
                     │    └── /api/        → 127.0.0.1:3000              (proxy)  │
                     │                             │                              │
                     │                    pathwaypilot-api.service                │
                     │                      node build/index.js                   │
                     │                             │                              │
                     │                     backend/data/  ◀── pathwaypilot-       │
-                    │                     (untracked)         refresh.timer      │
+                    │                                             refresh.timer      │
                     └────────────────────────────────────────────┼───────────────┘
                                                                  ▼
                                                           rest.kegg.jp
@@ -32,59 +32,98 @@ through this server.
 
 | path | what it is |
 |---|---|
-| `/opt/pathwaypilot` | the git checkout, on `main` |
-| `/opt/pathwaypilot/backend/.env` | configuration — **not in git**, see `backend/.env.example` |
-| `/opt/pathwaypilot/backend/build` | compiled backend, produced by `npm run build` |
-| `/opt/pathwaypilot/backend/data` | KEGG data — **not in git**, server-side state |
-| `/opt/pathwaypilot/web/dist` | built frontend, served by nginx |
+| `/home/pathwp/pathway-pilot` | the git checkout, on `main` |
+| `/home/pathwp/pathway-pilot/backend/.env` | configuration — **not in git**, see `backend/.env.example` |
+| `/home/pathwp/pathway-pilot/backend/build` | compiled backend, produced by `npm run build` |
+| `/home/pathwp/pathway-pilot/backend/data` | KEGG data — server-side state, see below |
+| `/home/pathwp/pathway-pilot/web/dist` | built frontend, served directly by nginx |
+| `/etc/nginx/sites-available/pathwp-web` | the site, symlinked into `sites-enabled` |
 
-Everything runs as an unprivileged `pathwaypilot` user that owns the checkout.
+Everything runs as the unprivileged `pathwp` user that owns the checkout. The paths above
+appear in both systemd units and in `deploy/nginx.conf.example`; they have to agree, so
+move them together or not at all.
 
-> **The machine serving pathwaypilot.ugent.be today does not use these paths yet.** Its
-> nginx site is `pathwp-web` and its document root is `/var/www/pathwp-web/dist`, which is
-> what `deploy/nginx.conf.example` targets. The `root` in that file, the paths in the two
-> systemd units, and this table all have to name the same checkout — if the existing tree
-> stays where it is instead of moving to `/opt/pathwaypilot`, change them together.
+Two things the machine needs that are easy to miss:
 
-## First-time setup
+- **A system-wide node.** systemd does not run a login shell, so nvm's node is invisible
+  to it and `ExecStart=/usr/bin/node` would fail. Install Node 22 LTS from the distro or
+  NodeSource; nvm stays fine for interactive work.
+- **The system timezone on `Europe/Brussels`**, because the refresh timer schedules in
+  local time and this host's systemd is too old to pin a zone per unit.
 
-Once per machine.
+`/var/www/pathwp-web/dist` was the old document root — a hand-copied build, last written
+in December 2024. Nothing writes there any more once the new site config is in place, and
+it can be archived and deleted.
+
+## Setting the machine up
+
+Once per machine. The API currently runs under `forever` + `nodemon` + `ts-node` against
+`src/`, started by hand; these steps replace that with systemd running compiled output.
+Do them in order — the old process keeps serving until step 6, so you can stop at any
+point and still have a working site.
 
 ```bash
-# 1. A service account that owns the tree
-sudo useradd --system --create-home --home-dir /opt/pathwaypilot pathwaypilot
-sudo -u pathwaypilot git clone https://github.com/unipept/pathway-pilot.git /opt/pathwaypilot
+# 1. A node systemd can see. nvm's v21.7.1 is end-of-life and only exists in
+#    pathwp's shell.
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt-get install -y nodejs
+/usr/bin/node --version                       # must print v22.x
 
-# 2. Configuration
-cd /opt/pathwaypilot/backend
-sudo -u pathwaypilot cp .env.example .env
-sudo -u pathwaypilot "$EDITOR" .env          # defaults work; check PORT
+# 2. Local time, for the refresh timer
+sudo timedatectl set-timezone Europe/Brussels
+timedatectl                                   # confirm
 
-# 3. systemd units
-sudo cp /opt/pathwaypilot/deploy/pathwaypilot-api.service       /etc/systemd/system/
-sudo cp /opt/pathwaypilot/deploy/pathwaypilot-refresh.service   /etc/systemd/system/
-sudo cp /opt/pathwaypilot/deploy/pathwaypilot-refresh.timer     /etc/systemd/system/
+# 3. Configuration, if backend/.env is not already there
+cd /home/pathwp/pathway-pilot/backend
+sudo -u pathwp cp -n .env.example .env
+sudo -u pathwp "$EDITOR" .env                 # defaults work; check PORT
+
+# 4. systemd units
+cd /home/pathwp/pathway-pilot
+sudo cp deploy/pathwaypilot-api.service     /etc/systemd/system/
+sudo cp deploy/pathwaypilot-refresh.service /etc/systemd/system/
+sudo cp deploy/pathwaypilot-refresh.timer   /etc/systemd/system/
+sudo systemd-analyze verify /etc/systemd/system/pathwaypilot-*.{service,timer}
 sudo systemctl daemon-reload
 
-# 4. nginx — the site already exists as pathwp-web; keep the same name so the
-#    symlink in sites-enabled and the Certbot renewal hooks keep working.
-sudo cp /opt/pathwaypilot/deploy/nginx.conf.example /etc/nginx/sites-available/pathwp-web
-sudo ln -s /etc/nginx/sites-available/pathwp-web /etc/nginx/sites-enabled/   # already linked
+# 5. Build once, while the old process is still serving. RESTART=0 stops the
+#    script before it touches systemd — the old process still owns port 3000,
+#    so starting the unit now would only fail on EADDRINUSE.
+sudo -u pathwp env RESTART=0 ./deploy/deploy.sh   # env: sudoers may strip a bare VAR=
+
+# 6. Hand over: stop the old process, start the unit
+sudo -u pathwp -i forever list               # note what is running — there are two monitors
+sudo -u pathwp -i forever stopall
+sudo systemctl enable --now pathwaypilot-api
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:3000/mapping/ec/1.1.1.1
+
+# 7. nginx — same site name, so the sites-enabled symlink and the Certbot
+#    renewal hooks keep working. Keep a copy of the old file first.
+sudo cp /etc/nginx/sites-available/pathwp-web /root/pathwp-web.nginx.bak
+sudo cp deploy/nginx.conf.example /etc/nginx/sites-available/pathwp-web
 sudo nginx -t && sudo systemctl reload nginx
 
-# 5. First deploy — builds both halves and seeds backend/data (~3 min)
-cd /opt/pathwaypilot && sudo -u pathwaypilot ./deploy/deploy.sh
-
-# 6. Enable on boot
-sudo systemctl enable --now pathwaypilot-api
+# 8. The monthly refresh
 sudo systemctl enable --now pathwaypilot-refresh.timer
+systemctl list-timers pathwaypilot-refresh.timer
+```
+
+Check anything that started the old process on boot — a `@reboot` crontab line for
+`pathwp`, or a `forever` service — and remove it, or it will fight the unit for port 3000
+after the next reboot.
+
+If step 7 leaves the site serving 403s, nginx cannot traverse into the checkout:
+
+```bash
+sudo -u www-data ls /home/pathwp/pathway-pilot/web/dist   # must list the build
+sudo chmod o+x /home/pathwp /home/pathwp/pathway-pilot    # if it cannot
 ```
 
 ## Deploying a change
 
 ```bash
-cd /opt/pathwaypilot
-sudo -u pathwaypilot ./deploy/deploy.sh
+cd /home/pathwp/pathway-pilot
+sudo -u pathwp ./deploy/deploy.sh
 ```
 
 The script pulls `main`, rebuilds the backend and the frontend, seeds `backend/data` if
@@ -140,13 +179,13 @@ The deploy is a git checkout, so rolling back is checking out the previous commi
 rebuilding:
 
 ```bash
-cd /opt/pathwaypilot
-sudo -u pathwaypilot git log --oneline -10          # find the last good commit
-sudo -u pathwaypilot git checkout <sha>
-cd backend && sudo -u pathwaypilot npm ci --omit=dev \
-  && sudo -u pathwaypilot npm install --no-save typescript \
-  && sudo -u pathwaypilot npm run build
-cd ../web && sudo -u pathwaypilot npm ci && sudo -u pathwaypilot npm run build
+cd /home/pathwp/pathway-pilot
+sudo -u pathwp git log --oneline -10          # find the last good commit
+sudo -u pathwp git checkout <sha>
+cd backend && sudo -u pathwp npm ci --omit=dev \
+  && sudo -u pathwp npm install --no-save typescript \
+  && sudo -u pathwp npm run build
+cd ../web && sudo -u pathwp npm ci && sudo -u pathwp npm run build
 sudo systemctl restart pathwaypilot-api
 ```
 
@@ -155,6 +194,9 @@ The data is not version-specific, so this only costs you freshness — run
 `sudo systemctl start pathwaypilot-refresh` afterwards if it matters.
 
 To get back onto the branch afterwards: `git checkout main`, then run `deploy.sh`.
+
+A rollback leaves the built frontend at whatever the last build produced, so run the
+frontend build (or `deploy.sh`) rather than only restarting the API.
 
 ## Checking on it
 
@@ -183,5 +225,8 @@ a cheap real request instead.
   `npm run serve` runs TypeScript through ts-node for local development. Keeping ts-node
   off the production path is deliberate — a break in that toolchain took `npm run serve`
   down once already.
+- **Two node installs.** systemd and `deploy.sh` use `/usr/bin/node`; an interactive
+  `pathwp` shell gets nvm's. Check `/usr/bin/node --version` before blaming a build for
+  something a version difference explains.
 - **No zero-downtime deploy.** `systemctl restart` stops the old process before the new
   one is ready. Given the traffic this serves, that is a reasonable trade.

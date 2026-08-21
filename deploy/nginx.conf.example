@@ -11,16 +11,20 @@
 #   sudo ln -s /etc/nginx/sites-available/pathwp-web /etc/nginx/sites-enabled/   # already linked
 #   sudo nginx -t && sudo systemctl reload nginx
 #
-# `root` must point at the built frontend — the `dist/` produced by
-# `npm run build` in web/. Change it here and in docs/deployment.md together
-# if the checkout ever moves.
+# `root` points straight at the `dist/` that `deploy.sh` builds inside the
+# checkout, so nginx can never serve a stale copy someone forgot to sync. That
+# needs nginx to be able to traverse into the checkout:
+#
+#   sudo -u www-data test -x /home/pathwp && sudo -u www-data ls /home/pathwp/pathway-pilot/web/dist
+#
+# The old document root, /var/www/pathwp-web/dist, is no longer used.
 
 server {
     listen 443 ssl; # managed by Certbot
 
     server_name pathwp.ugent.be pathwaypilot.ugent.be;
 
-    root /var/www/pathwp-web/dist;
+    root /home/pathwp/pathway-pilot/web/dist;
     index index.html;
 
     ssl_certificate /etc/letsencrypt/live/pathwp.ugent.be/fullchain.pem; # managed by Certbot
