@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title>Orthology: {{ koId }}</v-card-title>
         <v-card-subtitle class="mt-n2 text-subtitle-1">
-            <span v-for="name of koNames">
+            <span v-for="name of koNames" :key="name">
                 {{ name }} <br>
             </span>
         </v-card-subtitle>

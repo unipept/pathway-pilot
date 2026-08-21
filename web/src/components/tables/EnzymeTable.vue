@@ -1,6 +1,6 @@
 <template>
     <div v-if="hasItems" class="scrollable-overflow">
-        <div v-for="item of items.slice(0, itemsToDisplay)">
+        <div v-for="item of items.slice(0, itemsToDisplay)" :key="item.name">
             <enzyme-chip
                 :key="item.name"
                 class="chip flex-grow-1"

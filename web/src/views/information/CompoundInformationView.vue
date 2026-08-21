@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title>Compound: {{ compoundId }}</v-card-title>
         <v-card-subtitle class="mt-n2 text-subtitle-1">
-            <span v-for="name of compoundNames">
+            <span v-for="name of compoundNames" :key="name">
                 {{ name }} <br>
             </span>
         </v-card-subtitle>
