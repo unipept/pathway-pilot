@@ -1,0 +1,25 @@
+# Monthly KEGG refresh, on the first Monday of the month.
+#
+# Install:
+#   sudo cp deploy/pathwaypilot-refresh.{service,timer} /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now pathwaypilot-refresh.timer
+#
+# Check:  systemctl list-timers pathwaypilot-refresh.timer
+
+[Unit]
+Description=Monthly KEGG data refresh for PathwayPilot
+Documentation=https://github.com/unipept/pathway-pilot
+
+[Timer]
+# First Monday of every month at 03:00. The day-of-month range is what makes
+# it monthly: `Mon` alone would fire every week, and a bare day-of-month would
+# drift across weekdays.
+OnCalendar=Mon *-*-1..7 03:00
+# Run on next boot if the machine was down when it was due.
+Persistent=true
+# Spread the load so every deployment does not hit KEGG on the same second.
+RandomizedDelaySec=30m
+
+[Install]
+WantedBy=timers.target

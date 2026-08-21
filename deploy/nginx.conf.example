@@ -1,0 +1,70 @@
+# nginx site for pathwaypilot.ugent.be.
+#
+# Serves the built frontend as static files and proxies /api to the Node
+# process managed by pathwaypilot-api.service.
+#
+# Install:
+#   sudo cp deploy/nginx.conf.example /etc/nginx/sites-available/pathwaypilot
+#   sudo ln -s /etc/nginx/sites-available/pathwaypilot /etc/nginx/sites-enabled/
+#   sudo nginx -t && sudo systemctl reload nginx
+#
+# TLS lines are left commented: if certificates are managed elsewhere
+# (certbot, a UGent-managed proxy), keep this as the plain-HTTP backend.
+
+server {
+    listen 80;
+    server_name pathwaypilot.ugent.be;
+
+    # listen 443 ssl http2;
+    # ssl_certificate     /etc/letsencrypt/live/pathwaypilot.ugent.be/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/pathwaypilot.ugent.be/privkey.pem;
+
+    root /opt/pathwaypilot/web/dist;
+    index index.html;
+
+    # Pathway responses inline a base64 PNG and run to several hundred KB.
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
+    # Vite emits content-hashed filenames, so assets can be cached hard.
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # index.html must never be cached, or a deploy ships stale asset refs.
+    location = /index.html {
+        add_header Cache-Control "no-store";
+    }
+
+    location /api/ {
+        # Trailing slashes on both sides strip the /api prefix, so
+        # /api/pathway/map00053 reaches the backend as /pathway/map00053.
+        proxy_pass http://127.0.0.1:3000/;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # A cold backend builds its mapping tables before answering, and a
+        # pathway request fetches from KEGG, so allow well past the default 60s.
+        proxy_connect_timeout 10s;
+        proxy_read_timeout    300s;
+        proxy_send_timeout    300s;
+
+        # Responses are large and already complete; stream them straight out.
+        proxy_buffering off;
+    }
+
+    # Single-page app: unknown paths are routes, not missing files.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    access_log /var/log/nginx/pathwaypilot.access.log;
+    error_log  /var/log/nginx/pathwaypilot.error.log;
+}
