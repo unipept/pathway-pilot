@@ -17,6 +17,10 @@ export default defineConfigWithVueTs(
     rules: {
       'vue/multi-word-component-names': 'off',
 
+      // Vuetify data-table slots are named `item.<column>`. The rule reads the
+      // dot as a directive modifier; this is the documented way to allow it.
+      'vue/valid-v-slot': ['error', { allowModifiers: true }],
+
       // The base rule does not understand type-only imports or Vue's
       // compiler macros; the TypeScript-aware one replaces it.
       'no-unused-vars': 'off',
