@@ -24,8 +24,8 @@ You need Node 20 or newer. That is what CI uses; nothing older is tested.
 CI runs these on every pull request, so it is worth running them first:
 
 ```bash
-cd web     && npm ci && npm run build     # vue-tsc typecheck + production build
-cd backend && npm ci && npx tsc --noEmit  # typecheck
+cd web     && npm ci && npm run build                 # vue-tsc typecheck + production build
+cd backend && npm ci && npx tsc --noEmit && npm test  # typecheck + vitest
 ```
 
 Lint is not yet part of CI, but new code should not add problems to it:
@@ -49,10 +49,13 @@ Explain *why* in the body where the reason is not obvious from the diff.
 
 ## A note on tests
 
-There is currently no test suite. That means the checks above verify that the code
-compiles and builds, not that it behaves correctly — so please exercise your change in
-the running app before opening a pull request, and say in the description what you
-checked.
+`backend/` has a Vitest suite, run with `cd backend && npm test`. It is offline — it
+generates its own fixture data before running and removes it afterwards — so it needs
+no network and no real KEGG data.
+
+`web/` still has no test suite (tracked as issue #96), so for web changes please keep
+exercising your change in the running app before opening a pull request, and say in the
+description what you checked.
 
 ## Reporting problems
 
