@@ -57,5 +57,3 @@ checked. The sample files in `test-data/` cover every supported input format.
 ## Reporting problems
 
 - **Bugs and feature requests** — open an issue.
-- **Security vulnerabilities** — please do not open a public issue. See
-  [SECURITY.md](SECURITY.md) if present, or contact the maintainers privately.
