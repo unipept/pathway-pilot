@@ -3,8 +3,7 @@ import koMap from "../mappings/KoMap";
 import ecMap from "../mappings/EcMap";
 import reactionMap from "../mappings/ReactionMap";
 import compoundMap from "../mappings/CompoundMap";
-
-// TODO: Better error differentiation
+import NotFoundError from "../errors/NotFoundError";
 
 /**
  * Finds the pathway mapping for the given pathwayId
@@ -16,7 +15,7 @@ import compoundMap from "../mappings/CompoundMap";
 export const findPathwayMapping = async (pathwayId: string) => {
     const pathway = pathwayMap.get(pathwayId);
     if (!pathway) {
-        throw new Error("Pathway not found");
+        throw new NotFoundError("Pathway not found");
     }
 
     return pathway;
@@ -41,7 +40,7 @@ export const findPathwayMappings = async () => {
 export const findKoMapping = (koNumber: string) => {
     const ko = koMap.get(koNumber);
     if (!ko) {
-        throw new Error("KO number not found");
+        throw new NotFoundError("KO number not found");
     }
 
     return ko;
@@ -66,7 +65,7 @@ export const findKoMappings = () => {
 export const findEcMapping = async (ecNumber: string) => {
     const ec = ecMap.get(ecNumber);
     if (!ec) {
-        throw new Error("EC number not found");
+        throw new NotFoundError("EC number not found");
     }
 
     return ec;
@@ -91,7 +90,7 @@ export const findEcMappings = async () => {
 export const findReactionMapping = async (reactionId: string) => {
     const reaction = reactionMap.get(reactionId);
     if (!reaction) {
-        throw new Error("Reaction id not found");
+        throw new NotFoundError("Reaction id not found");
     }
 
     return reaction;
@@ -116,7 +115,7 @@ export const findReactionMappings = async () => {
 export const findCompoundMapping = async (compoundId: string) => {
     const compound = compoundMap.get(compoundId);
     if (!compound) {
-        throw new Error("Compound id not found");
+        throw new NotFoundError("Compound id not found");
     }
 
     return compound;
