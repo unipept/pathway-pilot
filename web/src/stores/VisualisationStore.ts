@@ -2,6 +2,7 @@ import Pathway from "@/logic/entities/Pathway";
 import Taxon from "@/logic/entities/Taxon";
 import { defineStore } from "pinia";
 import {ref, reactive} from "vue";
+import { API_BASE_URL } from "@/logic/constants/ApiConstants";
 
 const useVisualisationStore = defineStore('visualisationStore', () => {
     // Keep track of already fetched pathways
@@ -23,7 +24,7 @@ const useVisualisationStore = defineStore('visualisationStore', () => {
         const id = newPathway?.id;
         if (id && !pathwayData.has(id)) {
             pathwayData.set(id, fetch(
-                `https://pathwaypilot.ugent.be/api/pathway/${id}`
+                `${API_BASE_URL}/pathway/${id}`
             ).then(res => res.json()));
         }
     }
