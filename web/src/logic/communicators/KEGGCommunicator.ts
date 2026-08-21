@@ -1,6 +1,8 @@
+import { API_BASE_URL } from "../constants/ApiConstants";
+
 export default class KeggCommunicator {
     constructor(
-        private readonly baseUrl: string = "https://pathwaypilot.ugent.be/api"
+        private readonly baseUrl: string = API_BASE_URL
     ) {}
 
     public async fetchPathwayMapping() {
