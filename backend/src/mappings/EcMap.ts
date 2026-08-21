@@ -22,7 +22,7 @@ export type EcValue = {
     reactionIds: string[];
 };
 
-class EcMap extends ReaderMap<EcKey, EcValue> {
+export class EcMap extends ReaderMap<EcKey, EcValue> {
     constructor(
         descriptionFile: string  = config.ecDataFile,
         pathwayLinkFile: string  = config.ecPathwayLinkFile,

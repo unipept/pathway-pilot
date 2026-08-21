@@ -22,7 +22,7 @@ export type CompoundValue = {
     reactionIds: string[];
 };
 
-class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
+export class CompoundMap extends ReaderMap<CompoundKey, CompoundValue> {
     constructor(
         descriptionFile: string  = config.compoundDataFile,
         pathwayLinkFile: string  = config.compoundPathwayLinkFile,
