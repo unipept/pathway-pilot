@@ -1,0 +1,25 @@
+/**
+ * src/styles/reset.scss
+ *
+ * Vuetify 3 shipped `* { padding: 0; margin: 0 }` as part of its CSS reset.
+ * Vuetify 4 cut the reset down to `html`/`body`, so bare elements pick the
+ * browser's default margins back up: headings fall out of line with their
+ * timeline dots, and stray whitespace appears between blocks.
+ *
+ * Only the tags this app renders itself are listed. A blanket `*` is not safe
+ * here -- this layer outranks the per-component stylesheets emitted by
+ * vite-plugin-vuetify, so it would flatten VCard/VBtn padding too. `ul` is
+ * likewise left out because VList renders one.
+ */
+@layer vuetify-core.reset {
+    h1, h2, h3, h4, h5, h6, p, ol, dl, dd, blockquote, figure, pre {
+        padding: 0;
+        margin: 0;
+    }
+
+    /* UA gives checkbox/radio inputs a 3px 3px 0 5px margin; v3 zeroed it.
+       Margin only -- padding here belongs to the field styles. */
+    input {
+        margin: 0;
+    }
+}
