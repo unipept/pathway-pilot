@@ -10,9 +10,9 @@ import request from 'supertest';
 // The unknown-EC-id case also drives two more assertions that belong to
 // ErrorHandler's rendering contract rather than to this route -- that a 404
 // logs no stack, and that an unexpected error still answers 500 with the
-// generic body and logs one. Those live in ErrorHandler.test.ts instead of
+// generic body and logs one. Those live in ../middleware/ErrorHandler.test.ts instead of
 // here.
-import app from '../src/app';
+import app from '../../src/app';
 
 describe('GET /mapping/ec/:ecNumber', () => {
     it('returns the mapping the fixture yields for a known EC number', async () => {

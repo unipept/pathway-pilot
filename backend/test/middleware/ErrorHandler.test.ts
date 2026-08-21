@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Request, Response } from 'express';
 import request from 'supertest';
 
-import errorHandler from '../src/middleware/ErrorHandler';
-import app from '../src/app';
+import errorHandler from '../../src/middleware/ErrorHandler';
+import app from '../../src/app';
 
 // Every route test drives this middleware through a request that hasn't
 // written a response yet, so the res.headersSent branch (lines 15-16) never
@@ -62,8 +62,8 @@ describe('GET /mapping/ec/:ecNumber when the service throws an unexpected error'
     // the 500 path is still reachable and unweakened.
     it('still answers 500 with the generic body and logs the stack', async () => {
         vi.resetModules();
-        vi.doMock('../src/services/MappingService', async () => {
-            const actual = await vi.importActual<typeof import('../src/services/MappingService')>('../src/services/MappingService');
+        vi.doMock('../../src/services/MappingService', async () => {
+            const actual = await vi.importActual<typeof import('../../src/services/MappingService')>('../../src/services/MappingService');
             return {
                 ...actual,
                 findEcMapping: vi.fn().mockRejectedValue(new Error('boom'))
@@ -72,7 +72,7 @@ describe('GET /mapping/ec/:ecNumber when the service throws an unexpected error'
 
         const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-        const { default: mockedApp } = await import('../src/app');
+        const { default: mockedApp } = await import('../../src/app');
         const res = await request(mockedApp).get('/mapping/ec/1.1.1.1');
 
         expect(res.status).toBe(500);

@@ -4,14 +4,14 @@ import request from 'supertest';
 // Covers the app's wiring rather than any single route or controller: the
 // ready path of /health, and an unmatched path.
 //
-// The ready path lives here rather than in HealthController.test.ts because
+// The ready path lives here rather than in controllers/HealthController.test.ts because
 // that file mocks CompoundMap to an empty Map at module scope to cover the
 // degraded path -- a ready-path assertion there would see maps.compound as 0
 // and fail. This file imports the real, unmocked `app`, so all six maps are
 // built from the fixture as normal.
 //
 // /nope isn't a mapping route and never reaches errorHandler, so it belongs
-// in neither MappingRoute.test.ts nor ErrorHandler.test.ts: it's proving that
+// in neither routes/MappingRoute.test.ts nor middleware/ErrorHandler.test.ts: it's proving that
 // an unmatched path falls through to Express's own final handler rather than
 // being swallowed by something this app registered.
 import app from '../src/app';

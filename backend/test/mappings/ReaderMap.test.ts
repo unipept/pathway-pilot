@@ -3,7 +3,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import ReaderMap from '../src/mappings/ReaderMap';
+import ReaderMap from '../../src/mappings/ReaderMap';
 
 describe('ReaderMap#readlines', () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'reader-map-'));
