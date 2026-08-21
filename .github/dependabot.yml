@@ -16,6 +16,14 @@ updates:
       time: "13:00"
       timezone: "Europe/Brussels"
     open-pull-requests-limit: 99
+    groups:
+      typescript-tooling:
+        patterns:
+          - "typescript"
+          - "vue-tsc"
+          - "@vue/*"
+          - "@vitejs/*"
+          - "vite"
 
   - package-ecosystem: github-actions
     directory: "/"
