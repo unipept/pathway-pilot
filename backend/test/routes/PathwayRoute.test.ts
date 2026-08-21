@@ -47,3 +47,46 @@ describe('GET /pathway/:pathwayId', () => {
         ]);
     });
 });
+
+describe('GET /pathway/:pathwayId when KEGG cannot be reached', () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+        vi.mocked(axios.get).mockReset();
+    });
+
+    // findPathway has no try/catch of its own: it lets the axios rejection
+    // propagate, Express 5 forwards it out of the async handler, and
+    // ErrorHandler turns it into a 500. That is three components deep and the
+    // only route in the app that can fail because something outside it is
+    // down, so it is worth proving end to end rather than assuming.
+    it('answers 500 with the generic body instead of leaking the upstream error', async () => {
+        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        vi.mocked(axios.get).mockRejectedValueOnce(new Error('getaddrinfo ENOTFOUND rest.kegg.jp'));
+
+        const res = await request(app).get('/pathway/map00010');
+
+        expect(res.status).toBe(500);
+        expect(res.body).toEqual({ error: 'Internal server error' });
+        // The upstream message names an internal host and must not reach the
+        // caller, only the log.
+        expect(JSON.stringify(res.body)).not.toContain('rest.kegg.jp');
+        expect(errorSpy).toHaveBeenCalledWith(
+            expect.stringContaining('[err] GET /pathway/map00010 - getaddrinfo ENOTFOUND rest.kegg.jp')
+        );
+    });
+
+    // The PNG is fetched after the HTML has already parsed, so a failure here
+    // takes a different path out of findPathway than the one above. Without
+    // this, a stray try/catch around only the first request would still pass.
+    it('answers 500 when the HTML arrives but the image request fails', async () => {
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        vi.mocked(axios.get)
+            .mockResolvedValueOnce({ data: fixtureHtml })
+            .mockRejectedValueOnce(new Error('Request failed with status code 404'));
+
+        const res = await request(app).get('/pathway/map00010');
+
+        expect(res.status).toBe(500);
+        expect(res.body).toEqual({ error: 'Internal server error' });
+    });
+});
