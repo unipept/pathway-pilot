@@ -23,13 +23,13 @@
 
         <template #item.name="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.raw.name }}
+                {{ item.name }}
             </div>
         </template>
 
         <template #item.description="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.raw.description }}
+                {{ item.description }}
             </div>
         </template>
 
@@ -45,6 +45,7 @@
 </template>
 
 <script setup lang="ts">
+import type { DataTableHeader } from 'vuetify';
 import { ref, watch } from 'vue';
 import { FilterTableItem } from './FilterTableItem';
 
@@ -67,12 +68,12 @@ const pageOptions = ref({
 const selected = ref<FilterTableItem[]>(props.modelValue);
 
 const onRowClicked = (e: any, i: any) => {
-    if (selected.value.map(item => item.name).includes(i.item.raw.name)) {
-        selected.value = selected.value.filter((item) => item.name !== i.item.raw.name);
+    if (selected.value.map(item => item.name).includes(i.item.name)) {
+        selected.value = selected.value.filter((item) => item.name !== i.item.name);
     } else {
         selected.value = [...selected.value, {
-            name: i.item.raw.name,
-            description: i.item.raw.description,
+            name: i.item.name,
+            description: i.item.description,
             color: props.color
         }];
     }
@@ -81,10 +82,10 @@ const onRowClicked = (e: any, i: any) => {
 };
 
 const rowActive = (item: any) => {
-    return selected.value.map(item => item.name).includes(item.raw.name);
+    return selected.value.map(selection => selection.name).includes(item.name);
 };
 
-const headers = [
+const headers: DataTableHeader<FilterTableItem>[] = [
     {
         title: "",
         align: "start",

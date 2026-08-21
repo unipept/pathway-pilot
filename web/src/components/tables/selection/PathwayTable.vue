@@ -24,28 +24,28 @@
 
         <template #item.id="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.raw.id }}
+                {{ item.id }}
             </div>
         </template>
 
         <template #item.subCategory="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                <v-icon :color="categoryColor(item.raw.category, item.raw.subCategory).toString()" size="x-large">
+                <v-icon :color="categoryColor(item.category, item.subCategory).toString()" size="x-large">
                     mdi-circle-medium
                 </v-icon>
-                {{ item.raw.subCategory }}
+                {{ item.subCategory }}
             </div>
         </template>
 
         <template #item.name="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.raw.name }}
+                {{ item.name }}
             </div>
         </template>
 
         <template #item.count="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.raw.count }}
+                {{ item.count }}
             </div>
         </template>
 
@@ -71,6 +71,7 @@
 
 <script setup lang="ts">
 import Pathway from '@/logic/entities/Pathway';
+import type { DataTableHeader, DataTableSortItem } from 'vuetify';
 import { computed, ref, watch } from 'vue';
 import { PathwayTableItem } from '../selection/PathwayTableItem';
 import { groupColors, pathwayGroups } from "@/types/PathwayGroup";
@@ -87,7 +88,7 @@ const props = defineProps<Props>();
 const emits = defineEmits(["update:model-value"]);
 
 const page = ref(1);
-const pageOptions = ref({
+const pageOptions = ref<{ pageCount: number, sortBy: DataTableSortItem[] }>({
     pageCount: 1,
     sortBy: [{ key: 'count', order: 'desc' }],
 });
@@ -95,15 +96,15 @@ const pageOptions = ref({
 const selected = ref<Pathway | undefined>(undefined);
 
 const onRowClicked = (e: any, i: any) => {
-    selected.value = i.item.raw.id === selected.value?.id ? undefined : i.item.raw;
+    selected.value = i.item.id === selected.value?.id ? undefined : i.item;
     emits("update:model-value", selected.value);
 };
 
 const rowActive = (item: any) => {
-    return item.raw.id === selected.value?.id;
+    return item.id === selected.value?.id;
 };
 
-const headers = [
+const headers: DataTableHeader<PathwayTableItem>[] = [
     {
         title: "",
         align: "start",
