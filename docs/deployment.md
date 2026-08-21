@@ -2,7 +2,7 @@
 
 PathwayPilot runs on a single machine. nginx serves the built frontend and proxies
 `/api` to a Node process managed by systemd. A systemd timer refreshes the KEGG data
-monthly, on the first Monday.
+monthly, on the first Monday at 13:00.
 
 GitHub cannot reach the server, so **deploys are pull-based**: you run a script on the
 box and it fetches from GitHub. Nothing needs inbound SSH or a credential stored in the
@@ -40,6 +40,12 @@ through this server.
 
 Everything runs as an unprivileged `pathwaypilot` user that owns the checkout.
 
+> **The machine serving pathwaypilot.ugent.be today does not use these paths yet.** Its
+> nginx site is `pathwp-web` and its document root is `/var/www/pathwp-web/dist`, which is
+> what `deploy/nginx.conf.example` targets. The `root` in that file, the paths in the two
+> systemd units, and this table all have to name the same checkout — if the existing tree
+> stays where it is instead of moving to `/opt/pathwaypilot`, change them together.
+
 ## First-time setup
 
 Once per machine.
@@ -60,9 +66,10 @@ sudo cp /opt/pathwaypilot/deploy/pathwaypilot-refresh.service   /etc/systemd/sys
 sudo cp /opt/pathwaypilot/deploy/pathwaypilot-refresh.timer     /etc/systemd/system/
 sudo systemctl daemon-reload
 
-# 4. nginx
-sudo cp /opt/pathwaypilot/deploy/nginx.conf.example /etc/nginx/sites-available/pathwaypilot
-sudo ln -s /etc/nginx/sites-available/pathwaypilot /etc/nginx/sites-enabled/
+# 4. nginx — the site already exists as pathwp-web; keep the same name so the
+#    symlink in sites-enabled and the Certbot renewal hooks keep working.
+sudo cp /opt/pathwaypilot/deploy/nginx.conf.example /etc/nginx/sites-available/pathwp-web
+sudo ln -s /etc/nginx/sites-available/pathwp-web /etc/nginx/sites-enabled/   # already linked
 sudo nginx -t && sudo systemctl reload nginx
 
 # 5. First deploy — builds both halves and seeds backend/data (~3 min)
@@ -89,17 +96,28 @@ It is safe to re-run, and re-running with no new commits simply rebuilds.
 
 ## The KEGG data
 
-`backend/data/` is **not tracked in git**. It is roughly 8 MB of tables fetched from
-`rest.kegg.jp`, and it is server-side state rather than source.
+`backend/data/` is roughly 8 MB of tables fetched from `rest.kegg.jp`. A snapshot of it
+**is tracked in git**, so a fresh checkout starts without a refresh, but on the server
+those files are live state: the refresh timer rewrites them in place, which leaves the
+working tree permanently modified under `backend/data`. `deploy.sh` knows this — it
+ignores that directory when it checks the tree is clean, and copies the server's
+(newer) files back over anything a pull brings in.
 
-The timer refreshes it on the first Monday of each month at 03:00:
+The timer refreshes it on the first Monday of each month at 13:00:
 
 ```bash
 systemctl list-timers pathwaypilot-refresh.timer   # when it next runs
-systemd-analyze calendar 'Mon *-*-1..7 03:00'      # confirm the schedule reads right
+systemd-analyze calendar 'Mon *-*-1..7 13:00'      # confirm the schedule reads right
+timedatectl                                        # OnCalendar uses the system timezone
 sudo systemctl start pathwaypilot-refresh          # run it now
 journalctl -u pathwaypilot-refresh -n 50           # how the last run went
 ```
+
+The unit says `13:00` with no zone, which means 13:00 **local time on the server** — so
+`timedatectl` must report `Europe/Brussels` for that to be 13:00 in Brussels. On systemd
+252 and newer the zone can be pinned in the unit instead
+(`OnCalendar=Mon *-*-1..7 13:00 Europe/Brussels`); on older systemd that line does not
+parse and the timer will not load, so check `systemctl --version` before changing it.
 
 A run makes 19 sequential requests to KEGG and takes about three minutes. Each file is
 written to a temporary path and renamed into place, so an interrupted run cannot leave a
@@ -132,8 +150,9 @@ cd ../web && sudo -u pathwaypilot npm ci && sudo -u pathwaypilot npm run build
 sudo systemctl restart pathwaypilot-api
 ```
 
-`backend/data/` is untouched by a rollback, which is what you want — the data is not
-version-specific.
+A rollback does move `backend/data/` back to the snapshot committed at that revision.
+The data is not version-specific, so this only costs you freshness — run
+`sudo systemctl start pathwaypilot-refresh` afterwards if it matters.
 
 To get back onto the branch afterwards: `git checkout main`, then run `deploy.sh`.
 

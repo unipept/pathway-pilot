@@ -26,7 +26,11 @@ cd "$ROOT"
 # ---------------------------------------------------------------------------
 log "Checking the working tree is clean"
 # A deploy that quietly discards someone's hotfix is worse than one that stops.
-[ -z "$(git status --porcelain)" ] || die "working tree has local changes; commit, stash or revert them first"
+# backend/data is excluded: those files are tracked, but the refresh timer
+# rewrites them in place, so on a server that has ever refreshed they are
+# always modified. That is expected state, not an edit someone made.
+[ -z "$(git status --porcelain -- . ':(exclude)backend/data')" ] \
+    || die "working tree has local changes; commit, stash or revert them first"
 
 BEFORE="$(git rev-parse --short HEAD)"
 
@@ -34,7 +38,25 @@ BEFORE="$(git rev-parse --short HEAD)"
 log "Pulling $BRANCH"
 git fetch --quiet origin "$BRANCH"
 git checkout --quiet "$BRANCH"
+
+# Park the refreshed data outside git for the duration of the fast-forward:
+# otherwise a commit that touches backend/data cannot be merged over locally
+# modified files. The server's copy is newer than anything committed, so it
+# goes back afterwards.
+DATA_STASH=""
+if ! git diff --quiet -- backend/data; then
+    DATA_STASH="$(mktemp -d)"
+    cp -a backend/data/. "$DATA_STASH/"
+    git checkout --quiet -- backend/data
+fi
+
 git merge --ff-only --quiet "origin/$BRANCH" || die "cannot fast-forward $BRANCH; the local branch has diverged"
+
+if [ -n "$DATA_STASH" ]; then
+    cp -a "$DATA_STASH/." backend/data/
+    rm -rf "$DATA_STASH"
+    echo "    kept the server's refreshed backend/data"
+fi
 
 AFTER="$(git rev-parse --short HEAD)"
 if [ "$BEFORE" = "$AFTER" ]; then
@@ -56,13 +78,14 @@ npm prune --omit=dev
 
 # ---------------------------------------------------------------------------
 log "Seeding KEGG data if absent"
-# backend/data is server-side state, not tracked in git. On a fresh install it
-# does not exist, and the API cannot start without it.
+# backend/data ships in the repository, so a fresh checkout already has a
+# usable (if stale) snapshot and this is normally a no-op. It still matters if
+# the directory was ever emptied by hand: the API cannot start without it.
 if [ -z "$(ls -A data 2>/dev/null || true)" ]; then
     echo "    data/ is empty — running a full refresh (about three minutes)"
     npm run refresh-data
 else
-    echo "    data/ is present — leaving it to the weekly timer"
+    echo "    data/ is present — leaving it to the monthly timer"
 fi
 
 # ---------------------------------------------------------------------------
