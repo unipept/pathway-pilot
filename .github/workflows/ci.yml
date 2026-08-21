@@ -73,12 +73,18 @@ jobs:
         run: npm ci
 
       - name: Set up environment
-        run: cp .env.example .env
+        # backend/data is not tracked in git -- it is a cached copy of
+        # rest.kegg.jp seeded by `npm run refresh-data`, far too slow and too
+        # large for a smoke test. Generate a throwaway stand-in instead, so
+        # this job needs no network and no cache, and nothing that looks like
+        # KEGG data is committed. Drift against real KEGG is checked monthly
+        # by .github/workflows/kegg-refresh-check.yml.
+        run: |
+          npm run fixture
+          cp .env.example .env
+          sed -i 's|^DATA_DIR=.*|DATA_DIR=.fixture/|' .env
+          sed -i 's|^LINK_DIR=.*|LINK_DIR=.fixture/link/|' .env
 
-      # `npm run serve` is the documented way to start the backend
-      # (nodemon -> ts-node). We exercise that exact command rather than
-      # a plain `node` invocation so a broken ts-node/typescript toolchain
-      # fails CI instead of only surfacing at boot time for a developer.
       - name: Boot the backend and smoke test it
         run: |
           set -o pipefail
@@ -102,13 +108,29 @@ jobs:
             exit 1
           fi
 
-          status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/pathway/map00010)
+          # /mapping/ec/:id reads the data files and joins across five of them,
+          # so it exercises the parsers and the mapping layer. /pathway/:id
+          # would not -- it scrapes www.kegg.jp and touches no local data.
+          body=$(curl -s http://localhost:3000/mapping/ec/1.1.1.1)
           kill "$SERVER_PID" 2>/dev/null || true
 
-          if [ "$status" != "200" ]; then
-            echo "Expected HTTP 200 from /pathway/map00010, got $status"
-            cat server.log
-            exit 1
-          fi
+          echo "Response: $body"
 
-          echo "Backend booted and served /pathway/map00010 with $status"
+          for expected in '"K00001"' '"R00623"' '"map00010"' '"alcohol dehydrogenase"'; do
+            case "$body" in
+              *"$expected"*) ;;
+              *)
+                echo "Expected $expected in the /mapping/ec/1.1.1.1 response"
+                cat server.log
+                exit 1
+                ;;
+            esac
+          done
+
+          echo "Backend booted and resolved EC 1.1.1.1 across the fixture"
+
+      - name: Remove the generated fixture
+        # The runner is thrown away regardless, but keeping teardown explicit
+        # means the same two commands work locally without leaving files behind.
+        if: always()
+        run: npm run fixture -- --clean
