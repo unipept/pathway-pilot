@@ -64,44 +64,10 @@ describe('GET /mapping/ec/:ecNumber for an unknown id', () => {
     });
 });
 
-describe('GET /mapping/:type/:id for an unknown id', () => {
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
-
-    it('answers 404 for an unknown KO number', async () => {
-        vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-        const res = await request(app).get('/mapping/ko/K99999');
-
-        expect(res.status).toBe(404);
-    });
-
-    it('answers 404 for an unknown pathway id', async () => {
-        vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-        const res = await request(app).get('/mapping/pathway/map99999');
-
-        expect(res.status).toBe(404);
-    });
-
-    it('answers 404 for an unknown reaction id', async () => {
-        vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-        const res = await request(app).get('/mapping/reaction/R99999');
-
-        expect(res.status).toBe(404);
-    });
-
-    it('answers 404 for an unknown compound id', async () => {
-        vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-        const res = await request(app).get('/mapping/compound/C99999');
-
-        expect(res.status).toBe(404);
-    });
-});
-
+// The other four entity families' unknown-id cases live in
+// MappingRoute.test.ts, next to that family's known-id tests and asserting the
+// specific message as well as the status. Keeping a weaker copy here too would
+// mean two tests hitting the same URL with different expectations.
 describe('GET /mapping/ec/:ecNumber when the service throws an unexpected error', () => {
     afterEach(() => {
         vi.restoreAllMocks();
