@@ -12,8 +12,6 @@ PathwayPilot is available as a webapplication via [pathwaypilot.ugent.be](https:
 |---|---|
 | `web/`        | the Vue 3 + Vuetify frontend — this is the application users see |
 | `backend/`    | an Express + TypeScript API that proxies and caches KEGG data |
-| `script/`     | one-off Python tooling used to prepare KEGG import files |
-| `test-data/`  | sample input files in each supported format, useful for manual testing |
 
 The frontend talks to `backend/` for KEGG pathway maps and annotation mappings, and
 calls the [Unipept](https://unipept.ugent.be) and
