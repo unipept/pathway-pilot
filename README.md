@@ -1,5 +1,5 @@
 # PathwayPilot
-PathwayPilot is a taxonomy assignment and pathway visualisation tool for metaproteomics data. It combines Unipept [[1]](#1) and KEGG [[2]](#2) to provide pathway visualisations showing which pathways are represented in which species. It works both with peptide and protein input. 
+PathwayPilot [[1]](#1) is a taxonomy assignment and pathway visualisation tool for metaproteomics data. It combines Unipept [[2]](#2) and KEGG [[3]](#3) to provide pathway visualisations showing which pathways are represented in which species. It works both with peptide and protein input. 
 
 ## Usage
 PathwayPilot is available as a webapplication via [pathwaypilot.ugent.be](https://pathwaypilot.ugent.be).
@@ -64,6 +64,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## References
 <a id="1">[1]</a> 
-Unipept 4.0: Functional Analysis of Metaproteome Data. Singh et al., J. Proteome Res. 2019, 18, 2, 606–615, https://doi.org/10.1021/acs.jproteome.8b00716 \
+PathwayPilot: A User-Friendly Tool for Visualizing and Navigating Metabolic Pathways. Vande Moortele et al., Mol. Cell. Proteomics 2025, 24, 3, 100918, https://doi.org/10.1016/j.mcpro.2025.100918 \
 <a id="2">[2]</a> 
+Unipept 4.0: Functional Analysis of Metaproteome Data. Singh et al., J. Proteome Res. 2019, 18, 2, 606–615, https://doi.org/10.1021/acs.jproteome.8b00716 \
+<a id="3">[3]</a> 
 KEGG: Kyoto Encyclopedia of Genes and Genomes. Minoru Kanehisa, Susumu Goto, Nucleic Acids Research, Volume 28, Issue 1, 1 January 2000, Pages 27–30, https://doi.org/10.1093/nar/28.1.27
