@@ -4,8 +4,12 @@
  * Configures SASS variables and Vuetify overwrites
  */
 
-// https://next.vuetifyjs.com/features/sass-variables/`
-@use 'vuetify' with (
+// NOTE: this file is prepended to *every* Vuetify component stylesheet by
+// vite-plugin-vuetify. It must only pull in Vuetify's variables, never
+// 'vuetify' itself -- that entry point is the full framework stylesheet and
+// would be recompiled once per component.
+// https://next.vuetifyjs.com/features/sass-variables/
+@use 'vuetify/styles/settings' with (
     $container-max-widths: (
         'md': 1000px,
         'lg': 1000px,

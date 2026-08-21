@@ -23,13 +23,13 @@
 
         <template #item.name="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.raw.name }}
+                {{ item.name }}
             </div>
         </template>
 
         <template #item.rank="{ item }">
             <div :class="rowActive(item) ? 'active' : ''">
-                {{ item.raw.rank }}
+                {{ item.rank }}
             </div>
         </template>
 
@@ -46,6 +46,7 @@
 
 <script setup lang="ts">
 import Taxon from '@/logic/entities/Taxon';
+import type { DataTableHeader } from 'vuetify';
 import { ref, watch } from 'vue';
 import { TaxonTableItem } from './TaxonTableItem';
 
@@ -70,20 +71,20 @@ const pageOptions = ref({
 const selected = ref<Taxon[]>([]);
 
 const onRowClicked = (e: any, i: any) => {
-    if (selected.value.map((taxon: Taxon) => taxon.id).includes(i.item.raw.id)) {
-        selected.value = selected.value.filter((v) => v.id !== i.item.raw.id);
+    if (selected.value.map((taxon: Taxon) => taxon.id).includes(i.item.id)) {
+        selected.value = selected.value.filter((v) => v.id !== i.item.id);
     } else if (selected.value.length < props.max) {
-        selected.value = [...selected.value, i.item.raw];
+        selected.value = [...selected.value, i.item];
     }
 
     emits("update:model-value", selected.value);
 };
 
 const rowActive = (item: any) => {
-    return selected.value.map((taxon: Taxon) => taxon.id).includes(item.raw.id);
+    return selected.value.map((taxon: Taxon) => taxon.id).includes(item.id);
 };
 
-const headers = [
+const headers: DataTableHeader<TaxonTableItem>[] = [
     {
         title: "",
         align: "start",
