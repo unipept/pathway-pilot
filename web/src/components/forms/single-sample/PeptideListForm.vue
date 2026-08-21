@@ -25,22 +25,22 @@
 
             <p class="mt-3">
                 After uploading your data, it will undergo two seperate processing steps as follows:
-
-                <ol class="ms-5">
-                    <li class="ms-5 mt-1">
-                        <b>Analysis by the Unipept peptinfo endpoint:</b> Each line or peptide in 
-                        the dataset will be analysed using the <resource-link url="https://unipept.ugent.be/apidocs/peptinfo">Unipept peptinfo</resource-link> endpoint. 
-                        This analysis will result in a list of functional annotations and assign a taxon (LCA) to each peptide sequence. It is important to note that 
-                        <resource-link url="https://unipept.ugent.be/">Unipept</resource-link> is designed to process peptides with a length ranging from 5 to 50 amino acids. 
-                        Peptides that are shorter or longer  will be disregarded during the analysis.
-                    </li>
-                    <li class="ms-5 mt-1">
-                        <b>Mapping of functional annotations to Kegg pathways:</b> Each functional annotation obtained from the previous step will be further mapped onto one 
-                        or more <resource-link url="https://www.genome.jp/kegg/pathway.html">Kegg pathways</resource-link>. This step helps to establish associations between 
-                        the functional properties of peptides and the relevant pathways in the Kegg database.
-                    </li>
-                </ol>
             </p>
+
+            <ol class="ms-5">
+                <li class="ms-5 mt-1">
+                    <b>Analysis by the Unipept peptinfo endpoint:</b> Each line or peptide in 
+                    the dataset will be analysed using the <resource-link url="https://unipept.ugent.be/apidocs/peptinfo">Unipept peptinfo</resource-link> endpoint. 
+                    This analysis will result in a list of functional annotations and assign a taxon (LCA) to each peptide sequence. It is important to note that 
+                    <resource-link url="https://unipept.ugent.be/">Unipept</resource-link> is designed to process peptides with a length ranging from 5 to 50 amino acids. 
+                    Peptides that are shorter or longer  will be disregarded during the analysis.
+                </li>
+                <li class="ms-5 mt-1">
+                    <b>Mapping of functional annotations to Kegg pathways:</b> Each functional annotation obtained from the previous step will be further mapped onto one 
+                    or more <resource-link url="https://www.genome.jp/kegg/pathway.html">Kegg pathways</resource-link>. This step helps to establish associations between 
+                    the functional properties of peptides and the relevant pathways in the Kegg database.
+                </li>
+            </ol>
         </template>
     </upload-form>
 </template>
