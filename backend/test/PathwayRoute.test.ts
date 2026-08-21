@@ -3,12 +3,12 @@ import fs from 'fs';
 import path from 'path';
 import request from 'supertest';
 
-// This is a separate file from http.test.ts specifically so axios can be
-// mocked here: vi.mock is hoisted per test file, and http.test.ts imports
-// the real `app` -- and through it the real axios -- at module scope for its
-// own tests. Vitest gives every test file its own module registry, so
-// mocking axios and importing `app` here doesn't touch what http.test.ts (or
-// MappingRoute.test.ts) sees. Same mocking pattern as PathwayService.test.ts,
+// This is a separate file from MappingRoute.test.ts and app.test.ts
+// specifically so axios can be mocked here: vi.mock is hoisted per test file,
+// and those files import the real `app` -- and through it the real axios --
+// at module scope for their own tests. Vitest gives every test file its own
+// module registry, so mocking axios and importing `app` here doesn't touch
+// what they see. Same mocking pattern as PathwayService.test.ts,
 // which already covers findPathway's parsing; this only proves the
 // controller and route wire that service up correctly, nothing new about the
 // parsing itself.

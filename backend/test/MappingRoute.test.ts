@@ -1,13 +1,61 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import request from 'supertest';
 
-// Round one only drove /mapping/ec and /mapping/ec/:id through http.test.ts.
-// This walks the other four entity families -- ko, pathway, reaction,
-// compound -- through the same routes, each with a known id (200 + a body
-// assertion) and an unknown one (404 + the specific NotFoundError message).
-// app.ts never calls listen, so this exercises the real router chain without
-// opening a port -- same as http.test.ts.
+// Walks all five entity families -- ec, ko, pathway, reaction, compound --
+// through their /mapping/<family>/:id and /mapping/<family> routes, each with
+// a known id (200 + a body assertion) and an unknown one (404 + the specific
+// NotFoundError message). app.ts never calls listen, so this exercises the
+// real router chain without opening a port.
+//
+// The unknown-EC-id case also drives two more assertions that belong to
+// ErrorHandler's rendering contract rather than to this route -- that a 404
+// logs no stack, and that an unexpected error still answers 500 with the
+// generic body and logs one. Those live in ErrorHandler.test.ts instead of
+// here.
 import app from '../src/app';
+
+describe('GET /mapping/ec/:ecNumber', () => {
+    it('returns the mapping the fixture yields for a known EC number', async () => {
+        const res = await request(app).get('/mapping/ec/1.1.1.1');
+
+        expect(res.status).toBe(200);
+        // Asserted as a whole object rather than by substring: the `backend ·
+        // boots` job can only grep the response text, so it would pass with
+        // the right values in the wrong fields. Here we can do better.
+        expect(res.body).toEqual({
+            names: ['alcohol dehydrogenase', 'aldehyde reductase', 'ADH'],
+            pathways: [{ id: 'map00010', name: 'Glycolysis / Gluconeogenesis' }],
+            modules: [],
+            koNumbers: ['K00001'],
+            reactionIds: ['R00623']
+        });
+    });
+
+    describe('for an unknown EC number', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('answers 404 with the specific message', async () => {
+            vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            const res = await request(app).get('/mapping/ec/9.9.9.9');
+
+            expect(res.status).toBe(404);
+            expect(res.body).toEqual({ error: 'EC number not found' });
+        });
+    });
+});
+
+describe('GET /mapping/ec', () => {
+    it('returns an object keyed by EC number', async () => {
+        const res = await request(app).get('/mapping/ec');
+
+        expect(res.status).toBe(200);
+        expect(res.body['1.1.1.1']).toBeDefined();
+        expect(res.body['1.1.1.1'].names).toContain('alcohol dehydrogenase');
+    });
+});
 
 describe('GET /mapping/ko/:koNumber', () => {
     it('returns the mapping the fixture yields for a known KO number', async () => {
