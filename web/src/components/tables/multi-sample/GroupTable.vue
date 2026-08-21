@@ -1,5 +1,5 @@
 <template>
-    <v-card v-for="group, i in items" class="mb-3">
+    <v-card v-for="group, i in items" :key="group.name" class="mb-3">
         <v-card-text>
             <v-card
                 class="mb-2"

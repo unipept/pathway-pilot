@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title>Reaction: {{ reactionId }}</v-card-title>
         <v-card-subtitle class="mt-n2 text-subtitle-1">
-            <span v-for="name of reactionNames">
+            <span v-for="name of reactionNames" :key="name">
                 {{ name }} <br>
             </span>
         </v-card-subtitle>

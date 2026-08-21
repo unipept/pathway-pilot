@@ -2,7 +2,7 @@
     <div v-if="!empty" class="legend-container">
         <span v-if="title" class="text-h6">{{ title }}</span>
         <v-row class="pa-3">
-            <v-col v-for="item in items" class="pa-0" cols=4>
+            <v-col v-for="item in items" :key="item.label" class="pa-0" cols=4>
                 <v-icon :color="item.color">mdi-square</v-icon>
                 <span class="ms-3">{{ item.label }}</span>
             </v-col>
