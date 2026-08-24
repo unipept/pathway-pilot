@@ -13,9 +13,11 @@ import path from 'path';
 // replacement paths are built inside vi.hoisted, using require() rather than
 // the (not-yet-bound) ESM imports of fs/os/path.
 const { tmpDir, mockConfig } = vi.hoisted(() => {
+    /* eslint-disable @typescript-eslint/no-require-imports -- see the comment above: vi.hoisted runs before the ESM imports are bound. */
     const fs = require('fs');
     const os = require('os');
     const path = require('path');
+    /* eslint-enable @typescript-eslint/no-require-imports */
 
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kegg-fetcher-'));
     const dataFile = (name: string) => path.join(dir, name);

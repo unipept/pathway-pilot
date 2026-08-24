@@ -1,4 +1,3 @@
-import { KoMap } from "../mappings/KoMap";
 import NodeInformation from "./NodeInformation";
 import PathwayShape from "./PathwayShapes";
 
