@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 
 export default class ReaderMap<Key, Value> extends Map<Key, Value> {
     constructor() {

@@ -160,8 +160,8 @@ export default class KeggFetcher {
 
     private async fetchColumnFile(
         url: string, 
-        ltrans: (s: any) => string, 
-        rtrans: (s: any) => string,
+        ltrans: (s: string) => string, 
+        rtrans: (s: string) => string,
         filter: (s: string) => boolean = () => true
     ) {
         return await axios
