@@ -27,7 +27,7 @@ withDefaults(defineProps<Props>(), {
     alt: ''
 });
 
-const emits = defineEmits(['resize']);
+defineEmits(['resize']);
 
 const reactiveImage = ref<typeof VImg>();
 

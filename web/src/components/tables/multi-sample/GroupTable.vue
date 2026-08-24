@@ -49,7 +49,7 @@
 import Tooltip from '@/components/misc/Tooltip.vue';
 import { GroupTableItem } from './GroupTableItem';
 import SampleTable from './SampleTable.vue';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
 export interface Props {
     items: GroupTableItem[]

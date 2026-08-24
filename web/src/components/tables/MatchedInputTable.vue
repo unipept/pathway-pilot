@@ -48,7 +48,6 @@ import { MatchedInputTableItem } from './MatchedInputTableItem';
 import type { DataTableHeader, DataTableSortItem } from 'vuetify';
 import { computed, ref } from 'vue';
 import MatchedInputTableRow from './MatchedInputTableRow.vue';
-import Taxon from '@/logic/entities/Taxon';
 
 export interface Props {
     items: MatchedInputTableItem[];

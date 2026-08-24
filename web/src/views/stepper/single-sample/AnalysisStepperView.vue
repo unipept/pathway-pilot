@@ -49,7 +49,7 @@ export interface Props {
 
 defineProps<Props>();
 
-const { pathway, highlightedItems: highlightedTaxa } = storeToRefs(useVisualisationStore());
+const { pathway } = storeToRefs(useVisualisationStore());
 
 const selectedArea = ref<any>(undefined);
 const selectedCompound = ref<any>(undefined);

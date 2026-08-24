@@ -71,10 +71,9 @@
 <script setup lang="ts">
 import Pathway from '@/logic/entities/Pathway';
 import type { DataTableHeader, DataTableSortItem } from 'vuetify';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { PathwayTableItem } from '../selection/PathwayTableItem';
 import { groupColors, pathwayGroups } from "@/types/PathwayGroup";
-import WarningAlert from '@/components/alerts/WarningAlert.vue';
 
 export interface Props {
     modelValue: Pathway | undefined;
@@ -143,7 +142,7 @@ watch(() => props.modelValue, (value) => {
     selected.value = value;
 });
 
-watch(() => props.search, (value) => {
+watch(() => props.search, () => {
     page.value = 1;
 });
 </script>

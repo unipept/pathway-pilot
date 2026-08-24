@@ -11,7 +11,6 @@
 
 <script setup lang="ts">
 import { useKeggEntryLink } from '@/composables/useKeggEntryLink';
-import ResourceLink from '../misc/ResourceLink.vue';
 import EcIcon from '../icons/EcIcon.vue';
 
 export interface Props {

@@ -41,7 +41,6 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import Taxon from '@/logic/entities/Taxon';
 import useSingleSampleStore from '@/stores/sample/SingleSampleStore';
 import { storeToRefs } from 'pinia';
 import useVisualisationStore from '@/stores/VisualisationStore';
