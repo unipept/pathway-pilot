@@ -57,7 +57,6 @@ import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
 import { useMapAnnotator } from '@/composables/useMapAnnotator';
-import Taxon from '@/logic/entities/Taxon';
 import ImageControls from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
 import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';

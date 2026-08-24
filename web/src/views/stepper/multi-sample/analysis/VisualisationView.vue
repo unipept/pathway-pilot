@@ -60,13 +60,12 @@ import TaxonLegend from '@/components/legends/TaxonLegend.vue';
 import InteractiveImage from '@/components/images/InteractiveImage.vue';
 import WarningAlert from '@/components/alerts/WarningAlert.vue';
 import { storeToRefs } from 'pinia';
-import Pathway from '@/logic/entities/Pathway';
-import ImageControls, { ActiveButtonValue, ToggleButtonValue } from '@/components/images/ImageControls.vue';
+import ImageControls from '@/components/images/ImageControls.vue';
 import { usePngDownloader } from '@/composables/download/usePngDownloader';
 import AbundanceLegend from '@/components/legends/AbundanceLegend.vue';
 import { useDivergingLog } from '@/composables/useDivergingLog';
 import EcNumber from '@/logic/entities/EcNumber';
-import { intersection, max } from 'd3';
+import { intersection } from 'd3';
 import useGroupSampleStore from '@/stores/sample/GroupSampleStore';
 import FileFormat from '../../FileFormat';
 
@@ -212,7 +211,7 @@ const onRestore = () => {
     translate.value = { x: 0, y: 0 };
 }
 
-watch(pathway, async (pathway: Pathway | undefined) => {
+watch(pathway, async () => {
     onRestore();
     
     pngUrl.value = undefined;

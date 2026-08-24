@@ -128,8 +128,7 @@
 
 <script setup lang="ts">
 import useKeggStore from '@/stores/KeggStore';
-import { on } from 'events';
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 
 export interface Props {
     area: any
@@ -269,7 +268,7 @@ const onMouseEnter = (areaId: number) => {
     areaHover.value = areaId;
 }
 
-const onMouseLeave = (e: MouseEvent) => {
+const onMouseLeave = () => {
     areaHover.value = undefined;
 }
 
