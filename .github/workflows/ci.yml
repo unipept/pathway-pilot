@@ -33,6 +33,31 @@ jobs:
       - name: Typecheck and build
         run: npm run build
 
+  web-lint:
+    name: web · lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # --max-warnings 0 rather than a bare `npm run lint`: ESLint exits 0 on
+      # warnings, so without it this job could never fail and would gate
+      # nothing. Kept out of the package.json script so that `npm run lint`
+      # stays usable mid-change locally.
+      - name: Lint
+        run: npx eslint . --max-warnings 0
+
   backend:
     name: backend · typecheck
     runs-on: ubuntu-latest
@@ -53,6 +78,28 @@ jobs:
 
       - name: Typecheck
         run: npx tsc --noEmit
+
+  backend-lint:
+    name: backend · lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Same --max-warnings 0 reasoning as the web · lint job above.
+      - name: Lint
+        run: npx eslint . --max-warnings 0
 
   backend-test:
     name: backend · test

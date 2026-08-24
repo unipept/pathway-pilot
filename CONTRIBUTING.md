@@ -25,14 +25,15 @@ CI runs these on every pull request, so it is worth running them first:
 
 ```bash
 cd web     && npm ci && npm run build                 # vue-tsc typecheck + production build
+cd web     && npm run lint                            # eslint
 cd backend && npm ci && npx tsc --noEmit && npm test  # typecheck + vitest
+cd backend && npm run lint                            # eslint
 ```
 
-Lint is not yet part of CI, but new code should not add problems to it:
-
-```bash
-cd web && npm run lint
-```
+Both halves lint clean, and CI fails on warnings as well as errors
+(`eslint . --max-warnings 0`), so anything `npm run lint` prints will stop your
+pull request. `npm run lint:fix` handles the auto-fixable subset; unused
+variables and imports are not part of it and have to go by hand.
 
 ## Commit messages
 
