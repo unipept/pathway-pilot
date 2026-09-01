@@ -30,7 +30,7 @@
     "vitest": "^3.2.7"
   },
   "dependencies": {
-    "axios": "^1.2.5",
+    "axios": "^1.20.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
