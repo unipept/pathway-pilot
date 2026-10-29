@@ -120,7 +120,7 @@ jobs:
           docker run -d --name web -p 8080:8080 "ghcr.io/unipept/pathway-pilot-web:$VERSION"
           check() {
             for _ in $(seq 60); do
-              curl -sf -o /dev/null "$1" && return 0
+              curl -sf -o /dev/null --max-time 60 "$1" && return 0
               sleep 2
             done
             echo "$1 did not answer with 2xx"
@@ -130,6 +130,7 @@ jobs:
           }
           check http://localhost:3000/health
           check http://localhost:3000/mapping/ec/1.1.1.1
+          check http://localhost:3000/pathway/map00010
           check http://localhost:8080/
       - if: needs.version.outputs.push == 'true'
         uses: docker/login-action@v4
