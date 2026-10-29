@@ -23,3 +23,15 @@ updates:
       interval: monthly
       time: "13:00"
       timezone: "Europe/Brussels"
+
+  - package-ecosystem: docker
+    directories:
+      - "/backend"
+      - "/web"
+    schedule:
+      interval: monthly
+      time: "13:00"
+      timezone: "Europe/Brussels"
+    ignore:
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]

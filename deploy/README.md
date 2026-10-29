@@ -1,5 +1,18 @@
 # Deploying PathwayPilot
 
+## Container images
+
+The `Images` workflow builds two images:
+
+- `ghcr.io/unipept/pathway-pilot-api`: the backend on port 3000, with the KEGG data in the image.
+- `ghcr.io/unipept/pathway-pilot-web`: the frontend on port 8080. It calls the API at `/api` on its own host.
+
+A published release `vX.Y.Z` pushes the tags `X.Y.Z` and `X.Y`. On the first of each month, the
+latest release is built again with new KEGG data and pushed under the same tags. The proxy in front
+must send `/api/*` to the API with the `/api` prefix removed.
+
+The rest of this document describes the deployment without containers.
+
 PathwayPilot runs on a single machine. nginx serves the built frontend and proxies
 `/api` to a Node process managed by systemd. A systemd timer refreshes the KEGG data
 monthly, on the first Monday at 13:00.
