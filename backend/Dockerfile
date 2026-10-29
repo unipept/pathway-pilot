@@ -5,10 +5,8 @@ RUN npm ci
 COPY . .
 RUN cp .env.example .env && npm run build && npm prune --omit=dev
 
-# Each new DATA_VERSION fetches the KEGG data again.
 FROM build AS data
-ARG DATA_VERSION
-RUN echo "data version $DATA_VERSION" && npm run refresh-data
+RUN npm run refresh-data
 
 FROM node:22-alpine
 ENV NODE_ENV=production

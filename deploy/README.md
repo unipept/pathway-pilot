@@ -8,7 +8,8 @@ The `Images` workflow builds two images:
 - `ghcr.io/unipept/pathway-pilot-web`: the frontend on port 8080. It calls the API at `/api` on its own host.
 
 A published release `vX.Y.Z` pushes the tags `X.Y.Z` and `X.Y`. On the first of each month, the
-latest release is built again with new KEGG data and pushed under the same tags. The proxy in front
+latest release is built again with new KEGG data and pushed under the same tags. Older
+`X.Y` lines get no new data. The proxy in front
 must send `/api/*` to the API with the `/api` prefix removed.
 
 The rest of this document describes the deployment without containers.

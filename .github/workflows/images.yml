@@ -1,6 +1,7 @@
 # Builds the api and web images. A published release vX.Y.Z pushes the tags
 # X.Y.Z and X.Y. On the first of each month, the latest release is built again
-# with new KEGG data and pushed under the same tags.
+# with new KEGG data and pushed under the same tags. Pull requests reuse
+# cached KEGG data when there is some, and push nothing.
 
 name: Images
 
@@ -24,6 +25,8 @@ jobs:
   image:
     name: ${{ matrix.image }} image
     runs-on: ubuntu-latest
+    env:
+      IMAGE: ghcr.io/unipept/pathway-pilot-${{ matrix.image }}
     permissions:
       contents: read
       packages: write
@@ -34,7 +37,7 @@ jobs:
           - image: api
             context: backend
             port: 3000
-            check: /health
+            check: /mapping/ec/1.1.1.1
           - image: web
             context: web
             port: 8080
@@ -45,7 +48,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           EVENT: ${{ github.event_name }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
-          IMAGE: ghcr.io/unipept/pathway-pilot-${{ matrix.image }}
         run: |
           case "$EVENT" in
             pull_request)
@@ -61,7 +63,6 @@ jobs:
           fi
           {
             echo "ref=$tag"
-            echo "push=true"
             echo "image=$IMAGE:${tag#v}"
             echo "tags<<EOF"
             echo "$IMAGE:${tag#v}"
@@ -76,7 +77,7 @@ jobs:
         with:
           context: ${{ matrix.context }}
           platforms: linux/amd64
-          build-args: DATA_VERSION=${{ github.run_id }}
+          no-cache-filters: ${{ github.event_name != 'pull_request' && 'data' || '' }}
           labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
           pull: true
           cache-from: type=gha,scope=${{ matrix.image }}
@@ -84,21 +85,19 @@ jobs:
           load: true
           tags: ${{ steps.version.outputs.tags }}
       - name: Check that the image starts
-        env:
-          IMAGE: ${{ steps.version.outputs.image }}
         run: |
-          docker run -d --name app -p 8000:${{ matrix.port }} "$IMAGE"
+          docker run -d --name app -p 8000:${{ matrix.port }} "${{ steps.version.outputs.image }}"
           for _ in $(seq 60); do
             curl -sf -o /dev/null "http://localhost:8000${{ matrix.check }}" && exit 0
             sleep 2
           done
           docker logs app
           exit 1
-      - if: steps.version.outputs.push == 'true'
+      - if: github.event_name != 'pull_request'
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - if: steps.version.outputs.push == 'true'
-        run: docker push --all-tags "ghcr.io/unipept/pathway-pilot-${{ matrix.image }}"
+      - if: github.event_name != 'pull_request'
+        run: docker push --all-tags "$IMAGE"
