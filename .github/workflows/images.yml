@@ -1,0 +1,104 @@
+# Builds the api and web images. A published release vX.Y.Z pushes the tags
+# X.Y.Z and X.Y. On the first of each month, the latest release is built again
+# with new KEGG data and pushed under the same tags.
+
+name: Images
+
+on:
+  release:
+    types: [published]
+  pull_request:
+    paths:
+      - "*/Dockerfile"
+      - "*/.dockerignore"
+      - "web/nginx.conf"
+      - ".github/workflows/images.yml"
+  schedule:
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    name: ${{ matrix.image }} image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: api
+            context: backend
+            port: 3000
+            check: /health
+          - image: web
+            context: web
+            port: 8080
+            check: /
+    steps:
+      - id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          IMAGE: ghcr.io/unipept/pathway-pilot-${{ matrix.image }}
+        run: |
+          case "$EVENT" in
+            pull_request)
+              { echo "image=$IMAGE:test"; echo "tags=$IMAGE:test"; } >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+            release) tag=$RELEASE_TAG ;;
+            *) tag=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName) ;;
+          esac
+          if [[ ! $tag =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "Release tag $tag is not vX.Y.Z"
+            exit 1
+          fi
+          {
+            echo "ref=$tag"
+            echo "push=true"
+            echo "image=$IMAGE:${tag#v}"
+            echo "tags<<EOF"
+            echo "$IMAGE:${tag#v}"
+            echo "$IMAGE:${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.version.outputs.ref }}
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v7
+        with:
+          context: ${{ matrix.context }}
+          platforms: linux/amd64
+          build-args: DATA_VERSION=${{ github.run_id }}
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          pull: true
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+          load: true
+          tags: ${{ steps.version.outputs.tags }}
+      - name: Check that the image starts
+        env:
+          IMAGE: ${{ steps.version.outputs.image }}
+        run: |
+          docker run -d --name app -p 8000:${{ matrix.port }} "$IMAGE"
+          for _ in $(seq 60); do
+            curl -sf -o /dev/null "http://localhost:8000${{ matrix.check }}" && exit 0
+            sleep 2
+          done
+          docker logs app
+          exit 1
+      - if: steps.version.outputs.push == 'true'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - if: steps.version.outputs.push == 'true'
+        run: docker push --all-tags "ghcr.io/unipept/pathway-pilot-${{ matrix.image }}"
