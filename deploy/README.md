@@ -2,12 +2,22 @@
 
 ## Container images
 
-The `Images` workflow builds two images:
+The `Release` workflow builds two images:
 
 - `ghcr.io/unipept/pathway-pilot-api`: the backend on port 3000, with the KEGG data in the image.
 - `ghcr.io/unipept/pathway-pilot-web`: the frontend on port 8080. It calls the API at `/api` on its own host.
 
-A published release `vX.Y.Z` pushes the tags `X.Y.Z` and `X.Y`; a prerelease pushes nothing.
+To release, set the same version in `backend/package.json` and `web/package.json`
+(`npm version X.Y.Z --no-git-tag-version` in each), merge that to `main`, then tag it:
+
+```bash
+git tag vX.Y.Z origin/main && git push origin vX.Y.Z
+```
+
+The workflow checks that the tag is on `main` and matches both versions, runs CI, builds and
+checks both images, pushes them as `X.Y.Z` and `X.Y`, and creates the GitHub release. A tag
+`vX.Y.Z-<pre>` pushes only the image tag `X.Y.Z-<pre>` and creates a prerelease.
+
 On the first of each month, the highest release is built again with new KEGG data and pushed
 under the same tags. Older `X.Y` lines get no new data. The monthly build uses the Dockerfiles
 of that release, so a new base image version reaches the images with the next release.

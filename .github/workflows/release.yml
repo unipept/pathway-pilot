@@ -1,0 +1,181 @@
+# A release is the consequence of a tag. A tag vX.Y.Z on main that matches the
+# version in backend/ and web/ builds and checks both images, pushes them as
+# X.Y.Z and X.Y, and creates the GitHub release. A tag vX.Y.Z-<pre> pushes only
+# that exact image tag and creates a prerelease. On the first of each month,
+# the highest release is built again with new KEGG data and pushed under the
+# same tags. Pull requests that change the image files build without push.
+
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    paths:
+      - "*/Dockerfile"
+      - "*/.dockerignore"
+      - "web/nginx.conf"
+      - ".github/workflows/release.yml"
+  schedule:
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event_name == 'pull_request' && github.ref || 'publish' }}
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    name: Version
+    runs-on: ubuntu-latest
+    outputs:
+      ref: ${{ steps.version.outputs.ref }}
+      version: ${{ steps.version.outputs.version }}
+      minor: ${{ steps.version.outputs.minor }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+      push: ${{ steps.version.outputs.push }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          semver='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
+          case "$EVENT" in
+            pull_request)
+              echo "version=test" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+            push)
+              tag=$GITHUB_REF_NAME
+              if ! git merge-base --is-ancestor "$tag" "origin/$DEFAULT_BRANCH"; then
+                echo "::error::$tag is not on $DEFAULT_BRANCH. Merge first, then tag."
+                exit 1
+              fi
+              for dir in backend web; do
+                declared=$(jq -r .version "$dir/package.json")
+                if [ "v$declared" != "$tag" ]; then
+                  echo "::error::Tag $tag does not match the $dir/package.json version $declared."
+                  exit 1
+                fi
+              done
+              ;;
+            *)
+              tag=$(gh release list --repo "$GITHUB_REPOSITORY" --exclude-drafts --exclude-pre-releases \
+                --limit 100 --json tagName -q '.[].tagName' | grep -E "$semver" | sort -V | tail -1)
+              ;;
+          esac
+          {
+            echo "ref=$tag"
+            echo "version=${tag#v}"
+            echo "push=true"
+          } >> "$GITHUB_OUTPUT"
+          if [[ $tag =~ $semver ]]; then
+            echo "minor=${BASH_REMATCH[1]}.${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
+          elif [[ $tag =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-[0-9A-Za-z.-]+$ ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::Tag '$tag' is not vX.Y.Z or vX.Y.Z-<pre>."
+            exit 1
+          fi
+
+  test:
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/ci.yml
+
+  images:
+    name: Images
+    needs: [guard, test]
+    if: ${{ !failure() && !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      VERSION: ${{ needs.guard.outputs.version }}
+      MINOR: ${{ needs.guard.outputs.minor }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.guard.outputs.ref }}
+      - uses: docker/setup-buildx-action@v4
+      - name: Build the api image
+        uses: docker/build-push-action@v7
+        with:
+          context: backend
+          platforms: linux/amd64
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          pull: true
+          no-cache-filters: ${{ github.event_name != 'pull_request' && 'data' || '' }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+          load: true
+          tags: |
+            ghcr.io/unipept/pathway-pilot-api:${{ env.VERSION }}
+            ${{ env.MINOR && format('ghcr.io/unipept/pathway-pilot-api:{0}', env.MINOR) || '' }}
+      - name: Build the web image
+        uses: docker/build-push-action@v7
+        with:
+          context: web
+          platforms: linux/amd64
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          pull: true
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+          load: true
+          tags: |
+            ghcr.io/unipept/pathway-pilot-web:${{ env.VERSION }}
+            ${{ env.MINOR && format('ghcr.io/unipept/pathway-pilot-web:{0}', env.MINOR) || '' }}
+      - name: Check that the images start
+        run: |
+          docker run -d --name api -p 3000:3000 "ghcr.io/unipept/pathway-pilot-api:$VERSION"
+          docker run -d --name web -p 8080:8080 "ghcr.io/unipept/pathway-pilot-web:$VERSION"
+          check() {
+            for _ in $(seq 60); do
+              curl -sf -o /dev/null "$1" && return 0
+              sleep 2
+            done
+            echo "$1 did not answer with 2xx"
+            docker logs api
+            docker logs web
+            exit 1
+          }
+          check http://localhost:3000/health
+          check http://localhost:3000/mapping/ec/1.1.1.1
+          check http://localhost:8080/
+      - if: needs.guard.outputs.push == 'true'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - if: needs.guard.outputs.push == 'true'
+        run: |
+          docker push --all-tags ghcr.io/unipept/pathway-pilot-api
+          docker push --all-tags ghcr.io/unipept/pathway-pilot-web
+
+  release:
+    name: GitHub release
+    needs: [guard, images]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          PRERELEASE: ${{ needs.guard.outputs.prerelease }}
+        run: |
+          if [ "$PRERELEASE" = true ]; then
+            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes --prerelease
+          else
+            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes
+          fi
