@@ -14,11 +14,6 @@ on:
         type: string
         default: ""
   pull_request:
-    paths:
-      - "*/Dockerfile"
-      - "*/.dockerignore"
-      - "web/nginx.conf"
-      - ".github/workflows/images.yml"
   schedule:
     - cron: "0 3 1 * *"
   workflow_dispatch:
@@ -92,6 +87,7 @@ jobs:
           platforms: linux/amd64
           labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
           pull: true
+          build-args: KEGG_DATA=${{ github.event_name == 'pull_request' && 'fixture' || 'fetch' }}
           no-cache-filters: ${{ github.event_name != 'pull_request' && 'data' || '' }}
           cache-from: type=gha,scope=api
           cache-to: type=gha,mode=max,scope=api
@@ -115,6 +111,8 @@ jobs:
             ${{ env.MINOR && format('ghcr.io/unipept/pathway-pilot-web:{0}', env.MINOR) || '' }}
             ${{ env.MAJOR && format('ghcr.io/unipept/pathway-pilot-web:{0}', env.MAJOR) || '' }}
       - name: Check that the images start
+        env:
+          EVENT: ${{ github.event_name }}
         run: |
           docker run -d --name api -p 3000:3000 "ghcr.io/unipept/pathway-pilot-api:$VERSION"
           docker run -d --name web -p 8080:8080 "ghcr.io/unipept/pathway-pilot-web:$VERSION"
@@ -130,7 +128,8 @@ jobs:
           }
           check http://localhost:3000/health
           check http://localhost:3000/mapping/ec/1.1.1.1
-          check http://localhost:3000/pathway/map00010
+          # Pull requests use the fixture, and this route calls www.kegg.jp.
+          [ "$EVENT" = pull_request ] || check http://localhost:3000/pathway/map00010
           check http://localhost:8080/
       - if: needs.version.outputs.push == 'true'
         uses: docker/login-action@v4

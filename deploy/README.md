@@ -19,7 +19,8 @@ runs `Images`, which pushes `X.Y.Z`, `X.Y` and `X` when both images pass, and cr
 release. A tag `vX.Y.Z-<pre>` pushes only the image tag `X.Y.Z-<pre>` and creates a prerelease.
 
 On the first of each month, `Images` builds the highest release again with new KEGG data and
-pushes it under the same tags. On a pull request that changes the image files, it pushes nothing. Older `X.Y` lines get no new data. The monthly build uses the Dockerfiles
+pushes it under the same tags. On every pull request it builds and checks both images with the small test fixture
+instead of KEGG data, and pushes nothing. Older `X.Y` lines get no new data. The monthly build uses the Dockerfiles
 of that release, so a new base image version reaches the images with the next release.
 
 The proxy in front must send `/api/*` to the API with the `/api` prefix removed.
