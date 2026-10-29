@@ -1,0 +1,138 @@
+# Builds, checks and pushes the api and web images. See deploy/README.md.
+name: Images
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: true
+      version:
+        type: string
+        required: true
+      minor:
+        type: string
+        default: ""
+  pull_request:
+    paths:
+      - "*/Dockerfile"
+      - "*/.dockerignore"
+      - "web/nginx.conf"
+      - ".github/workflows/images.yml"
+  schedule:
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      ref: ${{ steps.version.outputs.ref }}
+      version: ${{ steps.version.outputs.version }}
+      minor: ${{ steps.version.outputs.minor }}
+      push: ${{ steps.version.outputs.push }}
+    steps:
+      - id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          INPUT_REF: ${{ inputs.ref }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_MINOR: ${{ inputs.minor }}
+        run: |
+          set -euo pipefail
+          if [ -n "$INPUT_VERSION" ]; then
+            ref=$INPUT_REF version=$INPUT_VERSION minor=$INPUT_MINOR
+          elif [ "$EVENT" = pull_request ]; then
+            echo "version=test" >> "$GITHUB_OUTPUT"
+            exit 0
+          else
+            ref=$(gh release list --repo "$GITHUB_REPOSITORY" --exclude-drafts --exclude-pre-releases \
+              --limit 100 --json tagName -q '.[].tagName' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+            if [[ ! $ref =~ ^v([0-9]+)\.([0-9]+)\.[0-9]+$ ]]; then
+              echo "::error::No vX.Y.Z release found."
+              exit 1
+            fi
+            version=${ref#v} minor=${BASH_REMATCH[1]}.${BASH_REMATCH[2]}
+          fi
+          {
+            echo "ref=$ref"
+            echo "version=$version"
+            echo "minor=$minor"
+            echo "push=true"
+          } >> "$GITHUB_OUTPUT"
+
+  images:
+    needs: version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    concurrency:
+      group: images-${{ needs.version.outputs.push == 'true' && 'publish' || github.ref }}
+      cancel-in-progress: false
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      MINOR: ${{ needs.version.outputs.minor }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.version.outputs.ref }}
+      - uses: docker/setup-buildx-action@v4
+      - name: Build the api image
+        uses: docker/build-push-action@v7
+        with:
+          context: backend
+          platforms: linux/amd64
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          pull: true
+          no-cache-filters: ${{ github.event_name != 'pull_request' && 'data' || '' }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+          load: true
+          tags: |
+            ghcr.io/unipept/pathway-pilot-api:${{ env.VERSION }}
+            ${{ env.MINOR && format('ghcr.io/unipept/pathway-pilot-api:{0}', env.MINOR) || '' }}
+      - name: Build the web image
+        uses: docker/build-push-action@v7
+        with:
+          context: web
+          platforms: linux/amd64
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          pull: true
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+          load: true
+          tags: |
+            ghcr.io/unipept/pathway-pilot-web:${{ env.VERSION }}
+            ${{ env.MINOR && format('ghcr.io/unipept/pathway-pilot-web:{0}', env.MINOR) || '' }}
+      - name: Check that the images start
+        run: |
+          docker run -d --name api -p 3000:3000 "ghcr.io/unipept/pathway-pilot-api:$VERSION"
+          docker run -d --name web -p 8080:8080 "ghcr.io/unipept/pathway-pilot-web:$VERSION"
+          check() {
+            for _ in $(seq 60); do
+              curl -sf -o /dev/null "$1" && return 0
+              sleep 2
+            done
+            echo "$1 did not answer with 2xx"
+            docker logs api
+            docker logs web
+            exit 1
+          }
+          check http://localhost:3000/health
+          check http://localhost:3000/mapping/ec/1.1.1.1
+          check http://localhost:8080/
+      - if: needs.version.outputs.push == 'true'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - if: needs.version.outputs.push == 'true'
+        run: |
+          docker push --all-tags ghcr.io/unipept/pathway-pilot-api
+          docker push --all-tags ghcr.io/unipept/pathway-pilot-web
