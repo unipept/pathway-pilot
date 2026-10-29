@@ -1,5 +1,32 @@
 # Deploying PathwayPilot
 
+## Container images
+
+The `Images` workflow builds, checks and pushes two images:
+
+- `ghcr.io/unipept/pathway-pilot-api`: the backend on port 3000, with the KEGG data in the image.
+- `ghcr.io/unipept/pathway-pilot-web`: the frontend on port 8080. It calls the API at `/api` on its own host.
+
+To release, set the same version in `backend/package.json` and `web/package.json`
+(`npm version X.Y.Z --no-git-tag-version` in each), merge that to `main`, then tag it:
+
+```bash
+git tag vX.Y.Z origin/main && git push origin vX.Y.Z
+```
+
+The `Release` workflow checks that the tag is on `main` and matches both versions, runs CI,
+runs `Images`, which pushes `X.Y.Z`, `X.Y` and `X` when both images pass, and creates the GitHub
+release. A tag `vX.Y.Z-<pre>` pushes only the image tag `X.Y.Z-<pre>` and creates a prerelease.
+
+On the first of each month, `Images` builds the highest release again with new KEGG data and
+pushes it under the same tags. On every pull request it builds and checks both images with the small test fixture
+instead of KEGG data, and pushes nothing. Older `X.Y` lines get no new data. The monthly build uses the Dockerfiles
+of that release, so a new base image version reaches the images with the next release.
+
+The proxy in front must send `/api/*` to the API with the `/api` prefix removed.
+
+The rest of this document describes the deployment without containers.
+
 PathwayPilot runs on a single machine. nginx serves the built frontend and proxies
 `/api` to a Node process managed by systemd. A systemd timer refreshes the KEGG data
 monthly, on the first Monday at 13:00.
