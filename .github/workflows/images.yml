@@ -1,7 +1,8 @@
-# Builds the api and web images. A published release vX.Y.Z pushes the tags
-# X.Y.Z and X.Y. On the first of each month, the latest release is built again
-# with new KEGG data and pushed under the same tags. Pull requests reuse
-# cached KEGG data when there is some, and push nothing.
+# Builds and checks the api and web images, and pushes both only when both
+# pass. A published release vX.Y.Z pushes the tags X.Y.Z and X.Y; a prerelease
+# pushes nothing. On the first of each month, the highest release is built
+# again with new KEGG data and pushed under the same tags. Pull requests push
+# nothing.
 
 name: Images
 
@@ -21,83 +22,102 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: images-${{ github.event_name == 'pull_request' && github.ref || 'publish' }}
+  cancel-in-progress: false
+
 jobs:
-  image:
-    name: ${{ matrix.image }} image
+  images:
     runs-on: ubuntu-latest
-    env:
-      IMAGE: ghcr.io/unipept/pathway-pilot-${{ matrix.image }}
     permissions:
       contents: read
       packages: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - image: api
-            context: backend
-            port: 3000
-            check: /mapping/ec/1.1.1.1
-          - image: web
-            context: web
-            port: 8080
-            check: /
     steps:
       - id: version
         env:
           GH_TOKEN: ${{ github.token }}
           EVENT: ${{ github.event_name }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
+          PRERELEASE: ${{ github.event.release.prerelease }}
         run: |
           case "$EVENT" in
             pull_request)
-              { echo "image=$IMAGE:test"; echo "tags=$IMAGE:test"; } >> "$GITHUB_OUTPUT"
+              echo "version=test" >> "$GITHUB_OUTPUT"
               exit 0
               ;;
             release) tag=$RELEASE_TAG ;;
-            *) tag=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName) ;;
+            *)
+              tag=$(gh release list --repo "$GITHUB_REPOSITORY" --exclude-drafts --exclude-pre-releases \
+                --limit 100 --json tagName -q '.[].tagName' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+              ;;
           esac
           if [[ ! $tag =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-            echo "Release tag $tag is not vX.Y.Z"
+            echo "Release tag '$tag' is not vX.Y.Z"
             exit 1
           fi
           {
             echo "ref=$tag"
-            echo "image=$IMAGE:${tag#v}"
-            echo "tags<<EOF"
-            echo "$IMAGE:${tag#v}"
-            echo "$IMAGE:${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
-            echo "EOF"
+            echo "version=${tag#v}"
+            echo "minor=${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+            [ "$PRERELEASE" = true ] || echo "push=true"
           } >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v7
         with:
           ref: ${{ steps.version.outputs.ref }}
       - uses: docker/setup-buildx-action@v4
-      - uses: docker/build-push-action@v7
+      - name: Build the api image
+        uses: docker/build-push-action@v7
         with:
-          context: ${{ matrix.context }}
+          context: backend
           platforms: linux/amd64
-          no-cache-filters: ${{ github.event_name != 'pull_request' && 'data' || '' }}
           labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
           pull: true
-          cache-from: type=gha,scope=${{ matrix.image }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+          no-cache-filters: ${{ github.event_name != 'pull_request' && 'data' || '' }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
           load: true
-          tags: ${{ steps.version.outputs.tags }}
-      - name: Check that the image starts
+          tags: |
+            ghcr.io/unipept/pathway-pilot-api:${{ steps.version.outputs.version }}
+            ${{ steps.version.outputs.minor && format('ghcr.io/unipept/pathway-pilot-api:{0}', steps.version.outputs.minor) || '' }}
+      - name: Build the web image
+        uses: docker/build-push-action@v7
+        with:
+          context: web
+          platforms: linux/amd64
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          pull: true
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+          load: true
+          tags: |
+            ghcr.io/unipept/pathway-pilot-web:${{ steps.version.outputs.version }}
+            ${{ steps.version.outputs.minor && format('ghcr.io/unipept/pathway-pilot-web:{0}', steps.version.outputs.minor) || '' }}
+      - name: Check that the images start
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          docker run -d --name app -p 8000:${{ matrix.port }} "${{ steps.version.outputs.image }}"
-          for _ in $(seq 60); do
-            curl -sf -o /dev/null "http://localhost:8000${{ matrix.check }}" && exit 0
-            sleep 2
-          done
-          docker logs app
-          exit 1
-      - if: github.event_name != 'pull_request'
+          docker run -d --name api -p 3000:3000 "ghcr.io/unipept/pathway-pilot-api:$VERSION"
+          docker run -d --name web -p 8080:8080 "ghcr.io/unipept/pathway-pilot-web:$VERSION"
+          check() {
+            for _ in $(seq 60); do
+              curl -sf -o /dev/null "$1" && return 0
+              sleep 2
+            done
+            echo "$1 did not answer with 2xx"
+            docker logs api
+            docker logs web
+            exit 1
+          }
+          check http://localhost:3000/health
+          check http://localhost:3000/mapping/ec/1.1.1.1
+          check http://localhost:8080/
+      - if: steps.version.outputs.push == 'true'
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - if: github.event_name != 'pull_request'
-        run: docker push --all-tags "$IMAGE"
+      - if: steps.version.outputs.push == 'true'
+        run: |
+          docker push --all-tags ghcr.io/unipept/pathway-pilot-api
+          docker push --all-tags ghcr.io/unipept/pathway-pilot-web
