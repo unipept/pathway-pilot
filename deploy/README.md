@@ -7,10 +7,12 @@ The `Images` workflow builds two images:
 - `ghcr.io/unipept/pathway-pilot-api`: the backend on port 3000, with the KEGG data in the image.
 - `ghcr.io/unipept/pathway-pilot-web`: the frontend on port 8080. It calls the API at `/api` on its own host.
 
-A published release `vX.Y.Z` pushes the tags `X.Y.Z` and `X.Y`. On the first of each month, the
-latest release is built again with new KEGG data and pushed under the same tags. Older
-`X.Y` lines get no new data. The proxy in front
-must send `/api/*` to the API with the `/api` prefix removed.
+A published release `vX.Y.Z` pushes the tags `X.Y.Z` and `X.Y`; a prerelease pushes nothing.
+On the first of each month, the highest release is built again with new KEGG data and pushed
+under the same tags. Older `X.Y` lines get no new data. The monthly build uses the Dockerfiles
+of that release, so a new base image version reaches the images with the next release.
+
+The proxy in front must send `/api/*` to the API with the `/api` prefix removed.
 
 The rest of this document describes the deployment without containers.
 
