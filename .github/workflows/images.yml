@@ -33,6 +33,7 @@ jobs:
       ref: ${{ steps.version.outputs.ref }}
       version: ${{ steps.version.outputs.version }}
       minor: ${{ steps.version.outputs.minor }}
+      major: ${{ steps.version.outputs.major }}
       push: ${{ steps.version.outputs.push }}
     steps:
       - id: version
@@ -62,6 +63,7 @@ jobs:
             echo "ref=$ref"
             echo "version=$version"
             echo "minor=$minor"
+            [ -z "$minor" ] || echo "major=${minor%%.*}"
             echo "push=true"
           } >> "$GITHUB_OUTPUT"
 
@@ -77,6 +79,7 @@ jobs:
     env:
       VERSION: ${{ needs.version.outputs.version }}
       MINOR: ${{ needs.version.outputs.minor }}
+      MAJOR: ${{ needs.version.outputs.major }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -96,6 +99,7 @@ jobs:
           tags: |
             ghcr.io/unipept/pathway-pilot-api:${{ env.VERSION }}
             ${{ env.MINOR && format('ghcr.io/unipept/pathway-pilot-api:{0}', env.MINOR) || '' }}
+            ${{ env.MAJOR && format('ghcr.io/unipept/pathway-pilot-api:{0}', env.MAJOR) || '' }}
       - name: Build the web image
         uses: docker/build-push-action@v7
         with:
@@ -109,6 +113,7 @@ jobs:
           tags: |
             ghcr.io/unipept/pathway-pilot-web:${{ env.VERSION }}
             ${{ env.MINOR && format('ghcr.io/unipept/pathway-pilot-web:{0}', env.MINOR) || '' }}
+            ${{ env.MAJOR && format('ghcr.io/unipept/pathway-pilot-web:{0}', env.MAJOR) || '' }}
       - name: Check that the images start
         run: |
           docker run -d --name api -p 3000:3000 "ghcr.io/unipept/pathway-pilot-api:$VERSION"

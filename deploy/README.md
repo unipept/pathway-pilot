@@ -15,7 +15,7 @@ git tag vX.Y.Z origin/main && git push origin vX.Y.Z
 ```
 
 The `Release` workflow checks that the tag is on `main` and matches both versions, runs CI,
-runs `Images`, which pushes `X.Y.Z` and `X.Y` when both images pass, and creates the GitHub
+runs `Images`, which pushes `X.Y.Z`, `X.Y` and `X` when both images pass, and creates the GitHub
 release. A tag `vX.Y.Z-<pre>` pushes only the image tag `X.Y.Z-<pre>` and creates a prerelease.
 
 On the first of each month, `Images` builds the highest release again with new KEGG data and
