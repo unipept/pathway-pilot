@@ -15,7 +15,8 @@ on:
         default: ""
   pull_request:
   schedule:
-    - cron: "0 3 1 * *"
+    - cron: "0 10 1 * *"
+      timezone: Europe/Brussels
   workflow_dispatch:
 
 permissions:
