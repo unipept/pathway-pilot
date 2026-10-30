@@ -8,6 +8,12 @@ updates:
       time: "13:00"
       timezone: "Europe/Brussels"
     open-pull-requests-limit: 99
+    groups:
+      # eslint and @eslint/js release together, majors included.
+      eslint:
+        patterns: ["eslint", "@eslint/*"]
+      npm-minor-patch:
+        update-types: [minor, patch]
 
   - package-ecosystem: npm
     directory: "/web"
@@ -16,6 +22,12 @@ updates:
       time: "13:00"
       timezone: "Europe/Brussels"
     open-pull-requests-limit: 99
+    groups:
+      # eslint and @eslint/js release together, majors included.
+      eslint:
+        patterns: ["eslint", "@eslint/*"]
+      npm-minor-patch:
+        update-types: [minor, patch]
 
   - package-ecosystem: github-actions
     directory: "/"
@@ -23,6 +35,9 @@ updates:
       interval: monthly
       time: "13:00"
       timezone: "Europe/Brussels"
+    groups:
+      actions:
+        patterns: ["*"]
 
   - package-ecosystem: docker
     directories:
